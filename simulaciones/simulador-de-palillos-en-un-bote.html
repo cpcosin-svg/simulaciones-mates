@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Simulador de palillos</title>
+<style>
+:root{--bg:#fafaf7;--fg:#222;--mut:#666;--card:#fff;--ac:#b5651d;--bad:#c0392b;--bd:#ddd;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1b19;--fg:#eee;--mut:#aaa;--card:#262622;--ac:#e0954d;--bad:#ff6b5b;--bd:#444}}
+:root[data-theme="dark"]{--bg:#1b1b19;--fg:#eee;--mut:#aaa;--card:#262622;--ac:#e0954d;--bad:#ff6b5b;--bd:#444}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--fg);font:15px system-ui,sans-serif;margin:0 auto;padding:12px;max-width:760px}
+h1{font-size:20px;margin:4px 0}h2{font-size:16px;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px;margin:12px 0}
+label{display:inline-block;margin:4px 10px 4px 0;color:var(--mut)}
+input[type=number]{width:70px;padding:3px}
+button{background:var(--ac);color:#fff;border:0;border-radius:6px;padding:7px 11px;margin:3px 3px 3px 0;font:inherit;cursor:pointer}
+canvas{width:100%;max-width:420px;height:auto;display:block;margin:8px auto}
+.mut{color:var(--mut)}.bad{color:var(--bad)}
+</style></head><body>
+<h1>🪥 Simulador de palillos en un bote</h1>
+<p class="mut">Vista des de dalt: cada cercle és la secció d'un palillo vertical.</p>
+<div class="card"><h2>1. Palillos verticals (cercles en un cercle)</h2>
+<label>Ø interior bote (mm) <input type="number" id="D" value="20" step="0.5" min="4"></label>
+<label>Ø palillo (mm) <input type="number" id="d" value="2" step="0.1" min="0.5"></label>
+<label>N <input type="number" id="n" value="0" min="1"></label><br>
+<button onclick="hex()">Hexagonal</button><button onclick="rnd()">Aleatori</button><button onclick="relax(4000)">Relaxa</button><button onclick="search()">Cerca màxim</button><button onclick="stopF=true">Atura</button>
+<canvas id="cv" width="420" height="420"></canvas>
+<div id="stats"></div><div id="st" class="mut"></div></div>
+<div class="card"><h2>2. Un palillo inclinat</h2>
+<label>Llargària ℓ (mm) <input type="number" id="l" value="65"></label>
+<label>Altura interior h (mm) <input type="number" id="h" value="70"></label><br>
+<label>Inclinació θ <input type="range" id="th" min="0" max="80" value="0"> <b id="thv">0°</b></label>
+<div id="tilt"></div></div>
+<script>
+const $=id=>document.getElementById(id);const cv=$('cv'),cx=cv.getContext('2d');
+let P=[],busy=false,stopF=false;
+const rr=()=>(+$('d').value)/(+$('D').value);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n);
+function hex(){const r=rr(),s=2*r,h=s*Math.sqrt(3)/2,m=Math.ceil(1/s)+2;let b=[];
+for(let i=0;i<8;i++)for(let j=0;j<8;j++){const ox=s*i/8,oy=h*j/8,c=[];
+for(let a=-m;a<=m;a++)for(let k=-m;k<=m;k++){const x=ox+s*(a+(k&1)/2),y=oy+h*k;if(Math.hypot(x,y)<=1-r+1e-9)c.push([x,y])}
+if(c.length>b.length)b=c}
+P=b;$('n').value=P.length;st('Hexagonal: '+P.length+' palillos.');draw();stats()}
+function rp(){const r=rr(),a=Math.random()*6.283,q=Math.sqrt(Math.random())*(1-r);return[q*Math.cos(a),q*Math.sin(a)]}
+function randomize(n){P=[];for(let i=0;i<n;i++)P.push(rp())}
+function setN(n){while(P.length>n)P.pop();while(P.length<n)P.push(rp())}
+function rnd(){randomize(Math.max(1,+$('n').value|0));relax(4000)}
+function step(){const r=rr();let m=0;
+for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const dx=P[j][0]-P[i][0],dy=P[j][1]-P[i][1],d=Math.hypot(dx,dy)||1e-9,o=2*r-d;
+if(o>0){m=Math.max(m,o);const f=o/2/d;P[i][0]-=dx*f;P[i][1]-=dy*f;P[j][0]+=dx*f;P[j][1]+=dy*f}}
+for(const p of P){const d=Math.hypot(p[0],p[1]),L=1-r;if(d>L){m=Math.max(m,d-L);p[0]*=L/d;p[1]*=L/d}}
+return m/r}
+function relax(mx){setN(Math.max(1,+$('n').value|0));return new Promise(res=>{let it=0;
+(function f(){for(let k=0;k<40;k++){const m=step();it++;
+if(m<1e-4){draw();stats();st('Disposició vàlida amb '+P.length+' palillos.');return res(true)}
+if(it>=mx||stopF){draw();stats();st('Encara hi ha solapaments (en roig).');return res(false)}}
+draw();requestAnimationFrame(f)})()})}
+async function search(){if(busy)return;busy=true;stopF=false;
+if(!await relax(3000)){st('Redueix N fins que siga vàlid i torna-ho a provar.');busy=false;return}
+let good=P.map(p=>p.slice());
+while(!stopF){const n=good.length+1;P=good.map(p=>p.slice());$('n').value=n;let c=await relax(4000);
+for(let t=0;!c&&t<8&&!stopF;t++){randomize(n);c=await relax(4000)}
+if(c)good=P.map(p=>p.slice());else break}
+P=good;$('n').value=P.length;draw();stats();
+st(stopF?'Aturat.':'No trobe cap disposició amb '+(good.length+1)+' (no vol dir que siga impossible).');busy=false}
+function draw(){const S=420,c=S/2,R=c-8,r=rr()*R;cx.clearRect(0,0,S,S);
+cx.strokeStyle=css('--fg');cx.lineWidth=2;cx.beginPath();cx.arc(c,c,R,0,7);cx.stroke();
+const t=2*rr()*(1-1e-3);
+P.forEach((p,i)=>{let bad=Math.hypot(p[0],p[1])>1-rr()+1e-3;
+for(let j=0;j<P.length&&!bad;j++)if(j!==i&&Math.hypot(p[0]-P[j][0],p[1]-P[j][1])<t)bad=true;
+cx.fillStyle=css(bad?'--bad':'--ac');cx.globalAlpha=.75;cx.beginPath();cx.arc(c+p[0]*R,c+p[1]*R,r,0,7);cx.fill();cx.globalAlpha=1})}
+function stats(){const r=rr(),n=P.length,b=0.9069/(r*r);
+$('stats').innerHTML=`R/r = ${(1/r).toFixed(2)} · Densitat = ${(n*r*r).toFixed(3)} · Cota N ≲ 0,9069·(R/r)² = ${b.toFixed(1)} · Eficiència = ${(100*n/b).toFixed(0)} %`}
+function st(s){$('st').textContent=s}
+function tilt(){const l=+$('l').value,h=+$('h').value,d=+$('d').value,D=+$('D').value,a=$('th').value*Math.PI/180;
+$('thv').textContent=$('th').value+'°';
+const v=l*Math.cos(a)+d*Math.sin(a),o=l*Math.sin(a)+d*Math.cos(a);
+$('tilt').innerHTML=`Extensió vertical: <b>${v.toFixed(1)} mm</b> (bote ${h}) ${v<=h?'✔':'<span class="bad">✘ no cap</span>'}<br>
+Extensió horitzontal: <b>${o.toFixed(1)} mm</b> (diàmetre ${D}) ${o<=D?'✔':'<span class="bad">✘ no cap</span>'}<br>
+Àrea de la secció horitzontal: <b>×${(1/Math.cos(a)).toFixed(3)}</b> respecte al palillo vertical (elipse de semieixos r i r/cosθ)`}
+['D','d'].forEach(i=>$(i).addEventListener('input',()=>{draw();stats();tilt()}));
+['l','h','th'].forEach(i=>$(i).addEventListener('input',tilt));
+hex();tilt();
+</script></body></html>
