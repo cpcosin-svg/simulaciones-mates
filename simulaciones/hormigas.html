@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio de hormigas — Simulación e investigación</title>
+<style>
+  :root { --ink:#20302a; --muted:#68756d; --paper:#f5f7f0; --panel:#ffffff; --line:#dce4d8; --green:#456c43; --green2:#dce9d2; --gold:#d99b25; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,sans-serif; background:var(--paper); color:var(--ink); }
+  header { padding:22px clamp(16px,3vw,36px) 14px; max-width:1500px; margin:auto; }
+  h1 { margin:0 0 5px; font-size:clamp(1.5rem,3vw,2.2rem); letter-spacing:-.03em; }
+  header p { margin:0; color:var(--muted); }
+  main { display:grid; grid-template-columns:minmax(0,1.8fr) minmax(280px,.8fr); gap:16px; max-width:1500px; margin:auto; padding:0 clamp(12px,3vw,36px) 30px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:18px; overflow:hidden; box-shadow:0 6px 22px #21301b0a; }
+  .canvas-head { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .canvas-head strong { font-size:1rem; }
+  .status { display:inline-flex; align-items:center; gap:7px; color:var(--muted); font-size:.86rem; }
+  .dot { width:8px; height:8px; border-radius:50%; background:#9ca69a; }
+  .dot.live { background:#3b9c54; box-shadow:0 0 0 4px #3b9c541c; }
+  #world { width:100%; display:block; background:#eaf1df; aspect-ratio: 1.45 / 1; }
+  .legend { display:flex; flex-wrap:wrap; gap:14px; padding:11px 16px; border-top:1px solid var(--line); font-size:.8rem; color:var(--muted); }
+  .legend span { display:flex; align-items:center; gap:6px; }
+  .swatch { width:12px;height:12px;border-radius:50%;display:inline-block; }
+  .side { padding:18px; }
+  .side h2 { font-size:1.08rem; margin:0 0 16px; }
+  .control { margin:0 0 20px; }
+  .labelrow { display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:8px; }
+  label { font-weight:650; font-size:.92rem; }
+  output { font-variant-numeric:tabular-nums; font-weight:750; color:var(--green); }
+  input[type=range] { width:100%; accent-color:var(--green); }
+  .rangeends { display:flex; justify-content:space-between; color:var(--muted); font-size:.75rem; }
+  .actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px; }
+  button { border:1px solid var(--line); border-radius:10px; padding:11px 12px; font:inherit; font-weight:700; cursor:pointer; background:#fff; color:var(--ink); }
+  button.primary { background:var(--green); color:white; border-color:var(--green); }
+  button:hover { filter:brightness(.97); }
+  button:focus-visible,input:focus-visible { outline:3px solid #8bbd80; outline-offset:2px; }
+  .stats { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:18px; }
+  .stat { background:#f6f8f3; border:1px solid #e6ece1; padding:12px; border-radius:12px; }
+  .stat small { color:var(--muted); display:block; font-size:.76rem; margin-bottom:5px; }
+  .stat strong { font-size:1.25rem; font-variant-numeric:tabular-nums; }
+  .note { color:var(--muted); font-size:.82rem; line-height:1.45; margin:14px 0 0; }
+  .below { max-width:1500px; padding:0 clamp(12px,3vw,36px) 30px; margin:auto; }
+  .research-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .research { padding:20px; }
+  .research h2 { margin:0 0 8px; font-size:1.2rem; }
+  .research p { color:var(--muted); line-height:1.5; font-size:.9rem; }
+  .lab-controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0; }
+  .field label { display:block; margin-bottom:6px; }
+  select, textarea, .field input { width:100%; border:1px solid var(--line); border-radius:9px; padding:10px; font:inherit; background:#fff; color:var(--ink); }
+  textarea { min-height:76px; resize:vertical; }
+  .wide { grid-column:1/-1; }
+  .table-wrap { overflow-x:auto; margin-top:14px; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th,td { padding:9px 8px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th { color:var(--muted); font-weight:700; }
+  .lab-status { background:#f6f8f3; padding:10px 12px; border-radius:10px; font-size:.88rem; }
+  .challenge-list { display:grid; gap:10px; margin:14px 0; }
+  .challenge { padding:12px; border:1px solid var(--line); border-radius:12px; background:#fbfcf9; }
+  .challenge strong { display:block; margin-bottom:4px; }
+  .challenge p { margin:4px 0 0; }
+  .saved-note { font-size:.84rem; border-left:3px solid var(--green); padding:8px 10px; margin-top:10px; background:#f6f8f3; }
+  .teacher-panel { margin-top:16px; padding:20px; }
+  .teacher-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:14px; }
+  .teacher-card { border:1px solid var(--line); border-radius:13px; padding:14px; background:#fbfcf9; }
+  .teacher-card h3 { margin:0 0 8px; font-size:1rem; }
+  .teacher-card p, .teacher-card li { color:var(--muted); font-size:.9rem; line-height:1.5; }
+  .checklist { display:grid; gap:9px; margin-top:10px; }
+  .checkline { display:flex; gap:9px; align-items:flex-start; font-size:.9rem; line-height:1.4; }
+  .checkline input { margin-top:4px; accent-color:var(--green); }
+  .teacher-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .rubric td, .rubric th { white-space:normal; vertical-align:top; }
+  .progress-track { height:8px; background:#e8eee3; border-radius:99px; overflow:hidden; margin:10px 0; }
+  .progress-fill { height:100%; width:0; background:var(--green); transition:width .2s; }
+  @media(max-width:850px) { .teacher-grid { grid-template-columns:1fr; } }
+  #resultsChart { width:100%; height:210px; display:block; margin-top:8px; }
+  @media(max-width:850px) { .research-grid { grid-template-columns:1fr; } .lab-controls { grid-template-columns:1fr; } .wide { grid-column:auto; } }
+  details { background:white; border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  summary { font-weight:750; cursor:pointer; }
+  details p, details li { color:var(--muted); line-height:1.55; font-size:.9rem; }
+  @media(max-width:850px) { main { grid-template-columns:1fr; } #world { aspect-ratio:1.1/1; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Laboratorio de hormigas</h1>
+  <p>Simula, experimenta y formula conclusiones sobre el comportamiento colectivo.</p>
+</header>
+<main>
+  <section class="panel" aria-label="Entorno de simulación">
+    <div class="canvas-head">
+      <strong>La colonia en movimiento</strong>
+      <span class="status"><i class="dot" id="statusDot"></i><span id="statusText">En pausa</span></span>
+    </div>
+    <canvas id="world" width="900" height="620" aria-label="Vista animada del hormiguero, las hormigas, las fuentes de alimento y los rastros"></canvas>
+    <div class="legend">
+      <span><i class="swatch" style="background:#79563b"></i>Hormiguero</span>
+      <span><i class="swatch" style="background:#30392c"></i>Hormigas</span>
+      <span><i class="swatch" style="background:#d99b25"></i>Alimento</span>
+      <span><i class="swatch" style="background:#b96b37"></i>Feromona intensa</span>
+    </div>
+  </section>
+  <aside class="panel side">
+    <h2>Parámetros de la colonia</h2>
+    <div class="control">
+      <div class="labelrow"><label for="antCount">Número de hormigas</label><output id="antOut">100</output></div>
+      <input id="antCount" type="range" min="10" max="300" step="10" value="100">
+      <div class="rangeends"><span>10</span><span>300</span></div>
+    </div>
+    <div class="control">
+      <div class="labelrow"><label for="latency">Latencia de feromona</label><output id="latOut">40 s</output></div>
+      <input id="latency" type="range" min="5" max="120" step="5" value="40">
+      <div class="rangeends"><span>5 s</span><span>120 s</span></div>
+    </div>
+    <div class="control">
+      <div class="labelrow"><label for="foodCount">Unidades iniciales de alimento</label><output id="foodOut">90</output></div>
+      <input id="foodCount" type="range" min="30" max="180" step="10" value="90">
+      <div class="rangeends"><span>30</span><span>180</span></div>
+    </div>
+    <div class="control">
+      <div class="labelrow"><label for="simSpeed">Velocidad de simulación</label><output id="speedOut">1×</output></div>
+      <input id="simSpeed" type="range" min="1" max="5" step="1" value="1">
+      <div class="rangeends"><span>1×</span><span>5×</span></div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="startBtn">▶ Iniciar</button>
+      <button id="resetBtn">↻ Reiniciar</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><small>Tiempo simulado</small><strong id="timeStat">0.0 s</strong></div>
+      <div class="stat"><small>Alimento restante</small><strong id="remainingStat">90</strong></div>
+      <div class="stat"><small>Entregado al nido</small><strong id="collectedStat">0</strong></div>
+      <div class="stat"><small>Viajes completados</small><strong id="tripsStat">0</strong></div>
+    </div>
+    <p class="note" id="message">Pulsa «Iniciar» para observar la exploración. Puedes cambiar los parámetros y reiniciar para comparar configuraciones.</p>
+  </aside>
+</main>
+<section class="below">
+  <div class="research-grid">
+    <section class="panel research" aria-label="Laboratorio estadístico">
+      <h2>1. Laboratorio estadístico</h2>
+      <p>Compara configuraciones mediante varias ejecuciones independientes. Cada repetición empieza desde cero y usa una semilla aleatoria implícita distinta.</p>
+      <div class="lab-controls">
+        <div class="field wide"><label for="experiment">¿Qué variable quieres investigar?</label>
+          <select id="experiment">
+            <option value="ants">Número de hormigas (50, 100, 200)</option>
+            <option value="latency">Latencia de feromona (10, 40, 100 s)</option>
+            <option value="food">Cantidad de alimento (60, 90, 150)</option>
+          </select>
+        </div>
+        <div class="field"><label for="replicates">Repeticiones por configuración</label>
+          <select id="replicates"><option value="1">1 repetición</option><option value="3" selected>3 repeticiones</option><option value="5">5 repeticiones</option></select>
+        </div>
+        <div class="field"><label for="labSpeed">Velocidad durante el experimento</label>
+          <select id="labSpeed"><option value="1">Normal</option><option value="2" selected>Rápida</option><option value="4">Muy rápida</option></select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="runExperiment">▶ Ejecutar experimento</button>
+        <button id="clearResults">Borrar resultados</button>
+      </div>
+      <p class="lab-status" id="labStatus" role="status">Prepara un experimento. La simulación principal no se modificará hasta que empiece cada repetición.</p>
+      <div class="table-wrap"><table><thead><tr><th>Variable</th><th>Repetición</th><th>Tiempo (s)</th><th>Viajes</th><th>Estado</th></tr></thead><tbody id="resultsBody"><tr><td colspan="5">Todavía no hay resultados.</td></tr></tbody></table></div>
+      <canvas id="resultsChart" width="700" height="210" aria-label="Gráfica del tiempo medio de finalización por configuración"></canvas>
+      <div class="actions"><button id="exportResults">Descargar CSV</button><button id="summaryResults">Resumen estadístico</button></div>
+      <p class="note" id="summaryText">La media permite comparar tendencias, pero con pocas repeticiones la variabilidad puede ser grande.</p>
+    </section>
+    <section class="panel research" aria-label="Retos de investigación">
+      <h2>2. Retos de investigación</h2>
+      <p>Elige un reto, escribe una predicción antes de experimentar y registra después lo que has observado. No hay que adivinar: hay que justificarlo con datos.</p>
+      <div class="field"><label for="challengeSelect">Reto</label>
+        <select id="challengeSelect">
+          <option value="0">Reto 1 · ¿Más hormigas significa acabar antes?</option>
+          <option value="1">Reto 2 · ¿La feromona debe durar mucho?</option>
+          <option value="2">Reto 3 · ¿Más alimento aumenta proporcionalmente el tiempo?</option>
+          <option value="3">Reto 4 · ¿Qué configuración es más eficiente?</option>
+          <option value="4">Reto 5 · ¿Los resultados son siempre iguales?</option>
+        </select>
+      </div>
+      <div class="challenge-list" id="challengePrompt"><div class="challenge"><strong>Pregunta investigable</strong><p>¿Qué pasará con el tiempo de recogida si aumentamos el número de hormigas y mantenemos todo lo demás igual?</p></div><div class="challenge"><strong>Diseño justo</strong><p>Compara 50, 100 y 200 hormigas, con la misma cantidad de alimento y la misma latencia. Repite cada caso al menos tres veces.</p></div></div>
+      <div class="field"><label for="hypothesis">Mi hipótesis (antes de probar)</label><textarea id="hypothesis" placeholder="Creo que… porque…"></textarea></div>
+      <div class="field" style="margin-top:10px"><label for="observations">Datos y observaciones</label><textarea id="observations" placeholder="He observado que… Los datos muestran…"></textarea></div>
+      <div class="field" style="margin-top:10px"><label for="conclusion">Conclusión razonada</label><textarea id="conclusion" placeholder="Por tanto, los resultados apoyan / no apoyan mi hipótesis porque…"></textarea></div>
+      <div class="actions" style="margin-top:12px"><button class="primary" id="saveChallenge">Guardar respuesta</button><button id="exportChallenge">Descargar ficha</button></div>
+      <div id="savedChallenges" aria-live="polite"></div>
+    </section>
+  </div>
+  <section class="panel teacher-panel" aria-label="Modo docente">
+    <h2>3. Modo docente · Diseña una investigación para el aula</h2>
+    <p>Prepara una sesión guiada, adapta la exigencia al grupo y genera una ficha imprimible. La secuencia propone que el alumnado prediga, experimente, analice y argumente con datos.</p>
+    <div class="lab-controls">
+      <div class="field"><label for="teacherStage">Nivel del grupo</label><select id="teacherStage"><option value="eso1">1.º–2.º ESO · Exploración guiada</option><option value="eso3">3.º–4.º ESO · Variables y estadística</option><option value="bach">Bachillerato · Modelización y crítica</option></select></div>
+      <div class="field"><label for="teacherDuration">Duración</label><select id="teacherDuration"><option value="30">30 minutos</option><option value="50" selected>50 minutos</option><option value="100">Dos sesiones · 100 minutos</option></select></div>
+      <div class="field wide"><label for="teacherFocus">Pregunta central de la sesión</label><select id="teacherFocus"><option value="ants">¿Más hormigas permiten recoger antes?</option><option value="latency">¿Cómo influye la duración de la feromona?</option><option value="food">¿El tiempo crece proporcionalmente al alimento?</option><option value="variability">¿Cuánto varían los resultados entre repeticiones?</option></select></div>
+    </div>
+    <div class="teacher-grid">
+      <div class="teacher-card">
+        <h3>Secuencia didáctica</h3>
+        <p id="teacherPlanIntro">Sesión de 50 minutos: predicción, experimento controlado, análisis y conclusión.</p>
+        <div class="progress-track"><div class="progress-fill" id="teacherProgress"></div></div>
+        <p id="teacherProgressText">0 de 5 pasos completados</p>
+        <div class="checklist" id="teacherChecklist">
+          <label class="checkline"><input type="checkbox" value="0"> <span><strong>1. Observar</strong> · Mirar la simulación sin cambiar parámetros y describir lo que ocurre.</span></label>
+          <label class="checkline"><input type="checkbox" value="1"> <span><strong>2. Formular una hipótesis</strong> · Escribir una predicción y justificarla.</span></label>
+          <label class="checkline"><input type="checkbox" value="2"> <span><strong>3. Diseñar el experimento</strong> · Cambiar una sola variable y mantener las demás constantes.</span></label>
+          <label class="checkline"><input type="checkbox" value="3"> <span><strong>4. Recoger y analizar datos</strong> · Hacer varias repeticiones, comparar medias y dispersión.</span></label>
+          <label class="checkline"><input type="checkbox" value="4"> <span><strong>5. Argumentar</strong> · Concluir usando datos y mencionar una limitación del modelo.</span></label>
+        </div>
+      </div>
+      <div class="teacher-card">
+        <h3>Orientaciones para el profesor</h3>
+        <ul id="teacherAdvice"><li>Empieza con una predicción individual antes de mostrar resultados.</li><li>Insiste en que solo se cambie una variable cada vez.</li><li>Con pocas repeticiones, las conclusiones deben ser provisionales.</li></ul>
+        <h3>Objetivos de aprendizaje</h3>
+        <ul id="teacherObjectives"><li>Distinguir variable independiente y variable medida.</li><li>Organizar datos y comparar resultados.</li><li>Justificar una conclusión con evidencias.</li></ul>
+        <p class="saved-note" id="teacherLevelNote">Nivel inicial: prioriza descripciones, tablas sencillas y comparaciones cualitativas.</p>
+      </div>
+    </div>
+    <div class="teacher-card" style="margin-top:14px">
+      <h3>Rúbrica rápida de evaluación</h3>
+      <div class="table-wrap"><table class="rubric"><thead><tr><th>Criterio</th><th>1 · Inicial</th><th>2 · En desarrollo</th><th>3 · Logrado</th></tr></thead><tbody id="teacherRubric"><tr><td>Hipótesis</td><td>Predicción sin razón.</td><td>Predicción con explicación parcial.</td><td>Predicción clara y justificada.</td></tr><tr><td>Diseño</td><td>Cambia varias cosas a la vez.</td><td>Controla algunas variables.</td><td>Cambia una variable y controla las demás.</td></tr><tr><td>Datos</td><td>Observaciones vagas.</td><td>Registra datos parcialmente.</td><td>Tabla clara y comparación cuantitativa.</td></tr><tr><td>Conclusión</td><td>No usa evidencias.</td><td>Menciona algún dato.</td><td>Responde la pregunta con datos y reconoce límites.</td></tr></tbody></table></div>
+    </div>
+    <div class="teacher-actions"><button class="primary" id="printWorksheet">Imprimir / guardar ficha del alumnado</button><button id="resetTeacherChecks">Reiniciar lista de pasos</button><button id="teacherCopyGuide">Descargar guía docente</button></div>
+    <p class="note">La lista de pasos es una ayuda para organizar la clase, no una calificación automática. La ficha se genera en una página imprimible con espacio para hipótesis, tabla de resultados y conclusión.</p>
+  </section>
+  <details>
+
+    <summary>¿Cómo funciona este modelo?</summary>
+    <p>Las hormigas exploran con movimiento parcialmente aleatorio. Al encontrar alimento, lo recogen y regresan al hormiguero; durante el regreso dejan un rastro visible cuya intensidad se desvanece. El rastro también guarda una orientación aproximada hacia la fuente, para que las hormigas que exploran puedan seguirlo hacia el alimento sin dejar de explorar.</p>
+    <ul>
+      <li>La feromona se evapora gradualmente: su intensidad cae al 5 % aproximadamente al alcanzar la latencia elegida.</li>
+      <li>El alimento aparece en tres fuentes. Cada unidad requiere un viaje de ida y vuelta.</li>
+      <li>El tiempo se mide en segundos simulados y no depende directamente de la velocidad de dibujo.</li>
+      <li>Este es un modelo pedagógico simplificado, no una reproducción biológica exacta.</li>
+    </ul>
+  </details>
+</section>
+<script>
+(() => {
+  const canvas = document.getElementById('world');
+  const ctx = canvas.getContext('2d');
+  const $ = id => document.getElementById(id);
+  const W = canvas.width, H = canvas.height;
+  const nest = {x: W*0.5, y: H*0.52};
+  const sources = [
+    {x: W*.17, y:H*.19, initial:0, amount:0, r:29},
+    {x: W*.82, y:H*.22, initial:0, amount:0, r:31},
+    {x: W*.78, y:H*.82, initial:0, amount:0, r:30}
+  ];
+  const cell = 12, cols = Math.ceil(W/cell), rows = Math.ceil(H/cell);
+  let pheromone, trailX, trailY, ants=[], running=false, simTime=0, delivered=0, trips=0, lastStamp=0, acc=0, finished=false;
+  let antTarget=100, latency=40, foodInitial=90, speed=1, batchMode=false;
+  const rand = (a,b) => a + Math.random()*(b-a);
+  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  const idx = (x,y) => clamp(Math.floor(y/cell),0,rows-1)*cols+clamp(Math.floor(x/cell),0,cols-1);
+  function newAnt() {
+    const angle = rand(0,Math.PI*2);
+    return {x:nest.x+rand(-10,10), y:nest.y+rand(-10,10), angle, mode:'search', carrying:false, target:null, homePath:[], age:0};
+  }
+  function setup() {
+    antTarget = +$('antCount').value; latency=+$('latency').value; foodInitial=+$('foodCount').value; speed=+$('simSpeed').value;
+    $('antOut').textContent=antTarget; $('latOut').textContent=latency+' s'; $('foodOut').textContent=foodInitial; $('speedOut').textContent=speed+'×';
+    pheromone = new Float32Array(cols*rows);
+    trailX = new Float32Array(cols*rows);
+    trailY = new Float32Array(cols*rows);
+    ants = Array.from({length:antTarget},newAnt);
+    const each = Math.floor(foodInitial/sources.length), rem=foodInitial-each*sources.length;
+    sources.forEach((s,i)=>{s.initial=each+(i<rem?1:0);s.amount=s.initial;});
+    simTime=0; delivered=0; trips=0; finished=false; running=false; lastStamp=0; acc=0;
+    $('startBtn').textContent='▶ Iniciar'; $('statusText').textContent='En pausa'; $('statusDot').classList.remove('live');
+    $('message').textContent='Pulsa «Iniciar» para observar la exploración. Puedes cambiar los parámetros y reiniciar para comparar configuraciones.';
+    updateStats(); draw();
+  }
+  function pherAt(x,y){return pheromone[idx(x,y)];}
+  // Deposit visible pheromone plus a directional cue pointing from nest toward the food.
+  // Returning ants lay the trail; searching ants use the cue to follow it outward.
+  function deposit(x,y,amount=0.7,dirX=0,dirY=0) {
+    const i=idx(x,y);
+    const old=pheromone[i], next=Math.min(18,old+amount);
+    pheromone[i]=next;
+    if (dirX || dirY) {
+      const mix=Math.max(0.05, amount / Math.max(next,0.001));
+      trailX[i]=trailX[i]*(1-mix)+dirX*mix;
+      trailY[i]=trailY[i]*(1-mix)+dirY*mix;
+      const mag=Math.hypot(trailX[i],trailY[i]) || 1;
+      trailX[i]/=mag; trailY[i]/=mag;
+    }
+  }
+  function trailDirection(x,y) {
+    // Average directional cues in a small neighbourhood to avoid a broken, pixel-like trail.
+    let vx=0,vy=0,total=0;
+    for(let oy=-2;oy<=2;oy++) for(let ox=-2;ox<=2;ox++){
+      const xx=x+ox*cell, yy=y+oy*cell;
+      if(xx<0||xx>=W||yy<0||yy>=H) continue;
+      const i=idx(xx,yy), p=pheromone[i];
+      if(p>0.08){vx+=trailX[i]*p;vy+=trailY[i]*p;total+=p;}
+    }
+    if(total<0.1) return null;
+    const mag=Math.hypot(vx,vy);
+    if(mag<0.05) return null;
+    return {x:vx/mag,y:vy/mag,strength:Math.min(1,total/5)};
+  }
+  function chooseDirection(a) {
+    // Most of the time ants explore; when they encounter a trail, they follow its
+    // outward direction with some noise so the colony can still discover alternatives.
+    const cue=trailDirection(a.x,a.y);
+    if(cue && Math.random() < 0.25 + 0.68*cue.strength) {
+      const desired=Math.atan2(cue.y,cue.x);
+      const difference=Math.atan2(Math.sin(desired-a.angle),Math.cos(desired-a.angle));
+      return a.angle + difference*0.72 + rand(-0.38,0.38);
+    }
+    return a.angle+rand(-1.15,1.15);
+  }
+  function nearestFood(x,y) {
+    let best=null, d=Infinity;
+    for(const s of sources) if(s.amount>0) {const dd=Math.hypot(s.x-x,s.y-y);if(dd<d){d=dd;best=s;}}
+    return best;
+  }
+  function step(dt) {
+    simTime += dt;
+    // Exponential evaporation; latency is the time for a trace to fall to 5%.
+    const decay=Math.exp(-Math.log(20)*dt/latency);
+    for(let i=0;i<pheromone.length;i++){
+      pheromone[i]*=decay;
+      // Directional information fades together with the pheromone itself.
+      if(pheromone[i]<0.025){trailX[i]=0;trailY[i]=0;}
+    }
+    const moveSpeed=48; // world units per simulated second
+    for(const a of ants) {
+      a.age += dt;
+      if(a.mode==='search') {
+        const s=nearestFood(a.x,a.y);
+        if(s && Math.hypot(s.x-a.x,s.y-a.y)<s.r+5 && s.amount>0) {
+          s.amount--; a.carrying=true; a.target=s; a.mode='home'; a.homePath=[];
+          a.angle=Math.atan2(nest.y-a.y,nest.x-a.x);
+        } else {
+          a.angle=chooseDirection(a);
+          const nx=a.x+Math.cos(a.angle)*moveSpeed*dt, ny=a.y+Math.sin(a.angle)*moveSpeed*dt;
+          a.x=clamp(nx,5,W-5); a.y=clamp(ny,5,H-5);
+          if(a.x<=5||a.x>=W-5) a.angle=Math.PI-a.angle;
+          if(a.y<=5||a.y>=H-5) a.angle=-a.angle;
+          // If a trail is nearby, it can bias exploration, but search remains stochastic.
+          deposit(a.x,a.y,0.025);
+        }
+      } else if(a.mode==='home') {
+        a.angle=Math.atan2(nest.y-a.y,nest.x-a.x)+rand(-.12,.12);
+        const d=Math.hypot(nest.x-a.x,nest.y-a.y);
+        const travel=Math.min(d,moveSpeed*1.25*dt);
+        a.x += Math.cos(a.angle)*travel; a.y += Math.sin(a.angle)*travel;
+        // Returning ants mark the route, but the directional cue points back toward food.
+        const toFoodX=a.target ? a.target.x-a.x : 0;
+        const toFoodY=a.target ? a.target.y-a.y : 0;
+        const toFoodMag=Math.hypot(toFoodX,toFoodY) || 1;
+        deposit(a.x,a.y,0.9,toFoodX/toFoodMag,toFoodY/toFoodMag);
+        if(d<13) {
+          delivered++; trips++; a.carrying=false; a.mode='search'; a.target=null;
+          a.angle=rand(0,Math.PI*2); a.x=nest.x+rand(-8,8); a.y=nest.y+rand(-8,8);
+        }
+      }
+    }
+    if(sources.every(s=>s.amount===0) && ants.every(a=>!a.carrying)) {
+      finished=true; running=false;
+      $('startBtn').textContent='▶ Iniciar'; $('statusText').textContent='Completado'; $('statusDot').classList.remove('live');
+      $('message').textContent=`¡Todo el alimento ha llegado al nido en ${simTime.toFixed(1)} segundos simulados! Reinicia para probar otra configuración.`;
+    }
+    if(!batchMode) updateStats();
+  }
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#eaf1df';ctx.fillRect(0,0,W,H);
+    // Subtle meadow texture
+    ctx.strokeStyle='rgba(115,145,89,.15)';ctx.lineWidth=1;
+    for(let x=20;x<W;x+=42) for(let y=18;y<H;y+=39){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+3,y-5);ctx.stroke();}
+    // Pheromone field: warm color, stronger and more opaque with intensity.
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+      const p=pheromone[r*cols+c]; if(p<0.035) continue;
+      const alpha=Math.min(.78,0.12+p/9);
+      ctx.fillStyle=`rgba(183,75,34,${alpha})`;
+      // Slightly overlapping soft marks make the trail read as a continuous trace.
+      ctx.beginPath();ctx.arc(c*cell+cell/2,r*cell+cell/2,Math.min(8,3+p*.48),0,Math.PI*2);ctx.fill();
+    }
+    // faint paths between nest and food sources only as background guides? no, avoid implying fixed routes.
+    // Food source patches
+    for(const s of sources){
+      ctx.fillStyle='#dce7cb';ctx.beginPath();ctx.arc(s.x,s.y,s.r+12,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#b7c9a4';ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle='#d99b25';ctx.beginPath();ctx.arc(s.x,s.y,Math.max(5,s.r*Math.min(1,s.amount/Math.max(1,s.initial))),0,Math.PI*2);ctx.fill();
+      const dots=Math.min(s.amount,24);
+      for(let i=0;i<dots;i++){const a=i*2.399, rr=Math.sqrt(i/dots)*s.r*.7;ctx.fillStyle='#f4c85e';ctx.beginPath();ctx.arc(s.x+Math.cos(a)*rr,s.y+Math.sin(a)*rr,2.2,0,Math.PI*2);ctx.fill();}
+      ctx.fillStyle='#536447';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(`${s.amount} alimento`,s.x,s.y+s.r+29);
+    }
+    // Nest
+    ctx.fillStyle='#cbb397';ctx.beginPath();ctx.ellipse(nest.x,nest.y,31,24,-.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#79563b';ctx.beginPath();ctx.ellipse(nest.x,nest.y,20,14,-.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#f4e5d2';ctx.beginPath();ctx.ellipse(nest.x-3,nest.y-3,8,5,-.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#354332';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText('HORMIGUERO',nest.x,nest.y+42);
+    // Ants
+    for(const a of ants){
+      ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.angle);
+      ctx.strokeStyle='#30392c';ctx.lineWidth=1.4;ctx.lineCap='round';
+      for(const side of [-1,1]){
+        ctx.beginPath();ctx.moveTo(-2,0);ctx.lineTo(-5,side*4);ctx.lineTo(-8,side*5);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(1,0);ctx.lineTo(2,side*4);ctx.lineTo(5,side*5);ctx.stroke();
+      }
+      ctx.fillStyle='#30392c';ctx.beginPath();ctx.ellipse(-4,0,3.5,2.5,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(0,0,3,2.4,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(4,0,2.2,0,Math.PI*2);ctx.fill();
+      if(a.carrying){ctx.fillStyle='#d99b25';ctx.beginPath();ctx.arc(0,-4,2.4,0,Math.PI*2);ctx.fill();}
+      ctx.restore();
+    }
+  }
+  function updateStats(){
+    const remaining=sources.reduce((sum,s)=>sum+s.amount,0);
+    $('timeStat').textContent=simTime.toFixed(1)+' s';
+    $('remainingStat').textContent=remaining;
+    $('collectedStat').textContent=delivered;
+    $('tripsStat').textContent=trips;
+  }
+  function frame(stamp){
+    if(!lastStamp)lastStamp=stamp;
+    const realDt=Math.min(.05,(stamp-lastStamp)/1000);lastStamp=stamp;
+    if(running){
+      // Fixed-size simulation steps for more stable results; animation speed only changes simulated time progression.
+      acc+=realDt*speed;
+      while(acc>=.025){step(.025);acc-=.025;if(!running)break;}
+    }
+    draw();
+    requestAnimationFrame(frame);
+  }
+  $('startBtn').addEventListener('click',()=>{
+    if(finished){return;}
+    running=!running;
+    $('startBtn').textContent=running?'Ⅱ Pausar':'▶ Continuar';
+    $('statusText').textContent=running?'En marcha':'En pausa';
+    $('statusDot').classList.toggle('live',running);
+    if(running)$('message').textContent='Observa cómo se explora el entorno y cómo se refuerzan los rastros cuando las hormigas regresan al nido.';
+  });
+  $('resetBtn').addEventListener('click',setup);
+  for(const id of ['antCount','latency','foodCount','simSpeed']) $(id).addEventListener('input',()=>{
+    if(id==='antCount')$('antOut').textContent=$('antCount').value;
+    if(id==='latency')$('latOut').textContent=$('latency').value+' s';
+    if(id==='foodCount')$('foodOut').textContent=$('foodCount').value;
+    if(id==='simSpeed')$('speedOut').textContent=$('simSpeed').value+'×';
+    $('message').textContent='Has cambiado parámetros. Pulsa «Reiniciar» para iniciar una nueva ejecución con esta configuración.';
+  });
+  const experimentSets = {
+    ants: [{value:50,label:'50 hormigas'},{value:100,label:'100 hormigas'},{value:200,label:'200 hormigas'}],
+    latency: [{value:10,label:'10 s'},{value:40,label:'40 s'},{value:100,label:'100 s'}],
+    food: [{value:60,label:'60 unidades'},{value:90,label:'90 unidades'},{value:150,label:'150 unidades'}]
+  };
+  const labResults=[];
+  const challenges=[
+    {title:'¿Más hormigas significa acabar antes?',question:'¿Cómo cambia el tiempo total al aumentar la colonia?',design:'Compara 50, 100 y 200 hormigas. Mantén la latencia en 40 s y el alimento en 90 unidades. Haz varias repeticiones.',measure:'Tiempo hasta recoger todo el alimento y número de viajes.'},
+    {title:'¿La feromona debe durar mucho?',question:'¿Una latencia larga siempre ayuda a encontrar el alimento?',design:'Compara 10, 40 y 100 segundos de latencia, manteniendo 100 hormigas y 90 unidades de alimento.',measure:'Tiempo total y regularidad de los resultados. Busca posibles rutas persistentes.'},
+    {title:'¿Más alimento aumenta proporcionalmente el tiempo?',question:'Si multiplicamos el alimento, ¿se multiplica también el tiempo?',design:'Compara 60, 90 y 150 unidades, con 100 hormigas y 40 s de latencia.',measure:'Tiempo total. Compara las razones entre cantidades de alimento y tiempos.'},
+    {title:'¿Qué configuración es más eficiente?',question:'¿Qué combinación permite entregar alimento con menor tiempo por unidad?',design:'Ejecuta varios experimentos y compara tiempo total dividido entre alimento entregado.',measure:'Calcula tiempo por unidad y justifica qué configuración resulta mejor en este modelo.'},
+    {title:'¿Los resultados son siempre iguales?',question:'Con los mismos parámetros, ¿se obtiene siempre el mismo tiempo?',design:'Ejecuta al menos cinco repeticiones con la misma configuración. No cambies ningún parámetro.',measure:'Compara el mínimo, el máximo, la media y la dispersión de los tiempos.'}
+  ];
+  function drawResultsChart(){
+    const c=$('resultsChart'), g=c.getContext('2d'); g.clearRect(0,0,c.width,c.height); g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
+    const groups={}; for(const r of labResults){const key=r.variable; (groups[key]??=[]).push(r.time);}
+    const entries=Object.entries(groups); const left=52, right=18, top=20, bottom=42, cw=c.width-left-right, ch=c.height-top-bottom;
+    g.strokeStyle='#dce4d8';g.lineWidth=1;for(let i=0;i<=4;i++){const y=top+ch*i/4;g.beginPath();g.moveTo(left,y);g.lineTo(c.width-right,y);g.stroke();}
+    if(!entries.length){g.fillStyle='#68756d';g.font='14px system-ui';g.textAlign='center';g.fillText('Los resultados aparecerán aquí',c.width/2,c.height/2);return;}
+    const max=Math.max(1,...entries.flatMap(e=>e[1]));
+    entries.forEach(([name,vals],i)=>{const x=left+(i+.5)*cw/entries.length;const mean=vals.reduce((a,b)=>a+b,0)/vals.length;const barW=Math.min(70,cw/entries.length*.55);const h=mean/max*ch;g.fillStyle='#719765';g.fillRect(x-barW/2,top+ch-h,barW,h);g.fillStyle='#20302a';g.font='12px system-ui';g.textAlign='center';g.fillText(mean.toFixed(1),x,top+ch-h-6);g.fillStyle='#68756d';g.font='11px system-ui';g.fillText(name,x,c.height-20);});
+    g.fillStyle='#68756d';g.font='11px system-ui';g.textAlign='left';g.fillText('Tiempo medio (s)',8,13);
+  }
+  function renderResults(){
+    const body=$('resultsBody');
+    if(!labResults.length){body.innerHTML='<tr><td colspan="5">Todavía no hay resultados.</td></tr>';drawResultsChart();return;}
+    body.innerHTML=labResults.map(r=>`<tr><td>${r.variable}</td><td>${r.rep}</td><td>${r.time.toFixed(1)}</td><td>${r.trips}</td><td>${r.complete?'Completado':'Límite de tiempo'}</td></tr>`).join('');drawResultsChart();
+  }
+  function setVariable(name,value){if(name==='ants')$('antCount').value=value;if(name==='latency')$('latency').value=value;if(name==='food')$('foodCount').value=value;}
+  function runOneExperiment(){
+    const variable=$('experiment').value, sets=experimentSets[variable], reps=+$('replicates').value;
+    const base={ants:+$('antCount').value,latency:+$('latency').value,food:+$('foodCount').value};
+    const labSpeed=+$('labSpeed').value;
+    $('runExperiment').disabled=true;$('clearResults').disabled=true;
+    let index=0; const tasks=[]; for(const set of sets)for(let rep=1;rep<=reps;rep++)tasks.push({set,rep});
+    function next(){
+      if(index>=tasks.length){batchMode=false;running=false;$('runExperiment').disabled=false;$('clearResults').disabled=false;setVariable('ants',base.ants);setVariable('latency',base.latency);setVariable('food',base.food);$('simSpeed').value=base.speed||1;setup();renderResults();$('labStatus').textContent=`Experimento terminado: ${tasks.length} ejecuciones registradas. Puedes descargar los datos en CSV o revisar la media.`;return;}
+      const task=tasks[index++]; setVariable(variable,task.set.value); $('simSpeed').value=labSpeed; setup(); batchMode=true; running=true; let guard=0;
+      while(running && simTime<1200 && guard<12000){step(.1);guard++;}
+      const complete=finished;labResults.push({variable:task.set.label,rep:task.rep,time:simTime,trips,complete});
+      $('labStatus').textContent=`Ejecutando ${index} de ${tasks.length}: ${task.set.label}, repetición ${task.rep}.`;
+      renderResults(); setTimeout(next,15);
+    }
+    base.speed=+$('simSpeed').value; next();
+  }
+  $('runExperiment').addEventListener('click',runOneExperiment);
+  $('clearResults').addEventListener('click',()=>{labResults.length=0;renderResults();$('summaryText').textContent='La media permite comparar tendencias, pero con pocas repeticiones la variabilidad puede ser grande.';$('labStatus').textContent='Resultados borrados. Ejecuta un experimento para volver a empezar.';});
+  $('summaryResults').addEventListener('click',()=>{
+    if(!labResults.length){$('summaryText').textContent='Todavía no hay datos. Ejecuta primero un experimento.';return;}
+    const groups={};for(const r of labResults)(groups[r.variable]??=[]).push(r.time);
+    $('summaryText').textContent=Object.entries(groups).map(([k,v])=>{const mean=v.reduce((a,b)=>a+b,0)/v.length;const sd=Math.sqrt(v.reduce((a,b)=>a+(b-mean)**2,0)/v.length);return `${k}: n=${v.length}, media=${mean.toFixed(1)} s, mínimo=${Math.min(...v).toFixed(1)} s, máximo=${Math.max(...v).toFixed(1)} s, desviación típica=${sd.toFixed(1)} s.`;}).join(' ');
+  });
+  $('exportResults').addEventListener('click',()=>{if(!labResults.length){$('labStatus').textContent='No hay datos que exportar todavía.';return;}const csv=['variable,repeticion,tiempo_segundos,viajes,completado',...labResults.map(r=>`"${r.variable}",${r.rep},${r.time.toFixed(2)},${r.trips},${r.complete?'si':'no'}`)].join('\n');downloadText('resultados_hormigas.csv',csv,'text/csv;charset=utf-8;');});
+  function downloadText(filename,text,mime='text/plain;charset=utf-8;'){const blob=new Blob(['\ufeff',text],{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  function renderChallenge(){const c=challenges[+$('challengeSelect').value];$('challengePrompt').innerHTML=`<div class="challenge"><strong>Pregunta investigable</strong><p>${c.question}</p></div><div class="challenge"><strong>Diseño experimental sugerido</strong><p>${c.design}</p></div><div class="challenge"><strong>Qué medir</strong><p>${c.measure}</p></div>`;}
+  const saved=[];
+  $('challengeSelect').addEventListener('change',renderChallenge);
+  $('saveChallenge').addEventListener('click',()=>{const c=challenges[+$('challengeSelect').value];const item={title:c.title,hypothesis:$('hypothesis').value.trim(),observations:$('observations').value.trim(),conclusion:$('conclusion').value.trim()};if(!item.hypothesis&&!item.observations&&!item.conclusion){$('savedChallenges').innerHTML='<div class="saved-note">Escribe al menos una respuesta antes de guardarla.</div>';return;}saved.push(item);$('savedChallenges').innerHTML=`<div class="saved-note">Respuesta guardada en esta sesión: <strong>${item.title}</strong>. Total guardadas: ${saved.length}. Puedes descargar la ficha.</div>`;});
+  $('exportChallenge').addEventListener('click',()=>{const c=challenges[+$('challengeSelect').value];const text=`LABORATORIO DE HORMIGAS\n${c.title}\n\nPregunta: ${c.question}\n\nDiseño sugerido: ${c.design}\n\nQué medir: ${c.measure}\n\nMi hipótesis:\n${$('hypothesis').value}\n\nDatos y observaciones:\n${$('observations').value}\n\nConclusión razonada:\n${$('conclusion').value}\n`;downloadText('ficha_reto_hormigas.txt',text);});
+  const teacherProfiles={
+    eso1:{intro:'Sesión guiada: observar, predecir y comparar dos o tres resultados con lenguaje claro.',advice:['Pide primero una descripción sin explicar causas.','Usa una tabla sencilla y compara qué configuración tarda menos.','Acepta una conclusión cualitativa si está apoyada por observaciones.'],objectives:['Distinguir observación de predicción.','Identificar qué se cambia y qué se mide.','Comunicar una conclusión sencilla con evidencias.'],note:'Nivel inicial: prioriza descripciones, tablas sencillas y comparaciones cualitativas.',rubric:[['Hipótesis','Predicción vaga.','Predicción comprensible.','Predicción clara con una razón.'],['Diseño','No mantiene condiciones.','Mantiene algunas condiciones.','Cambia una variable cada vez.'],['Datos','No registra resultados.','Registra algunos datos.','Tabla completa y ordenada.'],['Conclusión','Opinión sin evidencia.','Menciona una observación.','Conclusión apoyada en resultados.']]},
+    eso3:{intro:'Investigación controlada: definir variables, repetir simulaciones y comparar medias y dispersión.',advice:['Identifica variable independiente, variable dependiente y controles.','Realiza al menos tres repeticiones por configuración.','Compara medias y rangos; no confundas asociación con causalidad.'],objectives:['Diseñar una comparación justa.','Calcular e interpretar media, mínimo, máximo y rango.','Argumentar si los datos apoyan la hipótesis.'],note:'Nivel intermedio: solicita repeticiones, medidas estadísticas y una breve discusión de la variabilidad.',rubric:[['Hipótesis','No es comprobable.','Es comprobable pero imprecisa.','Es comprobable y justificada.'],['Diseño','Confunde variables.','Control parcial.','Control explícito de variables.'],['Datos','Datos incompletos.','Tabla y comparación básica.','Repeticiones y estadística adecuada.'],['Conclusión','Sin datos.','Cita datos sin interpretarlos.','Interpreta datos y reconoce variabilidad.']]},
+    bach:{intro:'Modelización: cuantificar la relación entre variables, evaluar variabilidad y discutir las limitaciones del modelo.',advice:['Define una métrica de eficiencia, por ejemplo tiempo por unidad recogida.','Compara la tendencia con una hipótesis cuantitativa o proporcionalidad.','Discute aleatoriedad, supuestos y qué habría que cambiar para mejorar el modelo.'],objectives:['Construir una métrica y justificarla.','Interpretar media y desviación típica.','Evaluar críticamente los supuestos del modelo.'],note:'Nivel avanzado: exige una métrica explícita, análisis de dispersión y crítica de los supuestos.',rubric:[['Hipótesis','Afirmación no medible.','Predicción cuantitativa parcial.','Predicción cuantitativa contrastable.'],['Diseño','No controla condiciones.','Control parcial y poco justificado.','Diseño controlado y justificado.'],['Datos','Solo describe.','Usa medidas básicas.','Compara medidas y dispersión.'],['Conclusión','No discute límites.','Menciona una limitación.','Argumenta con datos y critica el modelo.']]}
+  };
+  function updateTeacherPlan(){
+    const profile=teacherProfiles[$('teacherStage').value],duration=+$('teacherDuration').value,focus=$('teacherFocus').value;
+    const focusNames={ants:'número de hormigas',latency:'latencia de feromona',food:'cantidad de alimento',variability:'variabilidad entre repeticiones'};
+    $('teacherPlanIntro').textContent=`${duration===100?'Dos sesiones de 50 minutos':`Sesión de ${duration} minutos`}: ${profile.intro} Pregunta elegida: ${focusNames[focus]}.`;
+    $('teacherAdvice').innerHTML=profile.advice.map(x=>`<li>${x}</li>`).join('');$('teacherObjectives').innerHTML=profile.objectives.map(x=>`<li>${x}</li>`).join('');$('teacherLevelNote').textContent=profile.note;
+    $('teacherRubric').innerHTML=profile.rubric.map(row=>`<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`).join('');
+  }
+  function updateTeacherProgress(){const boxes=[...document.querySelectorAll('#teacherChecklist input')],done=boxes.filter(x=>x.checked).length;$('teacherProgress').style.width=`${done/boxes.length*100}%`;$('teacherProgressText').textContent=`${done} de ${boxes.length} pasos completados`+(done===boxes.length?' · Secuencia completada':'');}
+  ['teacherStage','teacherDuration','teacherFocus'].forEach(id=>$(id).addEventListener('change',updateTeacherPlan));
+  document.querySelectorAll('#teacherChecklist input').forEach(x=>x.addEventListener('change',updateTeacherProgress));
+  $('resetTeacherChecks').addEventListener('click',()=>{document.querySelectorAll('#teacherChecklist input').forEach(x=>x.checked=false);updateTeacherProgress();});
+  function getWorksheetText(){const profile=teacherProfiles[$('teacherStage').value],focus=$('teacherFocus').selectedOptions[0].text,duration=$('teacherDuration').value;return `LABORATORIO DE HORMIGAS · FICHA DE INVESTIGACIÓN
+
+Nombre: ______________________________  Grupo: __________  Fecha: __________
+Nivel: ${$('teacherStage').selectedOptions[0].text}
+Duración prevista: ${duration} minutos
+
+PREGUNTA DE INVESTIGACIÓN
+${focus}
+
+1. MI HIPÓTESIS
+¿Qué creo que ocurrirá? ¿Por qué?
+________________________________________________________________________
+________________________________________________________________________
+
+2. DISEÑO EXPERIMENTAL
+Variable que cambiaré: ___________________________________________________
+Qué mantendré constante: _________________________________________________
+Qué mediré: _____________________________________________________________
+Número de repeticiones por configuración: ______
+
+3. RESULTADOS
+Configuración | Repetición 1 | Repetición 2 | Repetición 3 | Media
+_____________ | ____________ | ____________ | ____________ | ______
+_____________ | ____________ | ____________ | ____________ | ______
+_____________ | ____________ | ____________ | ____________ | ______
+
+4. ANÁLISIS
+¿Qué patrón observo? ¿Hay variabilidad entre repeticiones?
+________________________________________________________________________
+________________________________________________________________________
+
+5. CONCLUSIÓN BASADA EN DATOS
+¿Los resultados apoyan mi hipótesis? Cita al menos un dato.
+________________________________________________________________________
+________________________________________________________________________
+
+6. LIMITACIONES DEL MODELO
+¿Qué aspecto de una colonia real no representa bien esta simulación?
+________________________________________________________________________
+
+Recordatorio: cambia una variable cada vez y no confundas una observación con una explicación.
+
+Objetivos docentes: ${profile.objectives.join(' ')}
+`;}
+  $('printWorksheet').addEventListener('click',()=>{const text=getWorksheetText();const win=window.open('','_blank');if(!win){downloadText('ficha_investigacion_hormigas.html',`<!doctype html><meta charset="utf-8"><title>Ficha de investigación</title><pre style="white-space:pre-wrap;font:16px Arial;line-height:1.5">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`,'text/html;charset=utf-8;');return;}win.document.write(`<!doctype html><html lang="es"><meta charset="utf-8"><title>Ficha de investigación</title><style>body{font:12pt Arial;line-height:1.45;max-width:800px;margin:25px auto;white-space:pre-wrap}h1{font-size:18pt}@media print{body{margin:12mm}}</style><body>${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</body></html>`);win.document.close();win.focus();setTimeout(()=>win.print(),300);});
+  $('teacherCopyGuide').addEventListener('click',()=>{const p=teacherProfiles[$('teacherStage').value];const guide=`GUÍA DOCENTE · LABORATORIO DE HORMIGAS
+
+Nivel: ${$('teacherStage').selectedOptions[0].text}
+Duración: ${$('teacherDuration').value} minutos
+Pregunta central: ${$('teacherFocus').selectedOptions[0].text}
+
+SECUENCIA
+${p.intro}
+
+ORIENTACIONES
+- ${p.advice.join('\n- ')}
+
+OBJETIVOS
+- ${p.objectives.join('\n- ')}
+
+EVALUACIÓN
+Valora hipótesis, control de variables, tratamiento de datos y conclusión basada en evidencias. La rúbrica es orientativa; adapta los criterios a tu grupo.
+
+LIMITACIÓN IMPORTANTE
+La simulación es un modelo simplificado y aleatorio. Los resultados dependen de sus reglas internas y no deben presentarse como leyes biológicas universales.
+`;downloadText('guia_docente_hormigas.txt',guide);});
+  updateTeacherPlan();updateTeacherProgress();
+  renderChallenge();
+  setup();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

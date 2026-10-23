@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Juego de identidades trigonométricas</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f8f4;--grid:#dbe6dc;--fg:#16302b;--mu:#587068;--card:#fff;--ac:#0f766e;--bd:#c5d4c8;--sel:#ffe27a;--ok:#0f766e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10201d;--grid:#1a302b;--fg:#e6f1ec;--mu:#95b0a6;--card:#172b26;--ac:#5fd1c2;--bd:#2c4740;--sel:#7a6512;--ok:#5fd1c2}}
+:root[data-theme="dark"]{--bg:#10201d;--grid:#1a302b;--fg:#e6f1ec;--mu:#95b0a6;--card:#172b26;--ac:#5fd1c2;--bd:#2c4740;--sel:#7a6512;--ok:#5fd1c2}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;min-height:100%;background:var(--bg) linear-gradient(var(--grid) 1px,transparent 1px) 0 0/24px 24px,linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/24px 24px;color:var(--fg);font:16px/1.5 system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:18px 14px 40px}
+h1{font:600 22px Georgia,serif;margin:0 0 2px}
+p{margin:4px 0}.mu{color:var(--mu);font-size:14px}
+button{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;cursor:pointer}
+button:focus-visible,.nd:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+button:disabled{opacity:.4;cursor:not-allowed}
+#lv{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 6px}
+#lv button{min-width:38px}#lv .on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+#eq{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:22px 14px;margin:12px 0;font:24px/2 Georgia,"Cambria Math",serif;overflow-x:auto;white-space:nowrap;text-align:center}
+.nd{cursor:pointer;border-radius:4px;padding:0 1px}
+.nd:hover:not(:has(.nd:hover)){background:color-mix(in srgb,var(--sel) 45%,transparent)}
+.nd.sel{background:var(--sel)}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.5;margin:0 3px}
+.fr>span:first-child{border-bottom:1.5px solid currentColor}
+sup{font-size:.65em}
+#rules{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+#rules button{font-family:Georgia,"Cambria Math",serif}
+#alg{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+#log{min-height:24px;font-size:14px;color:var(--mu)}
+#msg{font-weight:600;color:var(--ok);min-height:28px;margin:8px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+</style></head>
+<body><main>
+<h1>Demuestra la identidad</h1>
+<p class="mu" id="wn"></p>
+<div id="lv"></div>
+<p class="mu">Pulsa una parte de la expresión, por ejemplo <i>sin(x+y)</i> o un cuadrado, y aplica una regla. Nada se simplifica solo: desarrolla y agrupa tú cuando toque. Ganas cuando ambos lados son idénticos y están simplificados.</p>
+<div id="eq" aria-live="polite"></div>
+<div class="row"><button id="sl">Seleccionar lado izquierdo</button><button id="sr">Seleccionar lado derecho</button></div>
+<p class="mu">Reglas trigonométricas</p><div id="rules"></div>
+<p class="mu">Álgebra (la haces tú)</p><div id="alg"></div>
+<div id="log"></div>
+<div id="msg"></div>
+<div class="row"><button id="undo">Deshacer</button><button id="reset">Reiniciar</button><button id="next">Siguiente nivel</button><button id="rnd">Ejercicio aleatorio</button></div>
+</main>
+<script>
+// ---- Álgebra: polinomios sobre átomos (x, y, sin(u), cos(u)) ----
+const AT={};
+const tm=(c,f)=>{const ak=a=>a.replace(/^sin/,'0sin').replace(/^cos/,'1cos');f=f.filter(a=>a[1]!=0).sort((a,b)=>ak(a[0])<ak(b[0])?-1:1);return{c,f,k:f.map(([a,e])=>e==1?a:a+'^'+e).join('*')}};
+const cst=c=>c==0?{}:{'':tm(c,[])};
+const atom=n=>({[n]:tm(1,[[n,1]])});
+const V=n=>{AT[n]={v:1};return atom(n)};
+const add=(p,q,s=1)=>{const r={...p};for(const k in q){const c=(r[k]?r[k].c:0)+s*q[k].c;if(Math.abs(c)<1e-9)delete r[k];else r[k]={c,f:(r[k]||q[k]).f,k}}return r};
+const mul=(p,q)=>{let r={};for(const a in p)for(const b in q){const m={};for(const[n,e]of[...p[a].f,...q[b].f])m[n]=(m[n]||0)+e;const t=tm(p[a].c*q[b].c,Object.entries(m));r=add(r,{[t.k]:t})}return r};
+const sc=(p,s)=>{const r={};for(const k in p)r[k]={...p[k],c:p[k].c*s};return r};
+const pw=(p,e)=>{let r=cst(1);for(let i=0;i<e;i++)r=mul(r,p);return r};
+const deg=t=>t.f.reduce((s,a)=>s+a[1],0);
+const ordered=p=>Object.values(p).sort((a,b)=>deg(b)-deg(a)||(a.k<b.k?-1:1));
+const pkey=p=>Object.keys(p).sort().map(k=>p[k].c.toFixed(6)+'·'+k).join('+');
+const F=(f,p)=>fromAST({k:'f',f,a:{k:'P',p}});
+function fromAST(n){
+  if(n.k=='n')return cst(n.v);
+  if(n.k=='v')return V(n.n);
+  if(n.k=='P')return n.p;
+  if(n.k=='-')return sc(fromAST(n.a),-1);
+  if(n.k=='d')return mul(fromAST(n.a),invP(fromAST(n.b)));
+  if(n.k=='p')return pw(fromAST(n.b),n.e);
+  if(n.k=='m'){let r=cst(n.neg?-1:1);n.t.forEach(c=>r=mul(r,fromAST(c)));return r}
+  if(n.k=='s'){let r={};n.t.forEach(c=>r=add(r,fromAST(c)));return r}
+  let a=fromAST(n.a),ts=ordered(a),neg=false;
+  if(!ts.length)return n.f=='cos'?cst(1):{};
+  if(ts[0].c<0){a=sc(a,-1);neg=true}
+  const name=n.f+'('+pkey(a)+')';AT[name]={f:n.f,a:U(toAST(a))};
+  const r=atom(name);return neg&&n.f!='cos'?sc(r,-1):r;
+}
+const U=n=>n.k=='s'&&n.t.length==1?n.t[0]:n;
+const invP=D=>{const ts=Object.values(D);if(ts.length==1){const t=ts[0],q=tm(1/t.c,t.f.map(([a,e])=>[a,-e]));return{[q.k]:q}}const name='inv('+pkey(D)+')';AT[name]={d:U(toAST(D))};return atom(name)};
+function toAST(p){
+  const ts=ordered(p);if(!ts.length)return{k:'n',v:0};
+  const nd=(a,e)=>{const A=AT[a],b=A.v?{k:'v',n:a}:A.d?A.d:{k:'f',f:A.f,a:A.a};return e>1?{k:'p',b,e}:b};
+  const mm=fs=>fs.length>1?{k:'m',t:fs}:fs[0];
+  return{k:'s',t:ts.map(t=>{
+    const N=[],D=[];
+    t.f.forEach(([a,e])=>{if(e<0||AT[a].d)D.push(nd(a,Math.abs(e)));else N.push(nd(a,e))});
+    if(Math.abs(t.c)!=1||!N.length)N.unshift({k:'n',v:Math.abs(t.c)});
+    const r=D.length?{k:'d',a:mm(N),b:mm(D)}:mm(N);
+    return t.c<0?{k:'-',a:r}:r})};
+}
+function parse(s){
+  const T=s.match(/sin|cos|tan|\d+(?:\.\d+)?|[xy+\-*\/^()]/g);let i=0;const pk=()=>T[i],nx=()=>T[i++];
+  const E=()=>{let t;if(pk()=='-'){nx();t=[{k:'-',a:Tm()}]}else t=[Tm()];while(pk()=='+'||pk()=='-'){const o=nx(),q=Tm();t.push(o=='-'?{k:'-',a:q}:q)}return t.length>1?{k:'s',t}:t[0]};
+  const Tm=()=>{const t=[Fc()];for(;;){const k=pk();if(k=='/'){nx();const d=Fc();if(d.k=='n')t.push({k:'n',v:1/d.v});else{const a=t.length>1?{k:'m',t:[...t]}:t[0];t.length=0;t.push({k:'d',a,b:d})}}else if(k=='*'){nx();t.push(Fc())}else if(k&&/^(sin|cos|tan|x|y|\(|\d)/.test(k))t.push(Fc());else break}return t.length>1?{k:'m',t}:t[0]};
+  const Fc=()=>{if(pk()=='-'){nx();return{k:'-',a:Fc()}}let b=At();if(pk()=='^'){nx();b={k:'p',b,e:+nx()}}return b};
+  const At=()=>{const k=nx();if(k=='('){const r=E();nx();return r}if(k=='sin'||k=='cos'||k=='tan'){nx();const a=E();nx();return{k:'f',f:k,a}}if(k=='x'||k=='y')return{k:'v',n:k};return{k:'n',v:+k}};
+  return E();
+}
+const fmt=c=>{for(let d=1;d<=12;d++){const n=Math.round(c*d);if(Math.abs(n/d-c)<1e-9)return d==1?''+n:n+'/'+d}return c.toFixed(3)};
+function rp(t,target,rep){
+  if(t===target)return rep;
+  if(t.k=='s'||t.k=='m')return{...t,t:t.t.map(c=>rp(c,target,rep))};
+  if(t.k=='f')return{...t,a:rp(t.a,target,rep)};
+  if(t.k=='p')return{...t,b:rp(t.b,target,rep)};
+  if(t.k=='-')return{...t,a:rp(t.a,target,rep)};
+  if(t.k=='d')return{...t,a:rp(t.a,target,rep),b:rp(t.b,target,rep)};
+  return t;
+}
+// ---- Reglas ----
+const sn=a=>F('sin',a),cs=a=>F('cos',a),M=mul,Ad=add,K=cst;
+const isf=(n,f)=>n.k=='f'&&n.f==f;
+const isp=(n,f)=>n.k=='p'&&n.e>=2&&n.b.k=='f'&&n.b.f==f;
+const sp=n=>{const ts=ordered(fromAST(n.a));if(ts.length<2)return null;const A={[ts[0].k]:ts[0]},B={};ts.slice(1).forEach(t=>B[t.k]=t);return{A,B,pos:ts[1].c>0}};
+const dbl=n=>{const a=fromAST(n.a),v=Object.values(a);return v.length&&v.every(t=>Number.isInteger(t.c)&&t.c%2==0)?sc(a,.5):null};
+const hf=n=>{if(!(n.k=='p'&&n.e==2&&n.b.k=='f'))return null;const u=fromAST(n.b.a);return Object.values(u).some(t=>!Number.isInteger(t.c))?sc(u,2):null};
+const RULES=[
+{w:1,l:'sin²A → 1 − cos²A',f:n=>isp(n,'sin')?M(pw(fromAST(n.b),n.e-2),Ad(K(1),pw(cs(fromAST(n.b.a)),2),-1)):null},
+{w:1,l:'cos²A → 1 − sin²A',f:n=>isp(n,'cos')?M(pw(fromAST(n.b),n.e-2),Ad(K(1),pw(sn(fromAST(n.b.a)),2),-1)):null},
+{w:1,l:'sin(A+B) → sinA cosB + cosA sinB',f:n=>{const s=isf(n,'sin')&&sp(n);return s&&s.pos?Ad(M(sn(s.A),cs(s.B)),M(cs(s.A),sn(s.B))):null}},
+{w:1,l:'sin(A−B) → sinA cosB − cosA sinB',f:n=>{const s=isf(n,'sin')&&sp(n);if(!s||s.pos)return null;const B=sc(s.B,-1);return Ad(M(sn(s.A),cs(B)),M(cs(s.A),sn(B)),-1)}},
+{w:1,l:'cos(A+B) → cosA cosB − sinA sinB',f:n=>{const s=isf(n,'cos')&&sp(n);return s&&s.pos?Ad(M(cs(s.A),cs(s.B)),M(sn(s.A),sn(s.B)),-1):null}},
+{w:1,l:'cos(A−B) → cosA cosB + sinA sinB',f:n=>{const s=isf(n,'cos')&&sp(n);if(!s||s.pos)return null;const B=sc(s.B,-1);return Ad(M(cs(s.A),cs(B)),M(sn(s.A),sn(B)))}},
+{w:2,l:'sin 2A → 2 sinA cosA',f:n=>{const a=isf(n,'sin')&&dbl(n);return a?sc(M(sn(a),cs(a)),2):null}},
+{w:2,l:'cos 2A → cos²A − sin²A',f:n=>{const a=isf(n,'cos')&&dbl(n);return a?Ad(pw(cs(a),2),pw(sn(a),2),-1):null}},
+{w:2,l:'cos 2A → 1 − 2sin²A',f:n=>{const a=isf(n,'cos')&&dbl(n);return a?Ad(K(1),sc(pw(sn(a),2),2),-1):null}},
+{w:2,l:'cos 2A → 2cos²A − 1',f:n=>{const a=isf(n,'cos')&&dbl(n);return a?Ad(sc(pw(cs(a),2),2),K(1),-1):null}},
+{w:3,l:'sin²(A/2) → (1 − cosA)/2',f:n=>{const a=n.k=='p'&&n.b.f=='sin'&&hf(n);return a?sc(Ad(K(1),cs(a),-1),.5):null}},
+{w:3,l:'cos²(A/2) → (1 + cosA)/2',f:n=>{const a=n.k=='p'&&n.b.f=='cos'&&hf(n);return a?sc(Ad(K(1),cs(a)),.5):null}}
+];
+RULES.push(
+{w:4,l:'tan A → sinA / cosA',f:n=>isf(n,'tan')?(a=>M(sn(a),invP(cs(a))))(fromAST(n.a)):null},
+{w:4,l:'tan 2A → 2tanA / (1 − tan²A)',f:n=>{const a=isf(n,'tan')&&dbl(n);return a?M(sc(F('tan',a),2),invP(Ad(K(1),pw(F('tan',a),2),-1))):null}}
+);
+RULES.forEach(r=>r.l=r.l.replace(/sin/g,'sen'));
+const WN=['Suma y diferencia','Ángulo doble','Ángulo mitad','Tangente y fracciones','Mezcla (ejercicios variados)'];
+const LV=[
+[1,'sin(x+y)+sin(x-y)','2 sin(x)cos(y)'],
+[1,'cos(x+y)+cos(x-y)','2 cos(x)cos(y)'],
+[1,'sin(x+y)sin(x-y)','sin(x)^2-sin(y)^2'],
+[1,'cos(x+y)cos(x-y)','cos(x)^2-sin(y)^2'],
+[1,'cos(x)cos(x-y)+sin(x)sin(x-y)','cos(y)'],
+[2,'1+sin(2x)','(sin(x)+cos(x))^2'],
+[2,'cos(2x)+2sin(x)^2','1'],
+[2,'sin(4x)','4 sin(x)cos(x)cos(2x)'],
+[2,'cos(2x)','cos(x)^4-sin(x)^4'],
+[2,'cos(2x)/cos(x)-sin(2x)/sin(x)','-1/cos(x)'],
+[3,'sin(x/2)^2+cos(x/2)^2','1'],
+[3,'2cos(x/2)^2-cos(x)','1'],
+[3,'sin(x/2)^2 cos(x/2)^2','sin(x)^2/4'],
+[4,'1/(1-tan(x))-1/(1+tan(x))','tan(2x)'],
+[5,'sin(x+y)-sin(x-y)','2 cos(x)sin(y)'],
+[5,'cos(x-y)-cos(x+y)','2 sin(x)sin(y)'],
+[5,'sin(x+y)cos(y)-cos(x+y)sin(y)','sin(x)'],
+[5,'cos(x+y)cos(y)+sin(x+y)sin(y)','cos(x)'],
+[5,'cos(x)^2-cos(2x)','sin(x)^2'],
+[5,'1-2sin(x/2)^2','cos(x)'],
+[5,'cos(x/2)^2-sin(x/2)^2','cos(x)'],
+[5,'sin(2x)/(1+cos(2x))','tan(x)'],
+[5,'(1-cos(2x))/sin(2x)','tan(x)'],
+[5,'sin(2x)/sin(x)-cos(2x)/cos(x)','1/cos(x)'],
+[5,'1/(1+cos(x))+1/(1-cos(x))','2/sin(x)^2']
+];
+// ---- Álgebra manual (la pulsa el alumno) ----
+const norm=n=>U(toAST(fromAST(n)));
+const size=n=>1+(n.t?n.t.reduce((a,c)=>a+size(c),0):0)+(n.a?size(n.a):0)+(n.b?size(n.b):0);
+const hasPS=n=>n.k=='p'?n.b.k=='s'||hasPS(n.b):n.k=='m'?n.t.some(c=>c.k=='s'||(c.k=='-'&&c.a.k=='s')||hasPS(c)):n.k=='s'?n.t.some(hasPS):n.k=='-'?hasPS(n.a):n.k=='d'?hasPS(n.a)||hasPS(n.b):false;
+const isSimp=n=>size(n)==size(norm(n));
+const sgn=t=>t.k=='-'?[-1,t.a]:[1,t];
+function expand(n){
+  let ts=[[1,[]]];
+  for(const f of n.t){const o=(f.k=='s'?f.t:[f]).map(sgn);ts=ts.flatMap(([s,fs])=>o.map(([s2,g])=>[s*s2,[...fs,g]]))}
+  return{k:'s',t:ts.map(([s,fs])=>{const m=fs.length>1?{k:'m',t:fs}:fs[0];return s<0?{k:'-',a:m}:m})};
+}
+const ml=(a,b)=>a.k=='n'&&a.v==1?b:b.k=='n'&&b.v==1?a:{k:'m',t:[a,b]};
+const ACT=[
+{l:'Desarrollar (distribuir)',f:n=>n.k=='m'&&n.t.some(t=>t.k=='s')?expand(n):n.k=='p'&&n.b.k=='s'?expand({t:Array(n.e).fill(n.b)}):null},
+{l:'Reducir a común denominador',f:n=>{if(n.k!='s'||n.t.length!=2)return null;const[s1,x]=sgn(n.t[0]),[s2,y]=sgn(n.t[1]);if(x.k!='d'||y.k!='d')return null;const w=(g,t)=>g<0?{k:'-',a:t}:t;return{k:'d',a:{k:'s',t:[w(s1,ml(x.a,y.b)),w(s2,ml(y.a,x.b))]},b:ml(x.b,y.b)}}},
+{l:'Agrupar y simplificar',f:n=>n.k=='n'||n.k=='v'||hasPS(n)||isSimp(n)?null:norm(n)}
+];
+// ---- Interfaz ----
+let lv=0,L,R,SEL=null,hist=[],ID=0,NODES={},done={};
+try{done=JSON.parse(localStorage.getItem('idtrig2')||'{}')}catch(e){}
+const $=id=>document.getElementById(id);
+const won=()=>pkey(fromAST(L))==pkey(fromAST(R))&&!hasPS(L)&&!hasPS(R)&&isSimp(L)&&isSimp(R);
+function rd(n,w){
+  const id=++ID;NODES[id]=n;let h='';
+  if(n.k=='n')h=fmt(n.v);else if(n.k=='v')h=n.n=='x'?'α':'β';
+  else if(n.k=='d')h='<span class="fr"><span>'+rd(n.a)+'</span><span>'+rd(n.b)+'</span></span>';
+  else if(n.k=='f')h=(n.f=='sin'?'sen':n.f)+'('+rd(n.a)+')';
+  else if(n.k=='p')h=n.b.k=='f'?(n.b.f=='sin'?'sen':n.b.f)+'<sup>'+n.e+'</sup>('+rd(n.b.a)+')':rd(n.b,n.b.k!='v')+'<sup>'+n.e+'</sup>';
+  else if(n.k=='m')h=n.t.map(c=>rd(c,c.k=='s'||c.k=='-')).join(' ');
+  else if(n.k=='-')h='−'+rd(n.a,n.a.k=='s');
+  else h=n.t.map((t,i)=>t.k=='-'?(i?' − ':'−')+rd(t.a,t.a.k=='s'):(i?' + ':'')+rd(t,t.k=='s')).join('');
+  return '<span class="nd'+(n===SEL?' sel':'')+'" data-i="'+id+'">'+(w?'(':'')+h+(w?')':'')+'</span>';
+}
+function load(i){lv=i;L=parse(LV[i][1]);R=parse(LV[i][2]);SEL=null;hist=[];draw()}
+function draw(){
+  ID=0;NODES={};const w=LV[lv][0],ok=won();
+  if(ok&&!done[lv]){done[lv]=1;try{localStorage.setItem('idtrig2',JSON.stringify(done))}catch(e){}}
+  $('wn').textContent='Mundo '+w+': '+WN[w-1]+' · nivel '+(lv+1)+' de '+LV.length;
+  $('lv').innerHTML=LV.map((l,i)=>'<button data-l="'+i+'" class="'+(i==lv?'on':'')+'">'+(done[i]?'✓ ':'')+(i+1)+'</button>').join('');
+  $('eq').innerHTML=rd(L)+' &nbsp;=&nbsp; '+rd(R);
+  $('rules').innerHTML=RULES.map((r,i)=>r.w<=w?'<button data-r="'+i+'" '+(!ok&&SEL&&r.f(SEL)?'':'disabled')+'>'+r.l+'</button>':'').join('');
+  $('alg').innerHTML=ACT.map((a,i)=>'<button data-a="'+i+'" '+(!ok&&SEL&&a.f(SEL)?'':'disabled')+'>'+a.l+'</button>').join('');
+  $('log').textContent=hist.length?'Pasos ('+hist.length+'): '+hist.map(h=>h.l).join('  ›  '):'';
+  $('msg').textContent=ok?'¡Demostrado! ∎ En '+hist.length+' pasos.':'';
+  $('next').disabled=lv>=LV.length-1;$('undo').disabled=!hist.length;
+}
+document.addEventListener('click',e=>{
+  const nd=e.target.closest('.nd');
+  if(nd&&$('eq').contains(nd)){SEL=NODES[nd.dataset.i];draw();return}
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.l!==undefined)load(+b.dataset.l);
+  else if(b.dataset.r!==undefined||b.dataset.a!==undefined){
+    const isR=b.dataset.r!==undefined,op=isR?RULES[+b.dataset.r]:ACT[+b.dataset.a];
+    const p=SEL&&op.f(SEL);if(!p)return;
+    const rep=isR?U(toAST(p)):p,g=t=>rp(t,SEL,rep);
+    hist.push({L,R,l:op.l});L=g(L);R=g(R);SEL=null;draw();
+  }
+  else if(b.id=='sl'){SEL=L;draw()}
+  else if(b.id=='sr'){SEL=R;draw()}
+  else if(b.id=='undo'&&hist.length){({L,R}=hist.pop());SEL=null;draw()}
+  else if(b.id=='reset')load(lv);
+  else if(b.id=='rnd'){const c=LV.map((l,i)=>i).filter(i=>LV[i][0]==5&&i!=lv);load(c[Math.floor(Math.random()*c.length)])}
+  else if(b.id=='next'&&lv<LV.length-1)load(lv+1);
+});
+load(0);
+</script></body></html>

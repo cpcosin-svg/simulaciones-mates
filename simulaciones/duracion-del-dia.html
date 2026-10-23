@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>¿Por qué cambia la duración del día? · Benicarló</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f5f3ee;--ink:#1d2433;--mut:#5b6478;--card:#fff;--line:#d8d4c8;--acc:#e08a00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1220;--ink:#e8ebf5;--mut:#9aa3ba;--card:#171d31;--line:#2a3350;--acc:#ffc233}}
+:root[data-theme="dark"]{--bg:#0e1220;--ink:#e8ebf5;--mut:#9aa3ba;--card:#171d31;--line:#2a3350;--acc:#ffc233}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Atkinson Hyperlegible",system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:14px;display:grid;gap:12px}
+h1{font:700 1.35rem/1.2 "Atkinson Hyperlegible",system-ui,sans-serif;margin:0}
+p{margin:.2rem 0;color:var(--mut)}
+#stage{position:relative;height:min(52vh,460px);background:#05070f;border-radius:10px;overflow:hidden;touch-action:none}
+#stage canvas{display:block;width:100%;height:100%}
+#hud{position:absolute;left:10px;bottom:8px;color:#cfd6ea;font-size:.8rem;pointer-events:none;max-width:45%}
+#inset{position:relative;height:min(52vh,460px);border-radius:10px;overflow:hidden;background:#05070f;touch-action:none;cursor:grab}
+#oc{display:block;width:100%;height:100%}
+.views{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:900px){.views{grid-template-columns:1fr}}
+#ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#insetT{position:absolute;left:6px;top:4px;color:#fff;font-size:.75rem;text-shadow:0 0 3px #000,0 0 3px #000;pointer-events:none}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.loc{color:var(--acc);font-weight:600;margin:2px 0 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+label{display:flex;justify-content:space-between;font-weight:600;margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+button.on{background:var(--acc);color:#111;border-color:var(--acc)}
+.big{font:700 2rem/1 "Atkinson Hyperlegible",system-ui,sans-serif;color:var(--acc)}
+canvas#chart{width:100%;height:150px;display:block}
+.key span{display:inline-block;width:11px;height:11px;border-radius:50%;margin:0 4px -1px 10px}
+</style>
+</head>
+<body>
+<main>
+<div>
+<h1>¿Por qué cambia la duración del día?</h1>
+<p class="loc">4º ESO · IES Benicarló · latitud 40,4° N, longitud 0,4° E</p>
+<p>Arrastra para girar la vista. Rueda o pellizca para acercar. A la derecha, la vista del observador muestra lo que ve la persona situada en el punto; arrástrala para cambiar hacia dónde mira. Con «Seguir al Sol» la vista se mueve sola de este a oeste siguiéndolo; si la giras a mano, el seguimiento se desactiva. En esa vista, la línea punteada es la trayectoria del Sol ese día, de este a oeste; la línea continua va registrando su avance, los puntos blancos marcan cada hora y el círculo blanco señala la altura máxima.</p>
+</div>
+<div class="views">
+<div id="stage"><div id="hud"></div></div>
+<div id="inset"><canvas id="oc"></canvas><canvas id="ov"></canvas><div id="insetT"></div></div>
+</div>
+<div class="grid">
+<div class="card">
+<label for="lat"><span>Latitud</span><span id="latV"></span></label>
+<input id="lat" type="range" min="-90" max="90" step="1" value="40">
+<label for="day"><span>Fecha</span><span id="dayV"></span></label>
+<input id="day" type="range" min="1" max="365" step="1" value="172">
+<label for="eps"><span>Inclinación del eje</span><span id="epsV"></span></label>
+<input id="eps" type="range" min="0" max="45" step="0.5" value="23.4">
+<label for="vaz"><span>El observador mira hacia</span><span id="vazV"></span></label>
+<input id="vaz" type="range" min="0" max="359" step="1" value="180">
+<div class="row" id="seasons">
+<button data-d="81">Equinoccio de marzo</button>
+<button data-d="172">Solsticio de junio</button>
+<button data-d="263">Equinoccio de septiembre</button>
+<button data-d="355">Solsticio de diciembre</button>
+</div>
+<div class="row">
+<button id="bSpin" class="on">Rotación</button>
+<button id="bYear">Avanzar el año</button>
+<button id="bFollow" class="on">Seguir al Sol</button>
+<button id="bZoom">Acercar a la Tierra</button>
+<button id="bRef">Arcos de referencia</button>
+</div>
+<p class="key"><span style="background:#ffc233"></span>arco de día<span style="background:#3a52c9"></span>arco de noche<span style="background:#ff5a4d"></span>eje<span style="background:#ffe27a"></span>camino del Sol</p>
+</div>
+<div class="card">
+<div class="big" id="hours"></div>
+<p id="detail"></p>
+<canvas id="chart"></canvas>
+<p>Horas de luz a lo largo del año en esta latitud; las rayas verticales marcan equinoccios y solsticios. El modelo usa una órbita circular, así que sus fechas se desvían uno o dos días de las reales.</p>
+</div>
+</div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id), rad=Math.PI/180;
+const R=10, RE=1.5, stage=$('stage'), inset=$('inset');
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+stage.insertBefore(renderer.domElement,stage.firstChild);
+const renderer2=new THREE.WebGLRenderer({antialias:true,canvas:$('oc')});renderer2.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(45,1,0.1,200), cam2=new THREE.PerspectiveCamera(80,1,0.01,100);
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+function label(l1,l2,color,sx,sy){
+  const c=document.createElement('canvas');c.width=256;c.height=96;const g=c.getContext('2d');
+  g.textAlign='center';g.fillStyle=color;
+  if(l2){g.font='bold 40px system-ui';g.fillText(l1,128,42);g.font='34px system-ui';g.fillText(l2,128,84)}
+  else{g.font='bold 78px system-ui';g.fillText(l1,128,72)}
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:false}));
+  s.scale.set(sx,sy,1);return s;
+}
+const sun=new THREE.Mesh(new THREE.SphereGeometry(1.6,32,16),new THREE.MeshBasicMaterial({color:0xffd24a}));
+scene.add(sun,new THREE.PointLight(0xffffff,1.6,0,0),new THREE.AmbientLight(0x30364d,1));
+const op=[];for(let i=0;i<=128;i++){const a=i/128*2*Math.PI;op.push(V(R*Math.cos(a),0,-R*Math.sin(a)))}
+const orbit=new THREE.Line(new THREE.BufferGeometry().setFromPoints(op),new THREE.LineBasicMaterial({color:0x5f6b91}));
+scene.add(orbit);
+
+// Equinoccios y solsticios sobre la órbita
+function theta(d){return Math.PI+2*Math.PI*(d-172)/365}
+const SP=[{d:80.75,n:'Equinoccio',s:'~21 mar',c:0x66d9a0},{d:172,n:'Solsticio',s:'21 jun',c:0xffa64d},{d:263.25,n:'Equinoccio',s:'~20 sep',c:0x66d9a0},{d:354.5,n:'Solsticio',s:'~21 dic',c:0xffa64d}];
+const NAMES=['equinoccio de marzo','solsticio de junio','equinoccio de septiembre','solsticio de diciembre'];
+const marks=new THREE.Group();scene.add(marks);
+SP.forEach(p=>{const t=theta(p.d),cx=Math.cos(t),cz=-Math.sin(t);
+  const m=new THREE.Mesh(new THREE.SphereGeometry(.3,16,12),new THREE.MeshBasicMaterial({color:p.c}));m.position.set(R*cx,0,R*cz);marks.add(m);
+  const l=label(p.n,p.s,'#'+p.c.toString(16),5.2,1.95);l.position.set((R+2.6)*cx,.9,(R+2.6)*cz);marks.add(l)});
+
+// Tierra: traslación > eje inclinado > giro
+const earth=new THREE.Group(),tilt=new THREE.Group(),spin=new THREE.Group();scene.add(earth);earth.add(tilt);tilt.add(spin);
+spin.add(new THREE.Mesh(new THREE.SphereGeometry(RE,48,32),new THREE.MeshLambertMaterial({color:0x2f6fb0})));
+spin.add(new THREE.Mesh(new THREE.SphereGeometry(RE*1.004,24,16),new THREE.MeshBasicMaterial({color:0x9fd0ff,wireframe:true,transparent:true,opacity:.28})));
+const axisL=new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(0,-RE*1.7,0),V(0,RE*1.7,0)]),new THREE.LineBasicMaterial({color:0xff5a4d}));tilt.add(axisL);
+const nrm=new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(0,-RE*1.7,0),V(0,RE*1.7,0)]),new THREE.LineDashedMaterial({color:0x8891ad,dashSize:.15,gapSize:.12}));nrm.computeLineDistances();earth.add(nrm);
+const term=new THREE.Mesh(new THREE.CircleGeometry(RE*1.5,48),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.13,side:THREE.DoubleSide,depthWrite:false}));earth.add(term);
+const N=180,lpos=new Float32Array((N+1)*3),lcol=new Float32Array((N+1)*3),lgeo=new THREE.BufferGeometry();
+lgeo.setAttribute('position',new THREE.BufferAttribute(lpos,3));lgeo.setAttribute('color',new THREE.BufferAttribute(lcol,3));
+const latL=new THREE.Line(lgeo,new THREE.LineBasicMaterial({vertexColors:true}));tilt.add(latL);
+const dot=new THREE.Mesh(new THREE.SphereGeometry(.09,16,12),new THREE.MeshBasicMaterial({color:0x222222}));
+const halo=new THREE.Mesh(new THREE.SphereGeometry(.22,16,12),new THREE.MeshBasicMaterial({color:0xffe27a,transparent:true,opacity:.45,depthWrite:false}));
+spin.add(dot,halo);
+
+// Observador: plano tangente (x=este, y=arriba, z=sur) con puntos cardinales
+const obs=new THREE.Group();spin.add(obs);const RP=.9;
+const plane=new THREE.Mesh(new THREE.CircleGeometry(RP,40).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffd166,transparent:true,opacity:.45,side:THREE.DoubleSide,depthWrite:false}));obs.add(plane);
+[['N','#ff7a70',[0,0,-1]],['S','#ffffff',[0,0,1]],['E','#ffffff',[1,0,0]],['O','#ffffff',[-1,0,0]]].forEach(([t,c,v])=>{
+  const s=label(t,null,c,.8,.3);s.position.set(v[0]*RP*1.12,.1,v[2]*RP*1.12);obs.add(s)});
+const PR=.8;
+function mk(n,mat,Cls){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(n*3),3));const o=new Cls(g,mat);o.frustumCulled=false;obs.add(o);return o}
+const pathL=mk(121,new THREE.LineBasicMaterial({color:0xffe27a}),THREE.Line);
+const hourP=mk(25,new THREE.PointsMaterial({color:0xffffff,size:6,sizeAttenuation:false}),THREE.Points);
+const refG=new THREE.Group();refG.visible=false;obs.add(refG);let showRef=false;
+const refL=[0xffa64d,0x66d9a0,0x6ea8ff].map(c=>{const o=mk(121,new THREE.LineBasicMaterial({color:c}),THREE.Line);refG.add(o);return o});
+// Camino del Sol en el sistema (este, arriba, sur) del observador: dl = declinación, la = latitud
+function fill(o,dl,steps,la){const a=o.geometry.attributes.position.array,c=Math.cos(dl);let k=0;
+  for(let i=0;i<=steps;i++){const H=-Math.PI+i*2*Math.PI/steps,U=Math.sin(la)*Math.sin(dl)+Math.cos(la)*c*Math.cos(H);
+    if(U>0){const Nn=Math.cos(la)*Math.sin(dl)-Math.sin(la)*c*Math.cos(H);a.set([-c*Math.sin(H)*PR,U*PR,-Nn*PR],k*3);k++}}
+  o.geometry.setDrawRange(0,k);o.geometry.attributes.position.needsUpdate=true}
+const sunP=new THREE.Mesh(new THREE.SphereGeometry(.05,12,8),new THREE.MeshBasicMaterial({color:0xfff2a0}));sunP.visible=false;scene.add(sunP);
+const hideInset=[sun,term,orbit,nrm,axisL,latL,marks,dot,halo];
+pathL.visible=hourP.visible=false; // el camino solo se dibuja en el recuadro del observador
+
+const trail=[];let lastRec=0,lastB=0,peak=null,peakAlt=0,follow=true,velv=35;
+function setFollow(v){follow=v;$('bFollow').classList.toggle('on',v);if(!v)velv=35}
+let eps=23.4*rad,lat=39*rad,day=172,vaz=180,spinOn=true,yearOn=false,zoomed=false,ang=0,lastKey='';
+const S=V(0,0,0),E=V(0,0,0),Nax=V(0,0,0),q=new THREE.Quaternion(),wp=V(0,0,0),Y=V(0,1,0);
+const dayCol=new THREE.Color(0xffc233),nightCol=new THREE.Color(0x3a52c9);
+function decl(d,e){return Math.asin(Math.max(-1,Math.min(1,-Math.sin(e)*Math.cos(theta(d)))))}
+function hours(d,la,e){const p=Math.max(-89.9*rad,Math.min(89.9*rad,la)),c=-Math.tan(p)*Math.tan(decl(d,e));return c>=1?0:c<=-1?24:24*Math.acos(c)/Math.PI}
+function dateStr(d){return new Date(2026,0,d).toLocaleDateString('es-ES',{day:'numeric',month:'long'})}
+const P8=['N','NE','E','SE','S','SO','O','NO'],dir8=a=>P8[Math.round(((a%360)+360)%360/45)%8];
+let sky={alt:0};
+
+function place(){
+  const t=theta(day);
+  E.set(R*Math.cos(t),0,-R*Math.sin(t));earth.position.copy(E);
+  S.copy(E).negate().normalize();
+  Nax.set(Math.sin(eps),Math.cos(eps),0);
+  tilt.quaternion.setFromUnitVectors(Y,Nax);
+  term.lookAt(E.clone().add(S));
+  const sl=S.clone().applyQuaternion(tilt.quaternion.clone().invert()),r=RE*1.01,cx=Math.cos(lat)*r,y=Math.sin(lat)*r;
+  for(let i=0;i<=N;i++){const a=i/N*2*Math.PI,x=cx*Math.cos(a),z=cx*Math.sin(a);
+    lpos.set([x,y,z],i*3);const c=(x*sl.x+y*sl.y+z*sl.z)>0?dayCol:nightCol;lcol.set([c.r,c.g,c.b],i*3)}
+  lgeo.attributes.position.needsUpdate=lgeo.attributes.color.needsUpdate=true;
+  dot.position.set(cx,y,0);halo.position.copy(dot.position);
+  // base local del observador (este, arriba, sur), con latitud acotada para evitar el polo
+  const la=Math.max(-89.5*rad,Math.min(89.5*rad,lat)),n=V(Math.cos(la),Math.sin(la),0),east=Y.clone().cross(n).normalize(),south=east.clone().cross(n);
+  obs.position.copy(dot.position);obs.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(east,n,south));
+  spin.rotation.y=ang;earth.updateMatrixWorld(true);
+  obs.getWorldQuaternion(q);dot.getWorldPosition(wp);
+  const eW=V(1,0,0).applyQuaternion(q),uW=V(0,1,0).applyQuaternion(q),nW=V(0,0,-1).applyQuaternion(q);
+  const alt=Math.asin(S.dot(uW))/rad,az=(Math.atan2(S.dot(eW),S.dot(nW))/rad+360)%360,isDay=alt>0;
+  sky={alt,az,uW,eW,nW};
+  if(follow){vaz=(vaz+(((az-vaz+540)%360)-180)*.15+360)%360;velv+=(Math.max(12,Math.min(60,alt))-velv)*.1;$('vaz').value=Math.round(vaz)}
+  if(spinOn&&Math.abs(ang-lastRec)>=1.5*rad){lastRec=ang;const b=Math.floor(ang/(15*rad)),hr=b!==lastB;lastB=b;
+    trail.push(alt>0?{p:V(S.dot(eW),S.dot(uW),-S.dot(nW)),a:ang,h:hr}:{p:null,a:ang});
+    while(trail.length&&trail[0].a<ang-2*Math.PI)trail.shift()}
+  dot.material.color.set(isDay?0xffe27a:0x1b1f2e);halo.visible=isDay;
+  const h=hours(day,lat,eps),d=decl(day,eps)/rad,f=x=>x.toFixed(1).replace('.',',');
+  let near='';SP.forEach((p,i)=>{if(Math.abs(day-p.d)<=1.6)near=' Hoy: '+NAMES[i]+'.'});
+  $('hours').textContent=f(h)+' h de luz';
+  $('detail').textContent=dateStr(day)+' · declinación del Sol '+f(d)+'° · '+(isDay?'de día':'de noche')+' en el punto. '+(x=>x>0?'Altura máxima del Sol: '+f(x)+'°.':'El Sol no sale.')(90-Math.abs(lat/rad-d))+near;
+  $('latV').textContent=Math.abs(lat/rad).toFixed(0)+'° '+(lat>=0?'N':'S');
+  $('dayV').textContent=dateStr(day);$('epsV').textContent=f(eps/rad)+'°';$('vazV').textContent=Math.round(vaz)+'° ('+dir8(vaz)+')';
+  $('hud').textContent=isDay?'Sol a '+alt.toFixed(0)+'° sobre el horizonte, hacia el '+dir8(az)+' (acimut '+az.toFixed(0)+'°)':'El Sol está bajo el horizonte';
+  $('insetT').textContent='Vista del observador · mirando al '+dir8(vaz);
+  const key=[day,lat,eps].join('|');if(key!==lastKey){lastKey=key;trail.length=0;drawChart(h);const dl=decl(day,eps);fill(pathL,dl,120,la);peakAlt=90-Math.abs(la-dl)/rad;peak=peakAlt>0?V(0,Math.cos(la-dl),-Math.sin(dl-la)):null;fill(hourP,dl,24,la);[eps,0,-eps].forEach((e,i)=>fill(refL[i],e,120,la))}
+}
+function drawChart(hNow){
+  const c=$('chart'),w=c.clientWidth,h=c.clientHeight,dpr=devicePixelRatio||1;
+  c.width=w*dpr;c.height=h*dpr;const g=c.getContext('2d');g.scale(dpr,dpr);
+  const cs=getComputedStyle(document.documentElement),ink=cs.getPropertyValue('--mut'),acc=cs.getPropertyValue('--acc'),ln=cs.getPropertyValue('--line');
+  const X=d=>28+(w-36)*(d-1)/364,Y2=v=>h-18-(h-28)*v/24;
+  g.strokeStyle=ln;g.fillStyle=ink;g.font='11px system-ui';g.lineWidth=1;
+  [0,6,12,18,24].forEach(v=>{g.beginPath();g.moveTo(28,Y2(v));g.lineTo(w-8,Y2(v));g.stroke();g.fillText(v,4,Y2(v)+4)});
+  SP.forEach(p=>{g.strokeStyle='#'+p.c.toString(16);g.setLineDash([3,3]);g.beginPath();g.moveTo(X(p.d),Y2(24));g.lineTo(X(p.d),Y2(0));g.stroke();
+    g.fillStyle=ink;g.fillText(p.n=='Solsticio'?'sol.':'eq.',X(p.d)-9,h-4)});
+  g.setLineDash([]);g.strokeStyle=acc;g.lineWidth=2;g.beginPath();
+  for(let d=1;d<=365;d++){const y=Y2(hours(d,lat,eps));d==1?g.moveTo(X(d),y):g.lineTo(X(d),y)}g.stroke();
+  g.fillStyle=acc;g.beginPath();g.arc(X(day),Y2(hNow),5,0,7);g.fill();
+}
+
+// Cámara principal orbital manual
+let az=.6,el=.55,dist=28;const target=V(0,0,0);
+function updCam(){
+  target.copy(zoomed?E:V(0,0,0));
+  cam.position.set(target.x+dist*Math.cos(el)*Math.sin(az),target.y+dist*Math.sin(el),target.z+dist*Math.cos(el)*Math.cos(az));cam.lookAt(target);
+}
+const pts=new Map(),cv=renderer.domElement;let pinch=0;
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY])});
+cv.addEventListener('pointerup',e=>{pts.delete(e.pointerId);pinch=0});
+cv.addEventListener('pointermove',e=>{
+  if(!pts.has(e.pointerId))return;const o=pts.get(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
+  if(pts.size==1){az-=(e.clientX-o[0])*.008;el=Math.max(-1.5,Math.min(1.5,el+(e.clientY-o[1])*.008))}
+  else if(pts.size==2){const[a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch)zoom(pinch/d);pinch=d}
+});
+function zoom(f){dist=Math.max(zoomed?3:12,Math.min(zoomed?20:60,dist*f))}
+cv.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY>0?1.08:.92)},{passive:false});
+// Arrastrar el recuadro cambia hacia dónde mira el observador
+let lx=null;inset.onpointerdown=e=>{inset.setPointerCapture(e.pointerId);lx=e.clientX};
+inset.onpointerup=()=>{lx=null};
+inset.onpointermove=e=>{if(lx===null)return;vaz=Math.round((vaz-(e.clientX-lx)*.4+360)%360);lx=e.clientX;$('vaz').value=vaz;setFollow(false)};
+
+$('lat').oninput=e=>{lat=e.target.value*rad};
+$('day').oninput=e=>{day=+e.target.value};
+$('eps').oninput=e=>{eps=e.target.value*rad};
+$('vaz').oninput=e=>{vaz=+e.target.value;setFollow(false)};
+document.querySelectorAll('#seasons button').forEach(b=>b.onclick=()=>{day=+b.dataset.d;$('day').value=day});
+$('bSpin').onclick=e=>{spinOn=!spinOn;e.target.classList.toggle('on',spinOn)};
+$('bYear').onclick=e=>{yearOn=!yearOn;e.target.classList.toggle('on',yearOn)};
+$('bRef').onclick=e=>{showRef=!showRef;e.target.classList.toggle('on',showRef)};
+$('bFollow').onclick=()=>setFollow(!follow);
+$('bZoom').onclick=e=>{zoomed=!zoomed;e.target.classList.toggle('on',zoomed);e.target.textContent=zoomed?'Ver todo el sistema':'Acercar a la Tierra';dist=zoomed?7:28};
+
+let IW=0,IH=0;const ov=$('ov'),og=ov.getContext('2d'),tmp=V(0,0,0);
+function walk(geo,f){const a=geo.attributes.position.array,n=Math.min(geo.drawRange.count,a.length/3);let pen=false;
+  for(let i=0;i<n;i++){tmp.set(a[i*3],a[i*3+1],a[i*3+2]);obs.localToWorld(tmp);tmp.project(cam2);
+    if(tmp.z>1){pen=false;continue}f((tmp.x+1)/2*IW,(1-tmp.y)/2*IH,pen);pen=true}}
+function line(geo,col,wd){og.strokeStyle=col;og.lineWidth=wd;og.beginPath();walk(geo,(x,y,pen)=>pen?og.lineTo(x,y):og.moveTo(x,y));og.stroke()}
+function proj(p){tmp.copy(p).multiplyScalar(PR);obs.localToWorld(tmp);tmp.project(cam2);return tmp.z>1?null:[(tmp.x+1)/2*IW,(1-tmp.y)/2*IH]}
+function overlay(){const d=devicePixelRatio||1;og.setTransform(d,0,0,d,0,0);og.clearRect(0,0,IW,IH);
+  if(showRef)['#ffa64d','#66d9a0','#6ea8ff'].forEach((c,i)=>line(refL[i].geometry,c,1.5));
+  og.setLineDash([6,5]);line(pathL.geometry,'rgba(255,226,122,.75)',2);og.setLineDash([]);
+  og.shadowColor='#000';og.shadowBlur=3;og.strokeStyle='#ffe27a';og.lineWidth=3;og.beginPath();let pen=false;
+  trail.forEach(t=>{const c=t.p&&proj(t.p);if(!c){pen=false;return}pen?og.lineTo(c[0],c[1]):og.moveTo(c[0],c[1]);pen=true});og.stroke();
+  og.fillStyle='#fff';trail.forEach(t=>{const c=t.h&&t.p&&proj(t.p);if(c){og.beginPath();og.arc(c[0],c[1],3,0,7);og.fill()}});
+  const pc=peak&&proj(peak);if(pc){og.strokeStyle='#fff';og.lineWidth=2;og.beginPath();og.arc(pc[0],pc[1],7,0,7);og.stroke();og.fillStyle='#fff';og.font='bold 12px system-ui';og.fillText('máx. '+peakAlt.toFixed(0)+'°',pc[0]+11,pc[1]+4)}
+  og.shadowBlur=0}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();
+  IW=inset.clientWidth;IH=inset.clientHeight;renderer2.setSize(IW,IH,false);ov.width=IW*(devicePixelRatio||1);ov.height=IH*(devicePixelRatio||1);cam2.aspect=IW/IH;cam2.updateProjectionMatrix();lastKey=''}
+addEventListener('resize',()=>{resize();place()});
+
+const night=new THREE.Color(0x070a18),dayC=new THREE.Color(0x5aa9ea),skyC=new THREE.Color();
+function render(){
+  const w=stage.clientWidth,h=stage.clientHeight;
+  sunP.visible=false;renderer.setScissorTest(false);renderer.setViewport(0,0,w,h);renderer.setClearColor(0x05070f,1);renderer.render(scene,cam);
+  // vista subjetiva
+  const up=sky.uW,rv=(vaz-0)*rad,elv=velv*rad;
+  cam2.position.copy(wp).addScaledVector(up,.03);cam2.up.copy(up);
+  const dir=sky.nW.clone().multiplyScalar(Math.cos(rv)).addScaledVector(sky.eW,Math.sin(rv)).multiplyScalar(Math.cos(elv)).addScaledVector(up,Math.sin(elv));
+  cam2.lookAt(cam2.position.clone().add(dir));
+  skyC.copy(night).lerp(dayC,Math.max(0,Math.min(1,(sky.alt+6)/14)));
+  hideInset.forEach(o=>o.visible=false);
+  
+  sunP.position.copy(wp).addScaledVector(S,PR);sunP.visible=true;renderer2.setClearColor(skyC,1);renderer2.render(scene,cam2);cam2.updateMatrixWorld(true);overlay();
+  hideInset.forEach(o=>o.visible=true);halo.visible=sky.alt>0;sunP.visible=false;
+}
+let last=performance.now(),acc=0;
+function loop(t){
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(spinOn)ang+=dt*2*Math.PI/8;
+  if(yearOn){acc+=dt*30;if(acc>=1){const k=Math.floor(acc);acc-=k;day=((day-1+k)%365)+1;$('day').value=day}}
+  place();updCam();render();requestAnimationFrame(loop);
+}
+resize();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

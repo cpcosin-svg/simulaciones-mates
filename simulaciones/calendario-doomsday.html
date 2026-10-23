@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calendario gregoriano en tres ejes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f4f5f7; --panel:#ffffff; --ink:#14171c; --muted:#59616d; --line:#d9dce2;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1116; --panel:#161a20; --ink:#eceef2; --muted:#9aa2af; --line:#2a303a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1116; --panel:#161a20; --ink:#eceef2; --muted:#9aa2af; --line:#2a303a;
+}
+*,*::before,*::after{box-sizing:inherit;}
+html,body{margin:0;}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  line-height:1.45; font-size:16px;
+}
+.page{max-width:1120px;margin:0 auto;padding:22px 16px 48px;}
+h1{font-size:1.6rem;line-height:1.2;margin:0 0 6px;font-weight:700;letter-spacing:-.01em;}
+h2{font-size:1.1rem;margin:0;font-weight:700;}
+.sub{color:var(--muted);margin:0 0 18px;max-width:66ch;}
+
+.bar{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:flex-end;margin-bottom:12px;}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted);}
+.field .val{color:var(--ink);font-weight:700;}
+input[type=number]{
+  width:92px;padding:7px 8px;font:inherit;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:6px;
+}
+input[type=range]{width:170px;accent-color:var(--ink);}
+.check{display:flex;align-items:center;gap:8px;font-size:.92rem;color:var(--ink);cursor:pointer;}
+.check input{width:18px;height:18px;accent-color:var(--ink);}
+button{font:inherit;color:var(--ink);cursor:pointer;}
+.btn{padding:7px 12px;background:var(--panel);border:1px solid var(--line);border-radius:6px;}
+.btn:hover{border-color:var(--ink);}
+.views{display:flex;gap:6px;flex-wrap:wrap;}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+
+#stage{
+  position:relative;height:min(64vh,580px);min-height:340px;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;
+}
+#stage canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none;}
+#stage canvas:active{cursor:grabbing;}
+#tip{
+  position:absolute;display:none;pointer-events:none;z-index:2;
+  background:var(--ink);color:var(--bg);padding:6px 9px;border-radius:6px;font-size:.85rem;
+  max-width:240px;
+}
+#tip i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px;}
+.hint{color:var(--muted);font-size:.85rem;margin:8px 0 0;}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 6px;align-items:center;}
+.wd{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 11px;
+  background:var(--panel);border:1px solid var(--line);border-radius:999px;font-size:.92rem;
+}
+.wd i{width:14px;height:14px;border-radius:4px;display:inline-block;}
+.wd[aria-pressed="false"]{opacity:.45;}
+.wd[aria-pressed="false"] i{background:transparent !important;border:2px solid var(--muted);}
+details{margin:6px 0 0;color:var(--muted);font-size:.9rem;max-width:80ch;}
+summary{cursor:pointer;color:var(--ink);}
+details p{margin:6px 0 0;}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:22px;}
+.cardhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;margin-bottom:10px;}
+.nav{display:flex;gap:6px;align-items:center;}
+.chip{display:inline-block;padding:1px 9px;border-radius:999px;color:#101418;font-weight:700;}
+#yinfo{margin:0 0 4px;}
+#anchors{margin:0 0 12px;color:var(--muted);font-size:.9rem;}
+.scroll{overflow-x:auto;padding-bottom:4px;}
+.grid{display:grid;grid-template-columns:36px repeat(31,minmax(21px,1fr));gap:2px;min-width:720px;}
+.grid div{height:24px;display:flex;align-items:center;justify-content:center;font-size:.72rem;border-radius:3px;color:#101418;}
+.grid .hd{color:var(--muted);height:18px;font-size:.7rem;}
+.grid .ml{justify-content:flex-start;color:var(--muted);font-size:.8rem;}
+.grid .empty{background:transparent;}
+.grid .off{background:var(--line);color:transparent;opacity:.5;}
+.grid .dim{opacity:.28;}
+.grid .anc{box-shadow:inset 0 0 0 2px var(--ink);font-weight:700;}
+
+.strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.yr{
+  display:flex;flex-direction:column;align-items:center;gap:3px;min-width:46px;padding:5px 6px 5px;
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;font-size:.78rem;
+}
+.yr:hover{border-color:var(--ink);}
+.yr.sel{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink);}
+.yr .yb{height:5px;width:100%;border-radius:2px;}
+.note{color:var(--muted);font-size:.85rem;margin:10px 0 0;}
+.cycgrid{display:grid;grid-template-columns:repeat(7,minmax(76px,1fr));gap:6px;min-width:560px;margin-top:8px;}
+.cycgrid .ch{padding:5px 6px;border-radius:6px;text-align:center;font-weight:700;color:#101418;font-size:.85rem;}
+.cy{padding:7px 4px;background:var(--panel);border:1px solid var(--line);border-radius:6px;font-size:.92rem;text-align:center;}
+.cy:hover{border-color:var(--ink);}
+.cy.leap{font-weight:700;}
+.cy.twin{background:var(--line);}
+.cy.sel{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink);}
+.eq{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0;}
+.tw{padding:2px 10px;border:1px solid var(--line);border-radius:999px;font-size:.9rem;}
+.tw.ok{border-color:var(--ink);}
+.tw.no{color:var(--muted);text-decoration:line-through;}
+.tw.me{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.eq .msg{color:var(--muted);font-size:.88rem;flex-basis:100%;}
+.cardtxt{margin:0 0 8px;max-width:80ch;}
+@media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto !important;} }
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>Calendario gregoriano en tres ejes</h1>
+  <p class="sub">Cada cubo es un día: su posición viene dada por el día del mes, el mes y el año, y su color por el día de la semana. Sirve de tablero para ver por qué funcionan los algoritmos tipo doomsday.</p>
+
+  <div class="bar">
+    <label class="field">Año inicial
+      <input type="number" id="start" min="1583" max="9900" step="1" value="2000">
+    </label>
+    <label class="field">Número de años <span class="val" id="countOut">28</span>
+      <input type="range" id="count" min="1" max="60" step="1" value="28">
+    </label>
+    <label class="field">Tamaño de los cubos
+      <input type="range" id="size" min="0.2" max="1" step="0.05" value="0.8">
+    </label>
+    <label class="check"><input type="checkbox" id="doom"> Resaltar fechas ancla</label>
+    <label class="check"><input type="checkbox" id="gap"> Separar bloques de 28 años</label>
+    <div class="field">Vista
+      <div class="views" id="views">
+        <button class="btn" data-view="iso">Isométrica</button>
+        <button class="btn" data-view="front">Frontal</button>
+        <button class="btn" data-view="side">Lateral</button>
+        <button class="btn" data-view="top">Superior</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="stage"><div id="tip"></div></div>
+  <p class="hint">Arrastra para girar. Rueda del ratón o pellizco para acercar. Toca un cubo para abrir su año abajo.</p>
+
+  <div class="legend" id="legend" role="group" aria-label="Días de la semana"></div>
+  <p class="hint" style="margin-top:0">Clic: mostrar u ocultar un día de la semana. Doble clic: aislarlo.</p>
+
+  <details>
+    <summary>¿Qué son las fechas ancla?</summary>
+    <p>Son las fechas de cada año que caen siempre en el mismo día de la semana, el doomsday de ese año: 4/4, 6/6, 8/8, 10/10 y 12/12; 9/5 y 5/9; 7/11 y 11/7; el 7 de marzo (y también 14, 21 y 28); el último día de febrero; y el 3 de enero (4 en año bisiesto). Al resaltarlas verás que, dentro de cada capa, todas comparten color.</p>
+  </details>
+
+  <section class="card" aria-labelledby="ttl">
+    <div class="cardhead">
+      <h2 id="ttl">Capa del año seleccionado</h2>
+      <div class="nav">
+        <button class="btn" id="prev" aria-label="Año anterior">&#9664;</button>
+        <button class="btn" id="next" aria-label="Año siguiente">&#9654;</button>
+        <label class="check"><input type="checkbox" id="letters"> Mostrar letras L M X J V S D</label>
+      </div>
+    </div>
+    <p id="yinfo"></p>
+    <p id="anchors"></p>
+    <div class="scroll"><div class="grid" id="slice"></div></div>
+    <h2 style="margin-top:18px;font-size:1rem">Doomsday de cada año</h2>
+    <div class="strip" id="strip"></div>
+    <p class="note">La barra de color bajo cada año es su doomsday. Un asterisco marca los años bisiestos.</p>
+  </section>
+
+  <section class="card" aria-labelledby="cttl">
+    <div class="cardhead">
+      <h2 id="cttl">Ciclo de 28 años</h2>
+      <div class="nav">
+        <button class="btn" id="ex2">Ver dos ciclos</button>
+        <button class="btn" id="ex2100">Cruzar el año 2100</button>
+      </div>
+    </div>
+    <p class="cardtxt">El calendario de un año queda fijado por dos datos: si es bisiesto y en qué día cae el 1 de enero, lo que deja 14 calendarios posibles. 28 años suman 28·365 + 7 = 10 227 días, que son 1 461 semanas exactas, así que el calendario vuelve a empezar. Vale mientras no se cruce un año secular no bisiesto (1900, 2100, 2200…).</p>
+    <p class="cardtxt">Con el doomsday: de un año al siguiente avanza 1 día si el nuevo año es común y 2 si es bisiesto. En 28 años son 21·1 + 7·2 = 35 = 5·7 días, y vuelve al mismo día.</p>
+    <div class="eq" id="cyeq"></div>
+    <p class="cardtxt" id="cycap" style="color:var(--muted);font-size:.9rem;margin-bottom:0"></p>
+    <div class="scroll"><div class="cycgrid" id="cycgrid"></div></div>
+    <p class="note" id="cynote"></p>
+    <p class="note" id="cyrange" style="margin-top:4px"></p>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ---------- Datos y calendario ---------- */
+const DAYS=['lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
+const LET=['L','M','X','J','V','S','D'];
+const COLORS=['#3b6fb6','#e8833a','#4aa36b','#d94f5c','#8e63b8','#e7c23f','#3fb6bd'];
+const MS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MFULL=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const T=[0,3,2,5,0,3,5,1,4,6,2,4];
+const AN=[0,3,28,7,4,9,6,11,8,5,10,7,12];
+
+const isLeap=y=>(y%4===0&&y%100!==0)||y%400===0;
+const mlen=(y,m)=>[31,isLeap(y)?29:28,31,30,31,30,31,31,30,31,30,31][m];
+// 0 = lunes ... 6 = domingo   (m: 1..12)
+function dow(y,m,d){
+  const yy=m<3?y-1:y;
+  const r=(yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)+T[m-1]+d)%7; // 0=domingo
+  return (r+6)%7;
+}
+function anchor(y,m){
+  if(m===1) return isLeap(y)?4:3;
+  if(m===2) return isLeap(y)?29:28;
+  return AN[m];
+}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const $=id=>document.getElementById(id);
+
+const S={start:2000,count:28,size:0.8,doom:false,letters:false,gap:false,on:[true,true,true,true,true,true,true],sel:2000};
+const HAS3D=!!window.THREE;
+
+/* ---------- Tema ---------- */
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+const THEME={panel:null,ink:'#14171c',inkC:null,muted:'#59616d'};
+
+/* ---------- Escena 3D ---------- */
+const stage=$('stage'), tip=$('tip');
+let renderer,scene,camera,mesh=null,cells=[],axes=null,frame=null,slab=null,palette=null;
+const cam={theta:0.75,phi:0.5,r:80};
+const VIEWS={iso:{theta:0.75,phi:0.5},front:{theta:0,phi:0},side:{theta:Math.PI/2,phi:0},top:{theta:0,phi:1.55}};
+const GAPW=2;
+const zpos=i=>i+(S.gap?Math.floor(i/28)*GAPW:0);
+const zc=()=>zpos(S.count-1)/2;
+const zOf=i=>zc()-zpos(i);
+
+let rq=false;
+function requestRender(){
+  if(!HAS3D||rq) return; rq=true;
+  requestAnimationFrame(()=>{rq=false;renderer.render(scene,camera);});
+}
+function defaultR(){
+  const asp=camera.aspect||1.6;
+  return (40+Math.max(31,zpos(S.count-1)+1))*Math.max(1,1.5/asp);
+}
+function placeCamera(){
+  if(!HAS3D) return;
+  const cp=Math.cos(cam.phi);
+  camera.position.set(cam.r*cp*Math.sin(cam.theta),cam.r*Math.sin(cam.phi),cam.r*cp*Math.cos(cam.theta));
+  camera.lookAt(0,0,0);
+  requestRender();
+}
+
+function initScene(){
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  stage.insertBefore(renderer.domElement,tip);
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(40,1.6,0.1,2000);
+  scene.add(new THREE.AmbientLight(0xffffff,0.65));
+  const dl=new THREE.DirectionalLight(0xffffff,0.55);
+  dl.position.set(-1,2,1.5); scene.add(dl);
+  palette=COLORS.map(c=>new THREE.Color(c));
+
+  // marco y losa translúcida de la capa seleccionada
+  frame=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(31.3,12.3,1.1)),new THREE.LineBasicMaterial({color:0x000000}));
+  slab=new THREE.Mesh(new THREE.BoxGeometry(31.3,12.3,1.1),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.1,depthWrite:false}));
+  scene.add(frame); scene.add(slab);
+
+  const ro=new ResizeObserver(resize); ro.observe(stage);
+  resize();
+  bindPointer();
+}
+function resize(){
+  if(!HAS3D) return;
+  const w=stage.clientWidth,h=stage.clientHeight; if(!w||!h) return;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h; camera.updateProjectionMatrix();
+  requestRender();
+}
+
+function build(){
+  if(!HAS3D) return;
+  if(mesh){scene.remove(mesh);mesh.geometry.dispose();mesh.material.dispose();mesh.dispose&&mesh.dispose();}
+  cells=[];
+  for(let i=0;i<S.count;i++){
+    const y=S.start+i;
+    for(let m=0;m<12;m++){
+      const L=mlen(y,m), ad=anchor(y,m+1);
+      for(let d=1;d<=L;d++) cells.push({i:i,y:y,m:m,d:d,w:dow(y,m+1,d),a:d===ad});
+    }
+  }
+  mesh=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial(),cells.length);
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  scene.add(mesh);
+  update();
+  buildAxes();
+  updateFrame();
+}
+
+const dummy=HAS3D?new THREE.Object3D():null, tmpCol=HAS3D?new THREE.Color():null;
+function update(){
+  if(!HAS3D||!mesh) return;
+  const zs=[]; for(let i=0;i<S.count;i++) zs.push(zOf(i));
+  for(let k=0;k<cells.length;k++){
+    const c=cells[k]; let s=S.size;
+    if(!S.on[c.w]) s=0.0001;
+    else if(S.doom&&!c.a) s=0.16;
+    dummy.position.set(c.d-16, 5.5-c.m, zs[c.i]);
+    dummy.scale.setScalar(s);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(k,dummy.matrix);
+    tmpCol.copy(palette[c.w]);
+    if(S.doom&&!c.a) tmpCol.lerp(THEME.panel,0.45);
+    mesh.setColorAt(k,tmpCol);
+  }
+  mesh.instanceMatrix.needsUpdate=true;
+  mesh.instanceColor.needsUpdate=true;
+  requestRender();
+}
+
+function makeLabel(text,color,px){
+  const c=document.createElement('canvas'), ctx=c.getContext('2d');
+  const font='700 '+(px*2)+'px "Atkinson Hyperlegible",system-ui,sans-serif';
+  ctx.font=font;
+  const w=Math.ceil(ctx.measureText(text).width)+10, h=px*2+10;
+  c.width=w; c.height=h;
+  ctx.font=font; ctx.fillStyle=color; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(text,w/2,h/2+1);
+  const tex=new THREE.CanvasTexture(c); tex.minFilter=THREE.LinearFilter;
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));
+  const k=0.03; sp.scale.set(w*k,h*k,1); sp.renderOrder=10;
+  return sp;
+}
+function buildAxes(){
+  if(!HAS3D) return;
+  if(axes){
+    axes.children.forEach(s=>{s.material.map.dispose();s.material.dispose();});
+    scene.remove(axes);
+  }
+  axes=new THREE.Group();
+  const zf=zOf(0), ink=THEME.ink, mu=THEME.muted;
+  const put=(t,col,px,x,y,z)=>{const s=makeLabel(t,col,px);s.position.set(x,y,z);axes.add(s);};
+  for(let m=0;m<12;m++) put(MS[m],mu,12,-17.6,5.5-m,zf);
+  [1,5,10,15,20,25,31].forEach(d=>put(String(d),mu,12,d-16,6.9,zf));
+  const step=Math.max(1,Math.ceil(S.count/12));
+  for(let i=0;i<S.count;i+=step) put(String(S.start+i),mu,12,17.6,-6.9,zOf(i));
+  put('Mes',ink,14,-20.5,0,zf);
+  put('Día del mes',ink,14,0,8.6,zf);
+  put('Año',ink,14,21.6,-6.9,0);
+  scene.add(axes);
+  requestRender();
+}
+function updateFrame(){
+  if(!HAS3D) return;
+  const i=S.sel-S.start, z=zOf(i), ok=i>=0&&i<S.count;
+  frame.position.set(0,0,z); slab.position.set(0,0,z);
+  frame.visible=slab.visible=ok;
+  requestRender();
+}
+
+/* ---------- Interacción 3D ---------- */
+let anim=0;
+function goView(v){
+  const t=VIEWS[v]; if(!t) return;
+  const from={theta:cam.theta,phi:cam.phi,r:cam.r};
+  let dth=t.theta-from.theta; dth=Math.atan2(Math.sin(dth),Math.cos(dth));
+  const to={theta:from.theta+dth,phi:t.phi,r:defaultR()};
+  cancelAnimationFrame(anim);
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){
+    cam.theta=to.theta;cam.phi=to.phi;cam.r=to.r;placeCamera();return;
+  }
+  const t0=performance.now(),D=420;
+  const step=now=>{
+    const k=Math.min(1,(now-t0)/D), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+    cam.theta=from.theta+(to.theta-from.theta)*e;
+    cam.phi=from.phi+(to.phi-from.phi)*e;
+    cam.r=from.r+(to.r-from.r)*e;
+    placeCamera();
+    if(k<1) anim=requestAnimationFrame(step);
+  };
+  anim=requestAnimationFrame(step);
+}
+
+const ray=HAS3D?new THREE.Raycaster():null, ndc=HAS3D?new THREE.Vector2():null;
+function hit(e){
+  const r=renderer.domElement.getBoundingClientRect();
+  ndc.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
+  ray.setFromCamera(ndc,camera);
+  const hs=ray.intersectObject(mesh);
+  for(let j=0;j<hs.length;j++){
+    const c=cells[hs[j].instanceId];
+    if(c&&S.on[c.w]&&!(S.doom&&!c.a)) return c;
+  }
+  return null;
+}
+function showTip(c,e){
+  if(!c){tip.style.display='none';return;}
+  tip.innerHTML='<i style="background:'+COLORS[c.w]+'"></i>'+DAYS[c.w]+' '+c.d+' de '+MFULL[c.m]+' de '+c.y+(c.a?'<br>Fecha ancla del doomsday':'');
+  tip.style.display='block';
+  const r=stage.getBoundingClientRect();
+  let x=e.clientX-r.left+14,y=e.clientY-r.top+14;
+  x=Math.min(x,r.width-tip.offsetWidth-8); y=Math.min(y,r.height-tip.offsetHeight-8);
+  tip.style.left=Math.max(4,x)+'px'; tip.style.top=Math.max(4,y)+'px';
+}
+let hoverBusy=false;
+function hover(e){
+  if(hoverBusy) return; hoverBusy=true;
+  const ev={clientX:e.clientX,clientY:e.clientY};
+  requestAnimationFrame(()=>{hoverBusy=false;if(mesh) showTip(hit(ev),ev);});
+}
+function bindPointer(){
+  const cv=renderer.domElement, ptrs=new Map();
+  let moved=0,lastPinch=0,tipTimer=0;
+  const pinch=()=>{const a=[...ptrs.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);};
+  cv.addEventListener('pointerdown',e=>{
+    cv.setPointerCapture(e.pointerId);
+    ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    moved=0; if(ptrs.size===2) lastPinch=pinch();
+    cancelAnimationFrame(anim); tip.style.display='none';
+  });
+  cv.addEventListener('pointermove',e=>{
+    if(!ptrs.has(e.pointerId)){ if(e.pointerType==='mouse') hover(e); return; }
+    const p=ptrs.get(e.pointerId), dx=e.clientX-p.x, dy=e.clientY-p.y;
+    p.x=e.clientX; p.y=e.clientY; moved+=Math.abs(dx)+Math.abs(dy);
+    if(ptrs.size===1){
+      cam.theta-=dx*0.008; cam.phi=clamp(cam.phi+dy*0.008,-1.5,1.55); placeCamera();
+    }else if(ptrs.size===2){
+      const d=pinch(); if(lastPinch) cam.r=clamp(cam.r*lastPinch/d,18,420); lastPinch=d; placeCamera();
+    }
+  });
+  const end=e=>{
+    if(ptrs.size===1&&moved<6&&e.type==='pointerup'&&mesh){
+      const c=hit(e);
+      if(c) selectYear(c.y);
+      if(e.pointerType!=='mouse'){
+        showTip(c,e); clearTimeout(tipTimer); tipTimer=setTimeout(()=>{tip.style.display='none';},2600);
+      }
+    }
+    ptrs.delete(e.pointerId); lastPinch=0;
+  };
+  cv.addEventListener('pointerup',end);
+  cv.addEventListener('pointercancel',end);
+  cv.addEventListener('pointerleave',()=>{tip.style.display='none';});
+  cv.addEventListener('wheel',e=>{
+    e.preventDefault();
+    cam.r=clamp(cam.r*Math.exp(e.deltaY*0.0012),18,420); placeCamera();
+  },{passive:false});
+}
+
+/* ---------- Capa anual (2D) ---------- */
+function renderSlice(){
+  const y=S.sel, g=$('slice'), frag=document.createDocumentFragment();
+  const cell=(cls,txt,title)=>{const d=document.createElement('div');d.className=cls;if(txt!==undefined)d.textContent=txt;if(title)d.title=title;return d;};
+  frag.appendChild(cell('hd',''));
+  for(let d=1;d<=31;d++) frag.appendChild(cell('hd',String(d)));
+  for(let m=0;m<12;m++){
+    frag.appendChild(cell('ml',MS[m]));
+    const L=mlen(y,m), ad=anchor(y,m+1);
+    for(let d=1;d<=31;d++){
+      if(d>L){frag.appendChild(cell('empty',''));continue;}
+      const w=dow(y,m+1,d), isA=d===ad;
+      const el=cell('',S.letters?LET[w]:String(d),DAYS[w]+' '+d+' de '+MFULL[m]+' de '+y);
+      if(!S.on[w]){el.className='off';}
+      else{
+        el.style.background=COLORS[w];
+        if(S.doom&&!isA) el.className='dim';
+      }
+      if(isA&&S.on[w]) el.classList.add('anc');
+      frag.appendChild(el);
+    }
+  }
+  g.innerHTML=''; g.appendChild(frag);
+
+  const dd=dow(y,4,4), leap=isLeap(y);
+  $('yinfo').innerHTML='<b>'+y+'</b>, '+(leap?'año bisiesto':'año no bisiesto')+'. Doomsday: <span class="chip" style="background:'+COLORS[dd]+'">'+DAYS[dd]+'</span>';
+  const al=[]; for(let m=1;m<=12;m++) al.push(anchor(y,m)+' '+MS[m-1].toLowerCase());
+  $('anchors').textContent='Fechas ancla: '+al.join(', ')+'.';
+}
+function renderStrip(){
+  const s=$('strip'); s.innerHTML='';
+  for(let i=0;i<S.count;i++){
+    const y=S.start+i, dd=dow(y,4,4), b=document.createElement('button');
+    b.className='yr'+(y===S.sel?' sel':'');
+    b.title=y+': doomsday en '+DAYS[dd]+(isLeap(y)?' (bisiesto)':'');
+    b.innerHTML='<span>'+y+(isLeap(y)?'*':'')+'</span><span class="yb" style="background:'+COLORS[dd]+'"></span>';
+    b.addEventListener('click',()=>selectYear(y));
+    s.appendChild(b);
+  }
+}
+function selectYear(y){
+  S.sel=clamp(y,S.start,S.start+S.count-1);
+  renderSlice(); renderStrip(); renderCycle(); updateFrame();
+}
+
+/* ---------- Ciclo de 28 años ---------- */
+const secNL=c=>c%100===0&&c%400!==0;
+function sameCal(a,b){return isLeap(a)===isLeap(b)&&dow(a,1,1)===dow(b,1,1);}
+function groupYears(a){
+  const out=[]; let s=a[0],p=a[0];
+  for(let i=1;i<=a.length;i++){
+    if(i<a.length&&a[i]===p+1){p=a[i];continue;}
+    out.push(s===p?String(s):s+'\u2013'+p); s=a[i]; p=a[i];
+  }
+  return out.join(', ');
+}
+function renderCycle(){
+  const y=S.sel, end=S.start+S.count-1;
+
+  // años a saltos de 28 respecto al seleccionado
+  const eq=$('cyeq'); eq.innerHTML='';
+  const yrs=[]; for(let k=-3;k<=4;k++){const yy=y+28*k; if(yy>=1583&&yy<=9900) yrs.push(yy);}
+  const lead=document.createElement('span'); lead.textContent='Saltos de 28 años desde '+y+':'; eq.appendChild(lead);
+  let anyNo=false;
+  yrs.forEach(yy=>{
+    const same=sameCal(y,yy), s=document.createElement('span');
+    s.className='tw '+(yy===y?'me':same?'ok':'no');
+    s.textContent=yy+(yy===y?'':same?' =':' \u2260');
+    s.title=yy===y?'año seleccionado':(same?'mismo calendario que '+y:'calendario distinto del de '+y);
+    if(!same) anyNo=true;
+    eq.appendChild(s);
+  });
+  if(anyNo){
+    const lo=yrs[0], hi=yrs[yrs.length-1], brk=[];
+    for(let c=Math.ceil(lo/100)*100;c<=hi;c+=100) if(secNL(c)) brk.push(c);
+    if(brk.length){
+      const m=document.createElement('span'); m.className='msg';
+      m.textContent='= mismo calendario, \u2260 distinto. '+brk.join(', ')+(brk.length>1?' no son bisiestos':' no es bisiesto')+' y el desplazamiento deja de ser múltiplo de 7.';
+      eq.appendChild(m);
+    }
+  }
+
+  // bloque de 28 años que contiene al seleccionado, agrupado por doomsday
+  const b0=S.start+28*Math.floor((y-S.start)/28), b1=Math.min(b0+27,end);
+  const cols=[[],[],[],[],[],[],[]]; let leaps=0,n=0;
+  for(let yy=b0;yy<=b1;yy++){cols[dow(yy,4,4)].push(yy);n++;if(isLeap(yy))leaps++;}
+  const g=$('cycgrid'); g.innerHTML='';
+  cols.forEach((_,w)=>{
+    const h=document.createElement('div'); h.className='ch'; h.style.background=COLORS[w]; h.textContent=DAYS[w]; g.appendChild(h);
+  });
+  const rows=Math.max.apply(null,cols.map(c=>c.length));
+  for(let r=0;r<rows;r++) for(let w=0;w<7;w++){
+    const yy=cols[w][r];
+    if(yy===undefined){g.appendChild(document.createElement('div'));continue;}
+    const b=document.createElement('button');
+    b.className='cy'+(isLeap(yy)?' leap':'')+(yy===y?' sel':'')+(yy!==y&&sameCal(yy,y)?' twin':'');
+    b.textContent=yy+(isLeap(yy)?'*':'');
+    b.title=yy+': doomsday en '+DAYS[w]+(isLeap(yy)?' (bisiesto)':'');
+    b.addEventListener('click',()=>selectYear(yy));
+    g.appendChild(b);
+  }
+  $('cycap').textContent='Bloque '+b0+'\u2013'+b1+'. Cada columna reúne los años con el mismo doomsday (el asterisco marca los bisiestos).';
+
+  let note;
+  if(n<28){
+    note='En el rango solo hay '+n+' años de este bloque. Amplía el rango a 28 años o más para verlo completo.';
+  }else if(leaps===7){
+    note='Cada doomsday aparece 4 veces: 3 años comunes y 1 bisiesto. Los años sombreados tienen el mismo calendario que el seleccionado.';
+  }else{
+    const secs=[]; for(let yy=b0;yy<=b1;yy++) if(secNL(yy)) secs.push(yy);
+    note='Este bloque tiene '+leaps+' años bisiestos en lugar de 7 porque incluye '+secs.join(', ')+', que no es bisiesto. Por eso las columnas no salen equilibradas.';
+  }
+  $('cynote').textContent=note;
+
+  // cada año del rango frente al de 28 años antes
+  const bad=[]; let tot=0;
+  for(let i=0;i<S.count;i++){
+    const yy=S.start+i; if(yy-28<1583) continue;
+    tot++; if(!sameCal(yy,yy-28)) bad.push(yy);
+  }
+  $('cyrange').textContent=tot?('Cada año del rango frente al de 28 años antes: coinciden '+(tot-bad.length)+' de '+tot+(bad.length?'. No coinciden: '+groupYears(bad)+'.':'.')):'';
+}
+function setRange(start,count){
+  S.start=start; S.count=count; S.gap=true; S.sel=start;
+  $('start').value=start; $('count').value=count; $('countOut').textContent=count; $('gap').checked=true;
+  rebuildAll(); goView('iso');
+}
+
+/* ---------- Controles ---------- */
+function rebuildAll(){
+  S.sel=clamp(S.sel,S.start,S.start+S.count-1);
+  build(); renderStrip(); renderSlice(); renderCycle();
+}
+function buildLegend(){
+  const lg=$('legend'); lg.innerHTML='';
+  DAYS.forEach((n,w)=>{
+    const b=document.createElement('button'); b.className='wd'; b.setAttribute('aria-pressed','true');
+    b.innerHTML='<i style="background:'+COLORS[w]+'"></i>'+n;
+    b.addEventListener('click',()=>{S.on[w]=!S.on[w];syncLegend();update();renderSlice();});
+    b.addEventListener('dblclick',()=>{S.on=S.on.map((_,k)=>k===w);syncLegend();update();renderSlice();});
+    lg.appendChild(b);
+  });
+  const all=document.createElement('button'); all.className='btn'; all.textContent='Todos';
+  all.addEventListener('click',()=>{S.on=S.on.map(()=>true);syncLegend();update();renderSlice();});
+  lg.appendChild(all);
+}
+function syncLegend(){
+  [...$('legend').querySelectorAll('.wd')].forEach((b,w)=>b.setAttribute('aria-pressed',S.on[w]?'true':'false'));
+}
+function refreshTheme(){
+  THEME.ink=cssVar('--ink')||'#14171c';
+  THEME.muted=cssVar('--muted')||'#59616d';
+  if(!HAS3D) return;
+  THEME.panel=new THREE.Color(cssVar('--panel')||'#ffffff');
+  THEME.inkC=new THREE.Color(THEME.ink);
+  frame.material.color.copy(THEME.inkC);
+  slab.material.color.copy(THEME.inkC);
+  update(); buildAxes();
+}
+
+function init(){
+  THEME.ink=cssVar('--ink')||'#14171c';
+  THEME.muted=cssVar('--muted')||'#59616d';
+  if(HAS3D){
+    THEME.panel=new THREE.Color(cssVar('--panel')||'#ffffff');
+    THEME.inkC=new THREE.Color(THEME.ink);
+    initScene();
+    frame.material.color.copy(THEME.inkC);
+    slab.material.color.copy(THEME.inkC);
+    cam.r=defaultR(); placeCamera();
+  }else{
+    stage.insertAdjacentHTML('afterbegin','<p style="padding:16px;color:var(--muted)">No se pudo cargar la librería 3D. La capa anual de abajo sigue funcionando.</p>');
+  }
+  buildLegend();
+
+  $('start').addEventListener('change',e=>{
+    const v=clamp(parseInt(e.target.value,10)||2000,1583,9900);
+    e.target.value=v; S.start=v; S.sel=clamp(S.sel,S.start,S.start+S.count-1);
+    cam.r=defaultR(); rebuildAll(); placeCamera();
+  });
+  $('count').addEventListener('input',e=>{
+    S.count=+e.target.value; $('countOut').textContent=S.count;
+    cam.r=defaultR(); rebuildAll(); placeCamera();
+  });
+  $('size').addEventListener('input',e=>{S.size=+e.target.value;update();});
+  $('doom').addEventListener('change',e=>{S.doom=e.target.checked;update();renderSlice();});
+  $('gap').addEventListener('change',e=>{S.gap=e.target.checked;cam.r=defaultR();build();placeCamera();});
+  $('ex2').addEventListener('click',()=>setRange(2000,56));
+  $('ex2100').addEventListener('click',()=>setRange(2072,56));
+  $('letters').addEventListener('change',e=>{S.letters=e.target.checked;renderSlice();});
+  $('prev').addEventListener('click',()=>selectYear(S.sel-1));
+  $('next').addEventListener('click',()=>selectYear(S.sel+1));
+  $('views').addEventListener('click',e=>{const b=e.target.closest('button[data-view]');if(b) goView(b.dataset.view);});
+
+  rebuildAll();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{if(HAS3D) buildAxes();});
+  if(window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change',refreshTheme);
+  new MutationObserver(refreshTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+}
+init();
+})();
+</script>
+</body>
+</html>

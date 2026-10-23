@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laboratorio de probabilidad</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{--bg:#eef2f0;--pn:#fff;--ink:#1c2b27;--mut:#58685f;--ln:#cbd7d1;--ac:#1f6f5c;--acs:rgba(31,111,92,.10);--ok:#1b7a43;--bad:#b83a2e;--wr:#fdf0cf;--wri:#6b4a00;--c1:#2b6cb0;--c2:#d9822b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111a17;--pn:#1a2622;--ink:#e4eee9;--mut:#9bb0a6;--ln:#33453e;--ac:#4fc0a0;--acs:rgba(79,192,160,.14);--ok:#5fd18b;--bad:#ff8d80;--wr:#3b3115;--wri:#f2d58a;--c1:#6ea8ee;--c2:#f0a35e}}
+:root[data-theme="dark"]{--bg:#111a17;--pn:#1a2622;--ink:#e4eee9;--mut:#9bb0a6;--ln:#33453e;--ac:#4fc0a0;--acs:rgba(79,192,160,.14);--ok:#5fd18b;--bad:#ff8d80;--wr:#3b3115;--wri:#f2d58a;--c1:#6ea8ee;--c2:#f0a35e}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1120px;margin:0 auto;padding:16px}
+h1{font-size:1.5rem;margin:0 0 14px}
+h2{font-size:1rem;margin:0 0 8px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:1fr 1.35fr;gap:14px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.pn{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:14px 16px}
+.pn.hid{display:none}
+#txt{font-size:1.08rem;margin:0 0 14px}
+button{font:inherit;cursor:pointer;border:1.5px solid var(--ln);background:var(--pn);color:var(--ink);border-radius:8px;padding:8px 14px}
+button:hover{border-color:var(--ac)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.pri{background:var(--ac);color:var(--pn);border-color:var(--ac);font-weight:700}
+.ch{display:flex;gap:10px;margin:14px 0}
+.ch button{flex:1;padding:14px 8px;font-weight:700;font-size:1.05rem}
+.ch button.on{background:var(--ac);color:var(--pn);border-color:var(--ac)}
+.ch button.no{border-color:var(--bad)}
+.msg{border-radius:8px;padding:10px 12px;margin:0 0 12px;font-size:.98rem}
+.msg:empty{display:none}
+.warn{background:var(--wr);color:var(--wri)}
+.good{background:var(--acs);color:var(--ok)}
+.leg{font-size:.95rem;color:var(--mut);margin:0 0 8px}
+.leg b{color:var(--ink)}
+input.cell,input.ans{width:66px;font:inherit;text-align:center;padding:4px;border:1.5px solid var(--ln);border-radius:6px;background:var(--pn);color:var(--ink)}
+input.ok{border-color:var(--ok);background:var(--acs)}
+input.bad{border-color:var(--bad)}
+table{border-collapse:collapse;margin:8px auto}
+th,td{border:1px solid var(--ln);padding:8px 12px;text-align:center}
+th{background:var(--acs)}
+.wrap{position:relative;max-width:640px;margin:8px auto}
+.wrap svg{width:100%;display:block}
+.wrap.t{aspect-ratio:640/340}
+.wrap.t svg{height:100%}
+.a{position:absolute;transform:translate(-50%,-50%);white-space:nowrap}
+.pill{position:absolute;transform:translate(-50%,-50%);background:var(--ac);color:var(--pn);border-radius:14px;padding:0 9px;font-weight:700}
+.q{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--ln)}
+.q:first-of-type{border-top:0}
+.tag{font-size:.85rem;font-weight:700;color:var(--ac)}
+.fb{grid-column:1/-1;font-size:.95rem;color:var(--mut)}
+.fb.o{color:var(--ok)}.fb.x{color:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.ov{text-decoration:overline;text-decoration-thickness:1.5px}
+.lv{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.lv button{font-weight:700}
+.lv button.on{background:var(--ac);color:var(--pn);border-color:var(--ac)}
+.mid{color:var(--mut);text-align:center;padding:40px 10px}
+</style>
+</head>
+<body>
+<main>
+<h1>Laboratorio de probabilidad</h1>
+<div class="lv" id="lv"><button data-l="basic">Básico</button><button data-l="medium">Medio</button><button data-l="advanced">Avanzado</button></div>
+<div class="grid">
+  <section class="pn"><h2>Problema</h2><p id="txt"></p><button class="pri" id="newb">Nuevo problema</button></section>
+  <section class="pn"><h2>Diagrama</h2><div id="dbody" class="mid">Elige abajo la representación que mejor encaja con el problema.</div></section>
+</div>
+<div class="ch" id="ch">
+  <button data-t="tree">Árbol</button>
+  <button data-t="venn">Conjuntos</button>
+  <button data-t="table">Tabla</button>
+</div>
+<div class="msg" id="cmsg"></div>
+<section class="pn hid" id="qs"><h2>Preguntas del problema</h2><div id="ql"></div>
+<div class="row"><button class="pri" id="qcheck">Comprobar respuestas</button><button id="qsol">Ver soluciones</button></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[rnd(0,a.length-1)];
+const fmt=x=>String(+x.toFixed(4)).replace('.',',');
+function parse(s){s=s.trim().replace(',','.');if(!s)return NaN;const p=s.endsWith('%');if(p)s=s.slice(0,-1);let v;if(s.includes('/')){const[a,b]=s.split('/');v=+a/+b}else v=+s;return p?v/100:v}
+const close=(v,e,t)=>isFinite(v)&&(t==='n'?Math.abs(v-e)<1e-9:Math.abs(v-e)<=Math.max(.0004,.02*e));
+
+/* ---------- Generadores de problemas ---------- */
+function genTable(lv){
+  const s=pick([
+    {n:'alumnos de 4.º ESO',A:'sea chica',nA:'sea chico',B:'vaya andando al centro',nB:'no vaya andando',at:'son chicas',bt:'van andando al centro',abt:'son chicas que van andando',pick:'un alumno'},
+    {n:'personas usuarias de una línea de autobús',A:'sea mayor de 65 años',nA:'tenga 65 años o menos',B:'lleve abono',nB:'pague billete sencillo',at:'son mayores de 65 años',bt:'llevan abono',abt:'son mayores de 65 años con abono',pick:'un usuario'},
+    {n:'empleados de una empresa',A:'sea mujer',nA:'sea hombre',B:'trabaje en remoto',nB:'trabaje en la oficina',at:'son mujeres',bt:'trabajan en remoto',abt:'son mujeres que trabajan en remoto',pick:'un empleado'}]);
+  const [lo,hi]=lv==='basic'?[3,9]:[6,25],c={ab:rnd(lo,hi),anb:rnd(lo,hi),nab:rnd(lo,hi),nanb:rnd(lo,hi)},N=c.ab+c.anb+c.nab+c.nanb;
+  return {type:'table',...s,c,text:`Se ha clasificado a ${N} ${s.n} según dos características. De ellos, ${c.ab+c.anb} ${s.at}, ${c.ab+c.nab} ${s.bt} y ${c.ab} ${s.abt}.`};
+}
+function genVenn(lv){
+  const s=pick([
+    {n:'jóvenes',A:'hable inglés',nA:'no hable inglés',B:'hable francés',nB:'no hable francés',at:'hablan inglés',bt:'hablan francés',abt:'hablan los dos idiomas',pick:'un joven'},
+    {n:'estudiantes',A:'practique fútbol',nA:'no practique fútbol',B:'practique baloncesto',nB:'no practique baloncesto',at:'practican fútbol',bt:'practican baloncesto',abt:'practican ambos deportes',pick:'un estudiante'},
+    {n:'personas encuestadas',A:'vea series',nA:'no vea series',B:'vea películas',nB:'no vea películas',at:'ven series',bt:'ven películas',abt:'ven ambas cosas',pick:'una persona'}]);
+  const c=lv==='basic'?{ab:rnd(2,5),anb:rnd(3,8),nab:rnd(3,8),nanb:rnd(2,6)}:{ab:rnd(3,9),anb:rnd(5,15),nab:rnd(5,15),nanb:rnd(3,10)},N=c.ab+c.anb+c.nab+c.nanb;
+  return {type:'venn',...s,c,text:`En un grupo de ${N} ${s.n}, ${c.ab+c.anb} ${s.at}, ${c.ab+c.nab} ${s.bt} y ${c.ab} ${s.abt}.`};
+}
+function genUrn(){
+  const r=rnd(3,6),b=rnd(3,6),n=r+b;
+  return {type:'tree',text:`Una urna contiene ${r} bolas rojas y ${b} azules. Se extraen dos bolas una detrás de otra, sin devolver la primera a la urna.`,
+    A:'la 1.ª bola sea roja',nA:'la 1.ª bola sea azul',B:'la 2.ª bola sea roja',nB:'la 2.ª bola sea azul',t:{pA:r/n,pBA:(r-1)/(n-1),pBnA:r/(n-1)}};
+}
+function genBayes(){
+  const p=pick([1,2,3,5]),s=pick([90,95,98]),f=pick([2,5,8,10]);
+  const o=pick([
+   {type:'tree',text:`El ${p} % de una población tiene una enfermedad. Si una persona está enferma, la prueba da positivo en el ${s} % de los casos; si está sana, da positivo (falso positivo) en el ${f} % de los casos. Se elige a una persona al azar.`,A:'esté enferma',nA:'esté sana',B:'dé positivo',nB:'dé negativo'},
+   {type:'tree',text:`El ${p} % del correo que recibe una cuenta es spam. El filtro marca como spam el ${s} % de los mensajes spam y, por error, el ${f} % de los mensajes legítimos. Se elige un correo al azar.`,A:'sea spam',nA:'sea legítimo',B:'el filtro lo marque como spam',nB:'el filtro no lo marque'}]);
+  return {...o,t:{pA:p/100,pBA:s/100,pBnA:f/100}};
+}
+
+/* ---------- Preguntas ---------- */
+const Q=(tag,t,v,h,s)=>({tag,t,v,h,s});
+const cm=t=>t.replace(/([AB])′/g,'<span class="ov">$1</span>');
+let LV='basic';
+const GENS={basic:[genTable,genVenn],medium:[genTable,genVenn,genUrn,genBayes],advanced:[genUrn,genBayes]};
+function questions(P){
+  const q=questions0(P);
+  if(P.c)return LV==='basic'?q.slice(0,3):q;
+  if(LV==='medium')return q;
+  const {pA,pBA,pBnA}=P.t,pB=pA*pBA+(1-pA)*pBnA,v=pA*(1-pBA)/(1-pB);
+  q.push(Q('Bayes',`P(A | B′): probabilidad de que ${P.A}, condicionada a que ${P.nB}.`,v,'Bayes: P(A ∩ B′) dividido entre P(B′) = 1 − P(B).',`${fmt(pA*(1-pBA))} / ${fmt(1-pB)} = ${fmt(v)}`));
+  return q;
+}
+function questions0(P){
+  if(P.c){
+    const {ab,anb,nab,nanb}=P.c,N=ab+anb+nab+nanb,a=ab+anb,b=ab+nab,F=(n,d)=>`${n}/${d} ≈ ${fmt(n/d)}`;
+    return [
+      Q('Laplace',`P(A): probabilidad de que ${P.A}.`,a/N,'Casos favorables entre casos posibles.',F(a,N)),
+      Q('Laplace',`P(A ∩ B): probabilidad de que ${P.A} y ${P.B}.`,ab/N,'Cuenta solo los casos en los que se cumplen las dos cosas a la vez.',F(ab,N)),
+      Q('Laplace',`P(A ∪ B): probabilidad de que ${P.A} o ${P.B} (o ambos).`,(a+b-ab)/N,'P(A) + P(B) − P(A ∩ B): no cuentes dos veces la intersección.',`(${a}+${b}−${ab})/${N} = ${F(a+b-ab,N)}`),
+      Q('Laplace',`P(A′ ∩ B′): probabilidad de que ${P.nA} y ${P.nB}.`,nanb/N,'Casos en los que no se cumple ninguna de las dos.',F(nanb,N)),
+      Q('Condicionada',`P(A | B): probabilidad de que ${P.A}, condicionada a que ${P.B}.`,ab/b,'Si sabes que ocurre B, los casos posibles son solo los de B.',F(ab,b)),
+      Q('Condicionada',`P(B | A): probabilidad de que ${P.B}, condicionada a que ${P.A}.`,ab/a,'Si sabes que ocurre A, los casos posibles son solo los de A.',F(ab,a))
+    ];
+  }
+  const {pA,pBA,pBnA}=P.t,pn=1-pA,pB=pA*pBA+pn*pBnA;
+  return [
+    Q('Probabilidad total',`P(B): probabilidad de que ${P.B}.`,pB,'Suma los caminos que acaban en B: P(A)·P(B|A) + P(A′)·P(B|A′).',`${fmt(pA)}·${fmt(pBA)} + ${fmt(pn)}·${fmt(pBnA)} = ${fmt(pB)}`),
+    Q('Producto de ramas',`P(A ∩ B): probabilidad de que ${P.A} y ${P.B}.`,pA*pBA,'Multiplica las probabilidades de las ramas de ese camino.',`${fmt(pA)}·${fmt(pBA)} = ${fmt(pA*pBA)}`),
+    Q('Producto de ramas',`P(A′ ∩ B): probabilidad de que ${P.nA} y ${P.B}.`,pn*pBnA,'Multiplica las ramas del camino A′ → B.',`${fmt(pn)}·${fmt(pBnA)} = ${fmt(pn*pBnA)}`),
+    Q('Bayes',`P(A | B): probabilidad de que ${P.A}, condicionada a que ${P.B}.`,pA*pBA/pB,'Bayes: P(A ∩ B) dividido entre P(B) (probabilidad total).',`${fmt(pA*pBA)} / ${fmt(pB)} = ${fmt(pA*pBA/pB)}`)
+  ];
+}
+
+/* ---------- Diagramas ---------- */
+const cell=(e,t)=>`<input class="cell" data-e="${e}" data-t="${t}" inputmode="decimal" aria-label="casilla">`;
+function tableHTML(c){
+  const a=c.ab+c.anb,na=c.nab+c.nanb,b=c.ab+c.nab,nb=c.anb+c.nanb,N=a+na;
+  return `<table><tr><th></th><th>B</th><th>B′</th><th>Total</th></tr>
+  <tr><th>A</th><td>${cell(c.ab,'n')}</td><td>${cell(c.anb,'n')}</td><td>${cell(a,'n')}</td></tr>
+  <tr><th>A′</th><td>${cell(c.nab,'n')}</td><td>${cell(c.nanb,'n')}</td><td>${cell(na,'n')}</td></tr>
+  <tr><th>Total</th><td>${cell(b,'n')}</td><td>${cell(nb,'n')}</td><td>${cell(N,'n')}</td></tr></table>`;
+}
+function vennHTML(c){
+  const N=c.ab+c.anb+c.nab+c.nanb,at=(x,y,v)=>`<div class="a" style="left:${x/5.6}%;top:${y/2.7}%">${cell(v,'n')}</div>`;
+  return `<div class="wrap"><svg viewBox="0 0 560 270" aria-hidden="true"><rect x="3" y="3" width="554" height="264" rx="10" fill="none" stroke="var(--ln)" stroke-width="2"/>
+  <circle cx="210" cy="135" r="105" fill="var(--c1)" fill-opacity=".22" stroke="var(--c1)" stroke-width="2.5"/>
+  <circle cx="350" cy="135" r="105" fill="var(--c2)" fill-opacity=".22" stroke="var(--c2)" stroke-width="2.5"/>
+  <text x="112" y="52" font-size="24" font-weight="700" fill="var(--c1)">A</text><text x="432" y="52" font-size="24" font-weight="700" fill="var(--c2)">B</text>
+  <text x="16" y="30" font-size="15" fill="var(--mut)">Total = ${N}</text></svg>
+  ${at(150,135,c.anb)}${at(280,135,c.ab)}${at(410,135,c.nab)}${at(505,235,c.nanb)}</div>`;
+}
+function treeHTML(t){
+  const {pA,pBA,pBnA}=t,pn=1-pA;
+  const br=[[19,37.5,pA],[19,62.5,pn],[48,18.75,pBA],[48,31.25,1-pBA],[48,68.75,pBnA],[48,81.25,1-pBnA]];
+  const L=[[12.5,'B','A∩B',pA*pBA],[37.5,'B′','A∩B′',pA*(1-pBA)],[62.5,'B','A′∩B',pn*pBnA],[87.5,'B′','A′∩B′',pn*(1-pBnA)]];
+  const ln=(a,b,c,d)=>`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}"/>`;
+  let h=`<div class="wrap t"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g stroke="var(--mut)" stroke-width="2" vector-effect="non-scaling-stroke" fill="none">
+  ${ln(4,50,34,25)}${ln(4,50,34,75)}${ln(34,25,62,12.5)}${ln(34,25,62,37.5)}${ln(34,75,62,62.5)}${ln(34,75,62,87.5)}</g></svg>`;
+  h+=`<div class="pill" style="left:34%;top:25%">A</div><div class="pill" style="left:34%;top:75%">A′</div>`;
+  L.forEach(l=>{h+=`<div class="pill" style="left:62%;top:${l[0]}%">${l[1]}</div><div class="a" style="left:82%;top:${l[0]}%">${l[2]} = ${cell(l[3],'p')}</div>`});
+  br.forEach(b=>{h+=`<div class="a" style="left:${b[0]}%;top:${b[1]}%">${cell(b[2],'p')}</div>`});
+  return h+'</div>';
+}
+const HINT={table:'Comprueba que las filas y las columnas suman sus totales.',venn:'Las cuatro regiones deben sumar el total del grupo. Ojo: la intersección ya está dentro de A y de B.',tree:'Las ramas que salen de un mismo nodo suman 1. En la segunda etapa son probabilidades condicionadas. Puedes escribir fracciones (3/7), decimales o porcentajes.'};
+const GOOD={table:'Tabla de contingencia: muy útil cuando clasificas a un grupo por dos características a la vez y quieres cruces y totales.',venn:'Diagrama de conjuntos: es lo natural cuando los grupos se solapan (solo A, ambos, ninguno).',tree:'Árbol: lo natural cuando hay etapas sucesivas o probabilidades condicionadas.'};
+const WHY={
+ table:{venn:'Un diagrama de conjuntos sirve cuando los grupos se solapan («solo A», «ambos», «ninguno»). Aquí cada persona se clasifica por dos características con categorías opuestas y lo que necesitas son los cruces y los totales: eso lo organiza mejor una tabla de contingencia.',tree:'El árbol se usa cuando hay etapas sucesivas o datos que son probabilidades condicionadas. Aquí no hay pasos: tienes recuentos de un grupo clasificado a la vez por dos características.'},
+ venn:{table:'Podrías hacerlo con tabla, pero el enunciado habla de pertenecer a un grupo, a otro, a los dos o a ninguno: es la situación típica del diagrama de conjuntos, con dos círculos que se solapan.',tree:'El árbol se usa cuando hay etapas sucesivas o datos que son probabilidades condicionadas. Aquí no hay pasos: se observan dos características a la vez en cada persona del grupo.'},
+ tree:{table:'La tabla de contingencia recoge recuentos de una población ya clasificada. Aquí el enunciado describe un proceso en etapas (primero ocurre A, después B) con probabilidades condicionadas, y esa estructura la refleja el árbol.',venn:'Un diagrama de conjuntos muestra solapamientos, pero no recoge bien los pasos sucesivos ni las probabilidades condicionadas. Aquí conviene un árbol.'}};
+
+/* ---------- Estado e interacción ---------- */
+let P,built=false;
+function newP(){
+  P=pick(GENS[LV])(LV);built=false;
+  $('#txt').textContent=P.text;$('#cmsg').textContent='';$('#cmsg').className='msg';
+  $('#dbody').className='mid';$('#dbody').textContent='Elige abajo la representación que mejor encaja con el problema.';
+  $('#qs').classList.add('hid');document.querySelectorAll('#ch button').forEach(b=>b.className='');
+}
+document.querySelectorAll('#ch button').forEach(b=>b.onclick=()=>{
+  if(built)return;const t=b.dataset.t,m=$('#cmsg');
+  if(t!==P.type){b.className='no';m.className='msg warn';m.textContent='Esa representación no es la más adecuada aquí. '+WHY[P.type][t]+' Prueba con otra.';return}
+  built=true;b.className='on';m.className='msg good';m.textContent='¡Buena elección! '+GOOD[t];
+  const leg=`<p class="leg"><b>A</b>: que ${P.A} · <b>A′</b>: que ${P.nA}<br><b>B</b>: que ${P.B} · <b>B′</b>: que ${P.nB}</p>`;
+  const body=t==='table'?tableHTML(P.c):t==='venn'?vennHTML(P.c):treeHTML(P.t);
+  const d=$('#dbody');d.className='';
+  d.innerHTML=cm(leg+body+`<div id="dmsg" class="msg" style="margin-top:10px"></div><div class="row"><button class="pri" id="dcheck">Comprobar diagrama</button><button id="dsol">Mostrar solución</button></div>`);
+  $('#dcheck').onclick=checkD;
+  $('#dsol').onclick=()=>d.querySelectorAll('.cell').forEach(i=>{i.value=fmt(+i.dataset.e);i.className='cell ok'});
+});
+function checkD(){
+  let bad=0;
+  document.querySelectorAll('#dbody .cell').forEach(i=>{const ok=close(parse(i.value),+i.dataset.e,i.dataset.t);i.className='cell '+(ok?'ok':'bad');if(!ok)bad++});
+  const m=$('#dmsg');
+  if(bad){m.className='msg warn';m.textContent=`Hay ${bad} casilla${bad>1?'s':''} por revisar (en rojo o vacías). `+HINT[P.type];return}
+  m.className='msg good';m.textContent='¡Diagrama correcto! Ahora responde a las preguntas.';showQs();
+}
+function showQs(){
+  const qs=questions(P);P.qs=qs;
+  $('#ql').innerHTML=cm(qs.map((q,i)=>`<div class="q"><div><span class="tag">${q.tag}</span><br>${q.t}</div><input class="ans" data-i="${i}" inputmode="decimal" aria-label="respuesta ${i+1}"><div class="fb" id="fb${i}"></div></div>`).join(''));
+  $('#qs').classList.remove('hid');$('#qs').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+$('#qcheck').onclick=()=>document.querySelectorAll('.ans').forEach(i=>{
+  const q=P.qs[+i.dataset.i],ok=close(parse(i.value),q.v,'p'),f=$('#fb'+i.dataset.i);
+  i.className='ans '+(ok?'ok':'bad');f.className='fb '+(ok?'o':'x');
+  f.innerHTML=cm(ok?'✔ Correcto: '+q.s:'✘ Revisa: '+q.h+' Puedes escribir fracción, decimal o porcentaje.');
+});
+$('#qsol').onclick=()=>document.querySelectorAll('.ans').forEach(i=>{const q=P.qs[+i.dataset.i],f=$('#fb'+i.dataset.i);f.className='fb';f.innerHTML=cm('Solución: '+q.s+'. '+q.h)});
+$('#newb').onclick=newP;
+document.querySelectorAll('#lv button').forEach(b=>b.onclick=()=>{LV=b.dataset.l;document.querySelectorAll('#lv button').forEach(x=>x.className=x===b?'on':'');newP()});
+document.querySelector('#lv button').className='on';
+newP();
+</script>
+</body>
+</html>

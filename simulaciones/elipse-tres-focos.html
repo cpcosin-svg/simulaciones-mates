@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La curva de los tres focos</title>
+<style>
+:root{
+  --bg:#fdf6ec; --panel:#ffffff; --text:#2b2440; --muted:#6b6280;
+  --accent:#e0457b; --accent2:#3a7bd5; --accent3:#2aa876;
+  --border:#efe3d0; --p1:#e0457b; --p2:#2aa876; --p3:#3a7bd5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1c1826; --panel:#26213a; --text:#f1ecff; --muted:#b3a9d0;
+    --accent:#ff6f9c; --accent2:#6fa8ff; --accent3:#4fd39a;
+    --border:#3a3454; --p1:#ff6f9c; --p2:#4fd39a; --p3:#6fa8ff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1c1826; --panel:#26213a; --text:#f1ecff; --muted:#b3a9d0;
+  --accent:#ff6f9c; --accent2:#6fa8ff; --accent3:#4fd39a;
+  --border:#3a3454; --p1:#ff6f9c; --p2:#4fd39a; --p3:#6fa8ff;
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Trebuchet MS",-apple-system,BlinkMacSystemFont,sans-serif;
+  padding:env(safe-area-inset-top,0px) 14px env(safe-area-inset-bottom,0px) 14px;
+  display:flex; justify-content:center;
+}
+#app{max-width:760px; width:100%; padding:20px 0 50px;}
+h1{font-size:1.7rem; margin:6px 0 2px; color:var(--accent);}
+h2{font-size:1.2rem; margin:0 0 8px; color:var(--accent2);}
+p.lead{color:var(--muted); font-size:1rem; margin:0 0 18px;}
+.card{
+  background:var(--panel); border:1px solid var(--border); border-radius:18px;
+  padding:18px 20px; margin-bottom:18px; box-shadow:0 2px 10px rgba(0,0,0,.04);
+}
+p{line-height:1.55; font-size:.98rem;}
+.row{display:flex; gap:16px; flex-wrap:wrap; align-items:center;}
+.row svg{flex-shrink:0;}
+.badge{display:inline-block; background:var(--accent); color:#fff; font-size:.75rem; padding:3px 10px; border-radius:20px; margin-bottom:6px;}
+.canvas-wrap{background:var(--bg); border:2px dashed var(--border); border-radius:14px; padding:6px; touch-action:none;}
+canvas{width:100%; height:auto; display:block; border-radius:10px; cursor:grab;}
+.legend{display:flex; gap:14px; flex-wrap:wrap; margin:10px 2px; font-size:.82rem; color:var(--muted);}
+.dot{width:11px; height:11px; border-radius:50%; display:inline-block; margin-right:4px; vertical-align:-1px;}
+.krow{display:flex; align-items:center; gap:10px; font-size:.95rem; margin-top:10px;}
+input[type=range]{flex:1; accent-color:var(--accent);}
+#kval,#sumval{font-weight:700; min-width:44px; text-align:right;}
+.sumline{margin-top:6px; font-size:.9rem; color:var(--muted);}
+.ok{color:var(--accent3); font-weight:700;}
+.hint{background:var(--bg); border-radius:10px; padding:8px 12px; font-size:.85rem; color:var(--muted); margin-top:12px;}
+.facts{display:grid; grid-template-columns:1fr; gap:14px;}
+@media(min-width:600px){.facts{grid-template-columns:1fr 1fr;}}
+.fact{border:1px solid var(--border); border-radius:14px; padding:12px 14px;}
+.fact h3{margin:6px 0 4px; font-size:1rem;}
+.fact p{font-size:.88rem; color:var(--muted); margin:0;}
+</style>
+</head>
+<body>
+<div id="app">
+  <span class="badge">Matemáticas · 2º ESO</span>
+  <h1>🥚 La curva de los tres focos</h1>
+  <p class="lead">¿Sabías que puedes dibujar una elipse con dos chinchetas y un cordel? ¿Y si usamos tres chinchetas? Vamos a descubrirlo.</p>
+
+  <div class="card">
+    <h2>El truco del jardinero</h2>
+    <div class="row">
+      <svg width="140" height="100" viewBox="0 0 140 100">
+        <ellipse cx="70" cy="50" rx="55" ry="30" fill="none" stroke="var(--accent2)" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <circle cx="35" cy="50" r="4" fill="var(--p1)"/>
+        <circle cx="105" cy="50" r="4" fill="var(--p2)"/>
+        <line x1="35" y1="50" x2="10" y2="50" stroke="var(--muted)" stroke-width="1.5"/>
+        <text x="35" y="42" font-size="9" fill="var(--muted)" text-anchor="middle">foco 1</text>
+        <text x="105" y="42" font-size="9" fill="var(--muted)" text-anchor="middle">foco 2</text>
+      </svg>
+      <p>Clava dos chinchetas en un tablero, átales un cordel flojo y tensa el cordel con un lápiz mientras lo mueves alrededor. El lápiz dibuja una <b>elipse</b>. ¿Por qué? Porque en cada punto de la curva, la suma de las distancias a las dos chinchetas es siempre la misma: <b>es lo que mide el cordel</b>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>¿Y si añadimos una tercera chincheta?</h2>
+    <p>Ahora usamos <b>tres</b> chinchetas (P₁, P₂, P₃) y un cordel más largo, atado a las tres. El lápiz que tensa el cordel dibuja una curva parecida a un huevo. En cualquier punto de esa curva se cumple:</p>
+    <p style="text-align:center; font-size:1.05rem; font-weight:700; color:var(--accent);">distancia a P₁ + distancia a P₂ + distancia a P₃ = longitud del cordel</p>
+    <p>A esta curva la llaman <b>3-elipse</b> (o "curva de tres focos"). ¡Pruébala tú mismo abajo!</p>
+  </div>
+
+  <div class="card">
+    <h2>🎮 Simulador: muévelo tú</h2>
+    <p style="margin-top:-4px;">Arrastra los tres puntos de colores. Cambia también el cordel (k) con el deslizador.</p>
+    <div class="canvas-wrap"><canvas id="cv" width="560" height="560"></canvas></div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--p1)"></i>P₁</span>
+      <span><i class="dot" style="background:var(--p2)"></i>P₂</span>
+      <span><i class="dot" style="background:var(--p3)"></i>P₃</span>
+      <span><i class="dot" style="background:var(--accent)"></i>la curva</span>
+    </div>
+    <div class="krow">
+      <label for="kslider" style="color:var(--muted)">Cordel (k)</label>
+      <input type="range" id="kslider" min="0" max="1" step="0.01">
+      <span id="kval"></span>
+    </div>
+    <div class="hint">💡 Prueba a poner los tres puntos en línea recta. Prueba a acortar el cordel al máximo: ¿en qué se convierte la curva?</div>
+  </div>
+
+  <div class="card">
+    <h2>🌍 Datos curiosos del mundo real</h2>
+    <div class="facts">
+      <div class="fact">
+        <svg width="60" height="50" viewBox="0 0 60 50"><circle cx="30" cy="15" r="3.5" fill="var(--p1)"/><circle cx="12" cy="40" r="3.5" fill="var(--p2)"/><circle cx="48" cy="40" r="3.5" fill="var(--p3)"/><circle cx="30" cy="30" r="3" fill="var(--accent)"/><line x1="30" y1="15" x2="30" y2="30" stroke="var(--muted)" stroke-width="1.3"/><line x1="12" y1="40" x2="30" y2="30" stroke="var(--muted)" stroke-width="1.3"/><line x1="48" y1="40" x2="30" y2="30" stroke="var(--muted)" stroke-width="1.3"/></svg>
+        <h3>El punto más ahorrador</h3>
+        <p>Si acortas el cordel al mínimo posible, la curva se encoge hasta un único punto: el lugar desde el que la suma de distancias a los tres puntos es la menor posible. Se llama <b>punto de Fermat</b>, y sirve para decidir dónde construir una fábrica o un almacén para ahorrar el máximo en transporte.</p>
+      </div>
+      <div class="fact">
+        <svg width="60" height="50" viewBox="0 0 60 50"><path d="M30 6 C 14 6 8 22 12 34 C 16 46 44 46 48 34 C 52 22 46 6 30 6 Z" fill="none" stroke="var(--accent2)" stroke-width="2.5"/></svg>
+        <h3>Alcantarillas con forma de huevo</h3>
+        <p>Las famosas alcantarillas victorianas de Londres tienen sección en forma de huevo (más estrechas abajo) para que el agua fluya rápido incluso cuando hay poca. Existe incluso una patente que usa exactamente esta curva de tres focos para diseñar canales de drenaje.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+const VMIN=-10, VMAX=10;
+const scale = W/(VMAX-VMIN);
+function toC(x,y){ return { cx:(x-VMIN)*scale, cy:(VMAX-y)*scale }; }
+function toM(cx,cy){ return { x:VMIN+cx/scale, y:VMAX-cy/scale }; }
+let foci = [ {x:-4,y:-2,c:'--p1'}, {x:4,y:-2,c:'--p2'}, {x:0,y:3.5,c:'--p3'} ];
+let k = 15, dragIdx=-1;
+
+function distSum(x,y){ let s=0; for(const f of foci) s+=Math.hypot(x-f.x,y-f.y); return s; }
+function computeMinF(){
+  let min=Infinity; const N=30;
+  for(let i=0;i<=N;i++) for(let j=0;j<=N;j++){
+    const x=VMIN+(VMAX-VMIN)*i/N, y=VMIN+(VMAX-VMIN)*j/N;
+    const v=distSum(x,y); if(v<min) min=v;
+  }
+  return min;
+}
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function drawGrid(){
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle=css('--border'); ctx.lineWidth=1;
+  for(let x=Math.ceil(VMIN);x<=VMAX;x++){ const a=toC(x,VMIN),b=toC(x,VMAX); ctx.beginPath(); ctx.moveTo(a.cx,a.cy); ctx.lineTo(b.cx,b.cy); ctx.stroke(); }
+  for(let y=Math.ceil(VMIN);y<=VMAX;y++){ const a=toC(VMIN,y),b=toC(VMAX,y); ctx.beginPath(); ctx.moveTo(a.cx,a.cy); ctx.lineTo(b.cx,b.cy); ctx.stroke(); }
+}
+function drawCurve(){
+  const N=110, step=(VMAX-VMIN)/N, vals=[];
+  for(let i=0;i<=N;i++){ vals.push([]); for(let j=0;j<=N;j++){ const x=VMIN+i*step,y=VMIN+j*step; vals[i].push(distSum(x,y)-k); } }
+  ctx.strokeStyle=css('--accent'); ctx.lineWidth=3.5; ctx.lineCap='round'; ctx.beginPath();
+  function interp(x1,y1,v1,x2,y2,v2){ const t=v1/(v1-v2); return [x1+(x2-x1)*t, y1+(y2-y1)*t]; }
+  for(let i=0;i<N;i++) for(let j=0;j<N;j++){
+    const x0=VMIN+i*step,x1=VMIN+(i+1)*step,y0=VMIN+j*step,y1=VMIN+(j+1)*step;
+    const v00=vals[i][j],v10=vals[i+1][j],v11=vals[i+1][j+1],v01=vals[i][j+1];
+    const pts=[];
+    if((v00>0)!==(v10>0)) pts.push(interp(x0,y0,v00,x1,y0,v10));
+    if((v10>0)!==(v11>0)) pts.push(interp(x1,y0,v10,x1,y1,v11));
+    if((v11>0)!==(v01>0)) pts.push(interp(x1,y1,v11,x0,y1,v01));
+    if((v01>0)!==(v00>0)) pts.push(interp(x0,y1,v01,x0,y0,v00));
+    if(pts.length===2){ const a=toC(pts[0][0],pts[0][1]),b=toC(pts[1][0],pts[1][1]); ctx.moveTo(a.cx,a.cy); ctx.lineTo(b.cx,b.cy); }
+    else if(pts.length===4){ const a=toC(pts[0][0],pts[0][1]),b=toC(pts[1][0],pts[1][1]); ctx.moveTo(a.cx,a.cy); ctx.lineTo(b.cx,b.cy); const c=toC(pts[2][0],pts[2][1]),d=toC(pts[3][0],pts[3][1]); ctx.moveTo(c.cx,c.cy); ctx.lineTo(d.cx,d.cy); }
+  }
+  ctx.stroke();
+}
+function drawFoci(){
+  foci.forEach((f,idx)=>{
+    const p=toC(f.x,f.y);
+    ctx.beginPath(); ctx.arc(p.cx,p.cy,11,0,Math.PI*2); ctx.fillStyle=css(f.c); ctx.fill();
+    ctx.strokeStyle=css('--panel'); ctx.lineWidth=2.5; ctx.stroke();
+    ctx.fillStyle=css('--text'); ctx.font='700 14px sans-serif';
+    ctx.fillText('P'+(idx+1), p.cx+13, p.cy-10);
+  });
+}
+function refreshKRange(){
+  const minF=computeMinF(); const slider=document.getElementById('kslider');
+  const lo=minF*1.03, hi=minF*3.2;
+  slider.min=lo.toFixed(2); slider.max=hi.toFixed(2); slider.step=((hi-lo)/200).toFixed(3);
+  if(k<lo||k>hi||!k) k=minF*1.5;
+  slider.value=k;
+  document.getElementById('kval').textContent=Math.round(k*10)/10;
+}
+function render(){ drawGrid(); drawCurve(); drawFoci(); }
+function fullUpdate(){ refreshKRange(); render(); }
+
+document.getElementById('kslider').addEventListener('input', e=>{
+  k=parseFloat(e.target.value);
+  document.getElementById('kval').textContent=Math.round(k*10)/10;
+  render();
+});
+function pointerPos(e){
+  const rect=cv.getBoundingClientRect(); const sx=W/rect.width, sy=H/rect.height;
+  const clientX=e.touches?e.touches[0].clientX:e.clientX, clientY=e.touches?e.touches[0].clientY:e.clientY;
+  return { cx:(clientX-rect.left)*sx, cy:(clientY-rect.top)*sy };
+}
+function nearestFocus(cx,cy){
+  let best=-1, bd=22;
+  foci.forEach((f,idx)=>{ const p=toC(f.x,f.y); const d=Math.hypot(p.cx-cx,p.cy-cy); if(d<bd){bd=d;best=idx;} });
+  return best;
+}
+function startDrag(e){ const {cx,cy}=pointerPos(e); const idx=nearestFocus(cx,cy); if(idx>=0){dragIdx=idx; cv.style.cursor='grabbing'; e.preventDefault();} }
+function moveDrag(e){
+  if(dragIdx<0) return; e.preventDefault();
+  const {cx,cy}=pointerPos(e); let {x,y}=toM(cx,cy);
+  x=Math.max(VMIN+0.3,Math.min(VMAX-0.3,Math.round(x*2)/2));
+  y=Math.max(VMIN+0.3,Math.min(VMAX-0.3,Math.round(y*2)/2));
+  foci[dragIdx].x=x; foci[dragIdx].y=y;
+  refreshKRange(); render();
+}
+function endDrag(){ dragIdx=-1; cv.style.cursor='grab'; }
+cv.addEventListener('mousedown', startDrag);
+window.addEventListener('mousemove', moveDrag);
+window.addEventListener('mouseup', endDrag);
+cv.addEventListener('touchstart', startDrag, {passive:false});
+window.addEventListener('touchmove', moveDrag, {passive:false});
+window.addEventListener('touchend', endDrag);
+fullUpdate();
+</script>
+</body>
+</html>

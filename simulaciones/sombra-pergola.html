@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador de sombra de una pérgola — v5 (techo inclinado)</title>
+<style>
+:root{
+  --bg:#f7f7f5; --card:#ffffff; --text:#1c1c1a; --muted:#6b6b64;
+  --accent:#c15f3c; --accent2:#2e6b5e; --border:#e3e1db;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17181a; --card:#212327; --text:#e9e8e4; --muted:#9a9a94;
+    --accent:#e08a63; --accent2:#5ea393; --border:#33353a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17181a; --card:#212327; --text:#e9e8e4; --muted:#9a9a94;
+  --accent:#e08a63; --accent2:#5ea393; --border:#33353a;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text); height:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  padding:20px 16px 40px;
+}
+h1{font-size:1.25rem; margin:0 0 4px;}
+.sub{color:var(--muted); font-size:.85rem; margin:0 0 20px; max-width:640px;}
+.wrap{max-width:920px; margin:0 auto;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:16px;}
+.card h2{font-size:.95rem; margin:0 0 12px; color:var(--accent);}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px;}
+label{display:block; font-size:.75rem; color:var(--muted); margin-bottom:4px;}
+input[type=number], input[type=date]{
+  width:100%; padding:7px 8px; border-radius:8px; border:1px solid var(--border);
+  background:var(--bg); color:var(--text); font-size:.9rem;
+}
+input[type=range]{width:100%;}
+select{width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.9rem;}
+.rowlabel{display:flex; justify-content:space-between; font-size:.8rem; color:var(--muted);}
+.canvaswrap{width:100%; overflow-x:auto;}
+canvas{background:var(--bg); border-radius:10px; display:block; margin:0 auto; max-width:100%;}
+button{
+  background:var(--accent2); color:#fff; border:none; border-radius:8px;
+  padding:9px 16px; font-size:.85rem; cursor:pointer; margin-right:8px; margin-top:4px;
+}
+button.secondary{background:var(--accent);}
+button:active{opacity:.85;}
+.result{font-size:.85rem; line-height:1.6;}
+.result b{color:var(--text);}
+.hl{color:var(--accent2); font-weight:600;}
+.note{font-size:.72rem; color:var(--muted); margin-top:10px;}
+#sweepCanvas{margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🌇 Sombra de una pérgola con techo inclinado en un recinto cerrado (v5)</h1>
+<p class="sub">Novedad v5: el techo puede estar inclinado (ángulo β). Ahora la pérgola está dentro de un patio rectangular con muros de altura Hw. Puedes moverla (X₀,Y₀) y girarla (θ) dentro del recinto; toda la sombra se recorta a la superficie útil del patio, y los propios muros también proyectan su sombra.</p>
+
+<div class="card">
+  <h2>Recinto (patio cerrado)</h2>
+  <div class="grid">
+    <div><label>Ancho patio E-O, Px (m)</label><input id="Px" type="number" value="15" step="0.5"></div>
+    <div><label>Largo patio N-S, Py (m)</label><input id="Py" type="number" value="12" step="0.5"></div>
+    <div><label>Altura muros, Hw (m)</label><input id="Hw" type="number" value="2" step="0.1"></div>
+  </div>
+  <div class="rowlabel"><span>Posición pérgola: Este (X₀)</span><span id="x0Val">0 m</span></div>
+  <input id="x0" type="range" min="-6" max="6" step="0.1" value="0">
+  <div class="rowlabel"><span>Posición pérgola: Norte (Y₀)</span><span id="y0Val">0 m</span></div>
+  <input id="y0" type="range" min="-5" max="5" step="0.1" value="0">
+</div>
+
+<div class="card">
+  <h2>Objeto y ubicación</h2>
+  <div class="grid">
+    <div><label>Largo L (m)</label><input id="L" type="number" value="12" step="0.1"></div>
+    <div><label>Ancho W (m)</label><input id="W" type="number" value="2.4" step="0.1"></div>
+    <div><label>Alto del borde bajo H (m)</label><input id="H" type="number" value="2.6" step="0.1"></div>
+    <div><label>Latitud (°, N positivo)</label><input id="lat" type="number" value="40.4" step="0.1"></div>
+    <div><label>Grosor de poste (m)</label><input id="postW" type="number" value="0.12" step="0.01"></div>
+  </div>
+  <div class="grid" style="margin:10px 0;">
+    <div><label>Inclinación del techo β (°)</label><input id="beta" type="number" value="0" min="0" max="45" step="1"></div>
+    <div><label>El techo sube a lo largo de…</label><select id="slopeAxis"><option value="W">el ancho (W)</option><option value="L">el largo (L)</option></select></div>
+  </div>
+  <div class="rowlabel"><span>Orientación del lado largo respecto al Norte (θ)</span><span id="thetaVal">0°</span></div>
+  <input id="theta" type="range" min="0" max="359" value="0">
+  <button id="animBtn" class="secondary" onclick="toggleAnim()" style="margin-top:8px;">▶ Animar rotación (0°→359°)</button>
+</div>
+
+<div class="card">
+  <h2>Vista instantánea</h2>
+  <div class="grid">
+    <div><label>Fecha</label><input id="fecha" type="date" value="2025-12-21"></div>
+  </div>
+  <div class="rowlabel"><span>Hora solar</span><span id="horaVal">12:00</span></div>
+  <input id="hora" type="range" min="0" max="24" step="0.1" value="12">
+  <button id="animDayBtn" class="secondary" onclick="toggleDayAnim()" style="margin-top:8px;">☀️ Animar sombra a lo largo del día</button>
+  <div class="grid" style="margin-top:10px;">
+    <div>
+      <div class="rowlabel"><span>Cámara: azimut</span><span id="camAzVal">210°</span></div>
+      <input id="camAz" type="range" min="0" max="359" value="210">
+    </div>
+    <div>
+      <div class="rowlabel"><span>Cámara: altura</span><span id="camElVal">25°</span></div>
+      <input id="camEl" type="range" min="5" max="80" value="25">
+    </div>
+  </div>
+  <div class="canvaswrap"><canvas id="cv" width="640" height="440"></canvas></div>
+  <div class="result" id="instRes"></div>
+</div>
+
+<div class="card">
+  <h2>Sombra acumulada en un periodo</h2>
+  <div class="grid">
+    <div><label>Desde</label><input id="d1" type="date" value="2025-09-01"></div>
+    <div><label>Hasta</label><input id="d2" type="date" value="2026-06-30"></div>
+  </div>
+  <button onclick="calcularTotal()">Calcular sombra útil (configuración actual)</button>
+  <button class="secondary" onclick="buscarOptimo()">Buscar mejor posición y orientación en el recinto</button>
+  <div class="result" id="totRes" style="margin-top:10px;"></div>
+  <div class="canvaswrap"><canvas id="sweepCanvas" width="640" height="200" style="display:none;"></canvas></div>
+  <p class="note">Techo plano o inclinado (β): con inclinación, la sombra del tejado es un paralelogramo de área A·|n·s|/sen(altura solar), así que ya no es constante y θ vuelve a importar con fuerza (y el giro útil pasa a ser de 0° a 360°). Modelo: recinto rectangular Px×Py con 4 muros (altura Hw, grosor 0.2 m) modelados como cajas iguales que los postes; tejado plano + 4 postes de la pérgola, todo recortado a la superficie del patio. El área mostrada es la <b>suma</b> de tejado+postes+muros recortados (no resta solapes: si el patio es pequeño y el sol muy rasante, dos sombras pueden coincidir y contarse dos veces). Simplificación importante: los muros no bloquean la luz que llega a la pérgola en sí (solo se calcula su propia sombra proyectada) — es decir, no hay oclusión mutua entre muros y pérgola. Sin corrección de ecuación del tiempo ni huso horario.</p>
+</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+function dayOfYear(d){
+  const start=new Date(d.getFullYear(),0,0);
+  return Math.floor((d-start)/86400000);
+}
+function toRad(d){return d*Math.PI/180;}
+
+// Vector unitario hacia el sol en ENU (Este,Norte,Arriba)
+function sunVector(date,horaDec,latDeg){
+  const n=dayOfYear(date);
+  const decl=toRad(23.44*Math.sin(2*Math.PI/365*(n-81)));
+  const H=toRad(15*(horaDec-12));
+  const phi=toRad(latDeg);
+  const E=-Math.cos(decl)*Math.sin(H);
+  const N=Math.sin(decl)*Math.cos(phi)-Math.cos(decl)*Math.cos(H)*Math.sin(phi);
+  const U=Math.cos(phi)*Math.cos(decl)*Math.cos(H)+Math.sin(phi)*Math.sin(decl);
+  return {E,N,U};
+}
+
+function footprint(L,W,thetaDeg,cx,cy){
+  cx=cx||0; cy=cy||0;
+  const t=toRad(thetaDeg);
+  const c=[[L/2,W/2],[L/2,-W/2],[-L/2,-W/2],[-L/2,W/2]]; // (a lo largo, ancho)
+  return c.map(([a,b])=>({
+    x: cx+a*Math.sin(t)+b*Math.cos(t),
+    y: cy+a*Math.cos(t)-b*Math.sin(t)
+  }));
+}
+
+function convexHull(pts){
+  pts=pts.slice().sort((p,q)=>p.x-q.x||p.y-q.y);
+  const cross=(o,a,b)=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
+  const lower=[];
+  for(const p of pts){while(lower.length>=2&&cross(lower[lower.length-2],lower[lower.length-1],p)<=0)lower.pop();lower.push(p);}
+  const upper=[];
+  for(let i=pts.length-1;i>=0;i--){const p=pts[i];while(upper.length>=2&&cross(upper[upper.length-2],upper[upper.length-1],p)<=0)upper.pop();upper.push(p);}
+  lower.pop();upper.pop();
+  return lower.concat(upper);
+}
+function polyArea(pts){
+  let a=0;
+  for(let i=0;i<pts.length;i++){const p=pts[i],q=pts[(i+1)%pts.length];a+=p.x*q.y-q.x*p.y;}
+  return Math.abs(a)/2;
+}
+
+// Recorte de un polígono al rectángulo del patio [-Px/2,Px/2]x[-Py/2,Py/2] (Sutherland-Hodgman)
+function boxHull(cx,cy,a,b,thetaDeg,H,sun){
+  const t=toRad(thetaDeg);
+  const base=[[a/2,b/2],[a/2,-b/2],[-a/2,-b/2],[-a/2,b/2]].map(([p,q])=>({
+    x:cx+p*Math.sin(t)+q*Math.cos(t), y:cy+p*Math.cos(t)-q*Math.sin(t)
+  }));
+  const k=H/sun.U;
+  const top=base.map(p=>({x:p.x-k*sun.E, y:p.y-k*sun.N}));
+  return convexHull(base.concat(top));
+}
+
+function clipRect(poly,Px,Py){
+  const hw=Px/2, hh=Py/2;
+  const edges=[
+    p=>p.x<=hw, p=>p.x>=-hw, p=>p.y<=hh, p=>p.y>=-hh
+  ];
+  const inter=[
+    (a,b)=>{const t=(hw-a.x)/(b.x-a.x); return{x:hw,y:a.y+t*(b.y-a.y)};},
+    (a,b)=>{const t=(-hw-a.x)/(b.x-a.x); return{x:-hw,y:a.y+t*(b.y-a.y)};},
+    (a,b)=>{const t=(hh-a.y)/(b.y-a.y); return{x:a.x+t*(b.x-a.x),y:hh};},
+    (a,b)=>{const t=(-hh-a.y)/(b.y-a.y); return{x:a.x+t*(b.x-a.x),y:-hh};}
+  ];
+  let out=poly;
+  for(let e=0;e<4;e++){
+    const inp=out; out=[];
+    for(let i=0;i<inp.length;i++){
+      const cur=inp[i], prev=inp[(i+inp.length-1)%inp.length];
+      const curIn=edges[e](cur), prevIn=edges[e](prev);
+      if(curIn){ if(!prevIn) out.push(inter[e](prev,cur)); out.push(cur); }
+      else if(prevIn) out.push(inter[e](prev,cur));
+    }
+  }
+  return out;
+}
+
+function wallHull(cx,cy,dx,dy,Hw,sun){ return boxHull(cx,cy,dy,dx,0,Hw,sun); }
+function wallShadows(Px,Py,wt,Hw,sun){
+  return [
+    wallHull(0,Py/2,Px,wt,Hw,sun), wallHull(0,-Py/2,Px,wt,Hw,sun),
+    wallHull(Px/2,0,wt,Py,Hw,sun), wallHull(-Px/2,0,wt,Py,Hw,sun)
+  ];
+}
+
+// Alturas de las 4 esquinas del techo (mismo orden que footprint): el borde bajo está a H,
+// el alto a H + (luz del lado que sube)·tan β. axis 'W': sube a lo largo del ancho; 'L': a lo largo del largo.
+function cornerHeights(L,W,H,beta,axis){
+  const Hh=H+(axis==='L'?L:W)*Math.tan(toRad(beta));
+  return axis==='L'?[Hh,Hh,H,H]:[Hh,H,H,Hh];
+}
+
+function shadowData(L,W,H,thetaDeg,sun,postW,x0,y0,Px,Py,Hw,beta,axis){
+  if(sun.U<=0.001) return null;
+  const roof=footprint(L,W,thetaDeg,x0,y0);
+  const zs=cornerHeights(L,W,H,beta,axis);
+  // cada esquina se proyecta con SU altura: la sombra es un paralelogramo (ya no una simple traslación)
+  const roofHull=convexHull(roof.map((p,i)=>({x:p.x-zs[i]*sun.E/sun.U, y:p.y-zs[i]*sun.N/sun.U})));
+  const postHulls=roof.map((c,i)=>boxHull(c.x,c.y,postW,postW,thetaDeg,zs[i],sun));
+  const wallHulls=wallShadows(Px,Py,0.2,Hw,sun);
+  const clipped=[roofHull,...postHulls,...wallHulls].map(h=>clipRect(h,Px,Py));
+  const areaSum=clipped.reduce((s,h)=>s+(h.length>=3?polyArea(h):0),0);
+  return {roofHull:clipped[0], postHulls:clipped.slice(1,5), wallHulls:clipped.slice(5),
+          area:areaSum, roofArea:polyArea(clipRect(roofHull,Px,Py))};
+}
+
+// ---- Cámara en perspectiva ----
+function sub(a,b){return{x:a.x-b.x,y:a.y-b.y,z:a.z-b.z};}
+function dot(a,b){return a.x*b.x+a.y*b.y+a.z*b.z;}
+function cross(a,b){return{x:a.y*b.z-a.z*b.y,y:a.z*b.x-a.x*b.z,z:a.x*b.y-a.y*b.x};}
+function norm(a){const l=Math.hypot(a.x,a.y,a.z)||1;return{x:a.x/l,y:a.y/l,z:a.z/l};}
+
+function makeCamera(azDeg,elDeg,dist,targetZ,cw,ch){
+  const az=toRad(azDeg), el=toRad(elDeg);
+  const C={x:dist*Math.cos(el)*Math.sin(az), y:dist*Math.cos(el)*Math.cos(az), z:dist*Math.sin(el)+targetZ};
+  const target={x:0,y:0,z:targetZ};
+  const fwd=norm(sub(target,C));
+  const worldUp={x:0,y:0,z:1};
+  const right=norm(cross(fwd,worldUp));
+  const up=cross(right,fwd);
+  const focal=cw*1.15;
+  return function project(p3){ // p3: {x:East,y:North,z:Up}
+    const v=sub(p3,C);
+    const xc=dot(v,right), yc=dot(v,up), zc=dot(v,fwd);
+    if(zc<=0.05) return null;
+    return {x:cw/2+focal*xc/zc, y:ch/2-focal*yc/zc, depth:zc};
+  };
+}
+
+function drawScene(){
+  updateLabels();
+  const L=parseFloat($('L').value),W=parseFloat($('W').value),H=parseFloat($('H').value);
+  const lat=parseFloat($('lat').value), theta=parseFloat($('theta').value);
+  const date=new Date($('fecha').value+'T00:00:00');
+  const hora=parseFloat($('hora').value);
+  const sun=sunVector(date,hora,lat);
+  const postW=parseFloat($('postW').value);
+  const Px=parseFloat($('Px').value), Py=parseFloat($('Py').value), Hw=parseFloat($('Hw').value);
+  const x0=parseFloat($('x0').value), y0=parseFloat($('y0').value);
+  const beta=parseFloat($('beta').value)||0, axis=$('slopeAxis').value;
+  const zs=cornerHeights(L,W,H,beta,axis);
+  const sd=shadowData(L,W,H,theta,sun,postW,x0,y0,Px,Py,Hw,beta,axis);
+
+  const cv=$('cv'), ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const cs=getComputedStyle(document.documentElement);
+  const border=cs.getPropertyValue('--border'), muted=cs.getPropertyValue('--muted');
+  const accent=cs.getPropertyValue('--accent'), accent2=cs.getPropertyValue('--accent2');
+
+  const ext=Math.max(Px,Py)*0.65;
+  const dist=Math.max(Px,Py,H)*1.6+10;
+  const proj=makeCamera(parseFloat($('camAz').value),parseFloat($('camEl').value),dist,H/2,cv.width,cv.height);
+
+  // muros del recinto (translúcidos, para no tapar la escena)
+  const corners=[[-Px/2,-Py/2],[Px/2,-Py/2],[Px/2,Py/2],[-Px/2,Py/2],[-Px/2,-Py/2]];
+  ctx.strokeStyle=muted; ctx.fillStyle=muted+'22'; ctx.lineWidth=1.5;
+  for(let i=0;i<4;i++){
+    const b1=proj({x:corners[i][0],y:corners[i][1],z:0}), b2=proj({x:corners[i+1][0],y:corners[i+1][1],z:0});
+    const t1=proj({x:corners[i][0],y:corners[i][1],z:Hw}), t2=proj({x:corners[i+1][0],y:corners[i+1][1],z:Hw});
+    if(b1&&b2&&t1&&t2){
+      ctx.beginPath();ctx.moveTo(b1.x,b1.y);ctx.lineTo(b2.x,b2.y);ctx.lineTo(t2.x,t2.y);ctx.lineTo(t1.x,t1.y);ctx.closePath();
+      ctx.fill();ctx.stroke();
+    }
+  }
+
+  // suelo (cuadrícula ligera) + N
+  ctx.strokeStyle=border; ctx.lineWidth=1;
+  for(let g=-ext;g<=ext;g+=ext/4){
+    let a=proj({x:g,y:-ext,z:0}), b=proj({x:g,y:ext,z:0});
+    if(a&&b){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+    a=proj({x:-ext,y:g,z:0}); b=proj({x:ext,y:g,z:0});
+    if(a&&b){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+  }
+  const nLabel=proj({x:0,y:ext*1.05,z:0});
+  if(nLabel){ctx.fillStyle=muted;ctx.font='12px sans-serif';ctx.fillText('N',nLabel.x-4,nLabel.y);}
+
+  // brújula en el centro de la base de la pérgola (siempre apuntando al Norte real, no gira con θ)
+  const rC=Math.max(L,W)*0.28;
+  ctx.strokeStyle=muted; ctx.lineWidth=1.2;
+  ctx.beginPath();
+  for(let i=0;i<=32;i++){
+    const a=2*Math.PI*i/32;
+    const p=proj({x:x0+rC*Math.sin(a), y:y0+rC*Math.cos(a), z:0.02});
+    if(p){ i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y); }
+  }
+  ctx.stroke();
+  const dirs=[['N',0,1],['E',1,0],['S',0,-1],['O',-1,0]];
+  ctx.font='bold 12px sans-serif';
+  dirs.forEach(([lab,ex,ny])=>{
+    const tip=proj({x:x0+rC*1.35*ex,y:y0+rC*1.35*ny,z:0.02});
+    const base=proj({x:x0,y:y0,z:0.02});
+    if(tip&&base){
+      ctx.strokeStyle=lab==='N'?accent:muted; ctx.lineWidth=lab==='N'?2:1;
+      ctx.beginPath();ctx.moveTo(base.x,base.y);ctx.lineTo(tip.x,tip.y);ctx.stroke();
+      ctx.fillStyle=lab==='N'?accent:muted;
+      ctx.fillText(lab,tip.x-4,tip.y-4);
+    }
+  });
+
+  // traza tenue de sombras anteriores (si la animación diaria está activa)
+  if(shadowTrace.length){
+    shadowTrace.forEach(hull=>{
+      const pts=hull.map(p=>proj({x:p.x,y:p.y,z:0.005})).filter(Boolean);
+      if(pts.length>=3){
+        ctx.beginPath();
+        pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+        ctx.closePath();
+        ctx.fillStyle=accent+'12';
+        ctx.fill();
+      }
+    });
+  }
+  if(tracing && sd) shadowTrace.push(sd.roofHull);
+
+  // sombra de los muros (tenue, tono neutro)
+  if(sd){
+    sd.wallHulls.forEach(hull=>{
+      const pts=hull.map(p=>proj({x:p.x,y:p.y,z:0.008})).filter(Boolean);
+      if(pts.length>=3){
+        ctx.beginPath();
+        pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+        ctx.closePath();
+        ctx.fillStyle=muted+'30'; ctx.fill();
+      }
+    });
+  }
+
+  // sombra de los postes (tenue, un pelín más marcada que la del tejado)
+  if(sd){
+    sd.postHulls.forEach(hull=>{
+      const pts=hull.map(p=>proj({x:p.x,y:p.y,z:0.012})).filter(Boolean);
+      if(pts.length>=3){
+        ctx.beginPath();
+        pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+        ctx.closePath();
+        ctx.fillStyle=accent2+'55'; ctx.fill();
+      }
+    });
+  }
+
+  // sombra del tejado (color tenue)
+  if(sd){
+    const pts=sd.roofHull.map(p=>proj({x:p.x,y:p.y,z:0.01})).filter(Boolean);
+    if(pts.length>=3){
+      ctx.beginPath();
+      pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+      ctx.closePath();
+      ctx.fillStyle=accent+'2b'; ctx.fill();
+      ctx.strokeStyle=accent+'80'; ctx.lineWidth=1; ctx.stroke();
+    }
+  }
+
+  // postes
+  const roofPts=footprint(L,W,theta,x0,y0);
+  ctx.strokeStyle=accent2; ctx.lineWidth=3;
+  roofPts.forEach((p,i)=>{
+    const b=proj({x:p.x,y:p.y,z:0}), t=proj({x:p.x,y:p.y,z:zs[i]});
+    if(b&&t){ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(t.x,t.y);ctx.stroke();}
+  });
+
+  // tejado
+  const roofScreen=roofPts.map((p,i)=>proj({x:p.x,y:p.y,z:zs[i]})).filter(Boolean);
+  if(roofScreen.length>=3){
+    ctx.beginPath();
+    roofScreen.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    ctx.closePath();
+    ctx.fillStyle=accent2+'cc'; ctx.fill();
+    ctx.strokeStyle=accent2; ctx.lineWidth=1.5; ctx.stroke();
+  }
+
+  $('instRes').innerHTML = sd
+    ? `Altitud solar: <b>${(Math.asin(sun.U)*180/Math.PI).toFixed(1)}°</b> · Sombra del techo: <b>${sd.roofArea.toFixed(1)} m²</b> (techo ${(L*W).toFixed(1)} m²) · Sombra útil dentro del recinto (tejado+postes+muros, recortada al patio): <b class="hl">${sd.area.toFixed(2)} m²</b> (suma, sin descontar solapes entre sombras)`
+    : `El sol está bajo el horizonte a esta hora: no hay sombra.`;
+}
+
+function updateLabels(){
+  $('thetaVal').textContent=$('theta').value+'°';
+  $('x0Val').textContent=parseFloat($('x0').value).toFixed(1)+' m';
+  $('y0Val').textContent=parseFloat($('y0').value).toFixed(1)+' m';
+  const h=parseFloat($('hora').value);
+  const hh=Math.floor(h), mm=Math.round((h-hh)*60);
+  $('horaVal').textContent=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+}
+
+function totalShadow(L,W,H,theta,lat,d1,d2,dayStep,timeStep,postW,x0,y0,Px,Py,Hw,beta,axis){
+  let total=0;
+  const start=new Date(d1+'T00:00:00'), end=new Date(d2+'T00:00:00');
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+dayStep)){
+    for(let h=0; h<24; h+=timeStep){
+      const sun=sunVector(d,h,lat);
+      if(sun.U<=0.001) continue;
+      const sd=shadowData(L,W,H,theta,sun,postW,x0,y0,Px,Py,Hw,beta,axis);
+      if(sd) total+=sd.area*timeStep;
+    }
+  }
+  const totalDays=Math.round((end-start)/86400000)+1;
+  const sampledDays=Math.ceil(totalDays/dayStep);
+  return total*(totalDays/sampledDays);
+}
+
+function readParams(){
+  return {
+    L:parseFloat($('L').value),W:parseFloat($('W').value),H:parseFloat($('H').value),
+    lat:parseFloat($('lat').value), postW:parseFloat($('postW').value),
+    Px:parseFloat($('Px').value), Py:parseFloat($('Py').value), Hw:parseFloat($('Hw').value),
+    beta:parseFloat($('beta').value)||0, axis:$('slopeAxis').value,
+    d1:$('d1').value, d2:$('d2').value
+  };
+}
+
+function calcularTotal(){
+  const p=readParams(), theta=parseFloat($('theta').value), x0=parseFloat($('x0').value), y0=parseFloat($('y0').value);
+  const total=totalShadow(p.L,p.W,p.H,theta,p.lat,p.d1,p.d2,1,0.5,p.postW,x0,y0,p.Px,p.Py,p.Hw,p.beta,p.axis);
+  $('totRes').innerHTML=`Con θ=<b>${theta}°</b> y la pérgola en (X₀=${x0}, Y₀=${y0}) m, la sombra útil acumulada dentro del recinto en el periodo es de <b class="hl">${total.toFixed(0)} m²·h</b> (≈${(total/24).toFixed(1)} m²·día medio).`;
+  $('sweepCanvas').style.display='none';
+}
+
+function buscarOptimo(){
+  const p=readParams();
+  const margX=p.L/2+0.3, margY=p.W/2+0.3; // que la pérgola no se salga del muro
+  const xs=[-p.Px/2+margX, 0, p.Px/2-margX];
+  const ys=[-p.Py/2+margY, 0, p.Py/2-margY];
+  let results=[], best=null, worst=null;
+  const curveByTheta={}; // para dibujar la curva: mejor total por cada θ, variando posición
+  for(let th=0; th<360; th+=15){
+    let bestForTh=-Infinity;
+    for(const x0 of xs) for(const y0 of ys){
+      const total=totalShadow(p.L,p.W,p.H,th,p.lat,p.d1,p.d2,5,1,p.postW,x0,y0,p.Px,p.Py,p.Hw,p.beta,p.axis);
+      const r={th,x0,y0,total};
+      if(!best||total>best.total) best=r;
+      if(!worst||total<worst.total) worst=r;
+      if(total>bestForTh) bestForTh=total;
+    }
+    curveByTheta[th]=bestForTh;
+  }
+  results=Object.keys(curveByTheta).map(th=>({th:+th,total:curveByTheta[th]}));
+  $('theta').value=best.th; $('x0').value=best.x0.toFixed(1); $('y0').value=best.y0.toFixed(1); updateLabels();
+  const diffPct=(100*(best.total-worst.total)/worst.total).toFixed(1);
+  $('totRes').innerHTML=`Mejor configuración encontrada: <b class="hl">θ≈${best.th}°, X₀≈${best.x0.toFixed(1)} m, Y₀≈${best.y0.toFixed(1)} m</b> → sombra útil ≈ <b>${best.total.toFixed(0)} m²·h</b> en el periodo.<br>La peor combinación probada (θ≈${worst.th}°, X₀≈${worst.x0.toFixed(1)}, Y₀≈${worst.y0.toFixed(1)}) da ≈${worst.total.toFixed(0)} m²·h — ${diffPct}% menos.<br><span style="color:var(--muted)">Búsqueda en rejilla: 3×3 posiciones × 24 orientaciones (216 combinaciones), cada una integrada sobre el periodo con muestreo cada 5 días y 1 hora. Suficiente para orientar la búsqueda, no para el ajuste fino final.</span>`;
+  drawSweep(results);
+  drawScene();
+}
+
+function drawSweep(results){
+  const cv=$('sweepCanvas'); cv.style.display='block';
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const max=Math.max(...results.map(r=>r.total)), min=Math.min(...results.map(r=>r.total));
+  const pad=30;
+  ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent2');
+  ctx.lineWidth=2; ctx.beginPath();
+  results.forEach((r,i)=>{
+    const x=pad+(cv.width-2*pad)*(r.th/345);
+    const y=cv.height-pad-(cv.height-2*pad)*((r.total-min)/((max-min)||1));
+    i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+  });
+  ctx.stroke();
+  ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted');
+  ctx.font='11px sans-serif';
+  ctx.fillText('0°',pad-6,cv.height-10); ctx.fillText('345°',cv.width-pad-16,cv.height-10);
+  ctx.fillText('Sombra total (m²·h) vs orientación θ',pad,16);
+}
+
+let animInterval=null;
+function toggleAnim(){
+  if(animDayInterval) toggleDayAnim(); // exclusividad: para la otra animación
+  const btn=$('animBtn');
+  if(animInterval){
+    clearInterval(animInterval); animInterval=null;
+    btn.textContent='▶ Animar rotación (0°→359°)';
+    return;
+  }
+  btn.textContent='⏸ Detener animación';
+  animInterval=setInterval(()=>{
+    let v=parseFloat($('theta').value)+1.5;
+    if(v>359){v=0;}
+    $('theta').value=v;
+    drawScene();
+  },60);
+}
+
+let animDayInterval=null, tracing=false, shadowTrace=[];
+function toggleDayAnim(){
+  if(animInterval) toggleAnim(); // exclusividad: para la otra animación
+  const btn=$('animDayBtn');
+  if(animDayInterval){
+    clearInterval(animDayInterval); animDayInterval=null; tracing=false;
+    btn.textContent='☀️ Animar sombra a lo largo del día';
+    return;
+  }
+  shadowTrace=[]; tracing=true;
+  btn.textContent='⏸ Detener animación';
+  animDayInterval=setInterval(()=>{
+    let v=parseFloat($('hora').value)+0.1;
+    if(v>24) v=0;
+    $('hora').value=v;
+    drawScene();
+  },40);
+}
+
+['L','W','H','lat','postW','Px','Py','Hw','beta','slopeAxis','x0','y0','theta','fecha','hora','camAz','camEl'].forEach(id=>$(id).addEventListener('input',()=>{
+  if((animInterval||animDayInterval) && id!=='camAz' && id!=='camEl'){
+    if(animInterval) toggleAnim();
+    if(animDayInterval) toggleDayAnim();
+  }
+  if(id!=='camAz' && id!=='camEl'){ shadowTrace=[]; tracing=false; } // cambios reales invalidan la traza
+  drawScene();
+}));
+drawScene();
+</script>
+</body>
+</html>

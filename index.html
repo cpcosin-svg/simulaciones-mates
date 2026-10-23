@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulaciones de matemáticas</title>
+<meta name="description" content="Simulaciones interactivas de matemáticas para el aula: geometría, trigonometría, análisis, probabilidad y aritmética.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f7fb;--panel:#fff;--ink:#16233b;--mu:#566480;--line:#d3dcea;--ac:#2f5bd8;--och:#e0a100;--on:#fff}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--panel:#172138;--ink:#e8eefb;--mu:#9fb0cf;--line:#26355a;--ac:#8aa9ff;--och:#f2c04a;--on:#0f1626}}
+:root[data-theme="dark"]{--bg:#0f1626;--panel:#172138;--ink:#e8eefb;--mu:#9fb0cf;--line:#26355a;--ac:#8aa9ff;--och:#f2c04a;--on:#0f1626}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.5 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+ background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px;background-position:-1px -1px}
+.wrap{max-width:1000px;margin:0 auto;padding:44px 18px 56px}
+h1{font-size:clamp(1.9rem,5.2vw,3rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 10px;font-weight:700;background:var(--bg);display:inline;padding:2px 8px 2px 0;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.lead{max-width:56ch;margin:14px 0 26px;color:var(--mu);font-size:1.08rem}
+.lead span{background:var(--bg);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
+.filters button{font:inherit;font-size:.95rem;padding:7px 13px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);cursor:pointer}
+.filters button:hover{border-color:var(--ac)}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#count{margin:0 0 18px;color:var(--mu);font-size:.92rem}
+#count span{background:var(--bg)}
+ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:12px}
+li[hidden]{display:none}
+a.sim{display:grid;grid-template-columns:76px 1fr;gap:16px;padding:14px;height:100%;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:inherit;text-decoration:none}
+a.sim:hover{border-color:var(--ac)}
+a.sim:hover h2{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+a.sim:focus-visible,.filters button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+svg{width:76px;height:76px;border-radius:4px;border:1px solid var(--line);color:var(--ac);fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
+ background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:8px 8px}
+svg .d{stroke-dasharray:3 4}svg .f{fill:var(--och);stroke:none}svg .o{fill:var(--panel)}svg .s{fill:var(--och);stroke:none;opacity:.55}
+h2{font-size:1.14rem;line-height:1.25;margin:0 0 4px;font-weight:700}
+.tx p{margin:0 0 8px;font-size:.95rem;color:var(--mu)}
+.tx .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0;font-size:.85rem}
+.lv{background:var(--ac);color:var(--on);padding:1px 8px;border-radius:3px;font-weight:700}
+@media(max-width:420px){a.sim{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:no-preference){a.sim{transition:border-color .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Simulaciones de matemáticas</h1>
+<p class="lead"><span>Herramientas interactivas para trabajar en clase o en casa. Cada una se abre en su propia página y se usa igual en móvil que en ordenador.</span></p>
+<div class="filters" id="filters" role="group" aria-label="Filtrar por área">
+<button type="button" data-f="all" aria-pressed="true">Todas</button>
+<button type="button" data-f="geo" aria-pressed="false">Geometría y trigonometría</button>
+<button type="button" data-f="ana" aria-pressed="false">Análisis</button>
+<button type="button" data-f="pro" aria-pressed="false">Probabilidad y estadística</button>
+<button type="button" data-f="ari" aria-pressed="false">Aritmética</button>
+</div>
+<p id="count" aria-live="polite"><span></span></p>
+<ul id="list">
+
+<li data-a="geo"><a class="sim" href="simulaciones/elipse-tres-focos.html">
+<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="34" rx="24" ry="17"/><circle class="f" cx="20" cy="40" r="3.4"/><circle class="f" cx="44" cy="40" r="3.4"/><circle class="f" cx="32" cy="25" r="3.4"/></svg>
+<div class="tx"><h2>La curva de los tres focos</h2><p>Dibuja con tres chinchetas y un cordel una curva en forma de huevo. Mueve los focos y el cordel hasta que la curva se encoja en un punto.</p><p class="meta"><span class="lv">2º ESO</span><span>Geometría</span></p></div></a></li>
+
+<li data-a="geo"><a class="sim" href="simulaciones/duracion-del-dia.html">
+<svg viewBox="0 0 64 64" aria-hidden="true"><line x1="6" y1="44" x2="58" y2="44"/><path class="d" d="M10 44A22 22 0 0 1 54 44"/><circle class="f" cx="32" cy="22" r="5"/><path d="M20 52h24"/></svg>
+<div class="tx"><h2>¿Por qué cambia la duración del día?</h2><p>La Tierra en 3D con el eje inclinado y la vista de un observador en Benicarló: trayectoria del Sol, altura máxima y horas de luz según la fecha y la latitud.</p><p class="meta"><span class="lv">4º ESO</span><span>Geometría y modelización</span></p></div></a></li>
+
+<li data-a="pro"><a class="sim" href="simulaciones/probabilidad.html">
+<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 32L30 18M8 32L30 46M30 18L54 10M30 18L54 26M30 46L54 38M30 46L54 54"/><circle class="f" cx="8" cy="32" r="3.4"/><circle class="f" cx="54" cy="10" r="3.4"/><circle class="f" cx="54" cy="26" r="3.4"/><circle class="f" cx="54" cy="38" r="3.4"/><circle class="f" cx="54" cy="54" r="3.4"/></svg>
+<div class="tx"><h2>Laboratorio de probabilidad</h2><p>Problemas aleatorios en tres niveles. Elige árbol, conjuntos o tabla, rellena el diagrama y responde a las preguntas.</p><p class="meta"><span class="lv">4º ESO</span><span>Probabilidad</span></p></div></a></li>
+
+<li data-a="pro"><a class="sim" href="simulaciones/hormigas.html">
+<svg viewBox="0 0 64 64" aria-hidden="true"><path class="d" d="M12 50C20 32 30 46 36 30S48 22 52 16"/><circle class="f" cx="10" cy="52" r="5"/><circle class="f" cx="54" cy="14" r="4"/><circle cx="26" cy="42" r="1.6"/><circle cx="40" cy="28" r="1.6"/></svg>
+<div class="tx"><h2>Laboratorio de hormigas</h2><p>Una colonia que busca alimento y deja feromonas. Cambia el número de hormigas, la latencia y el alimento, y compara configuraciones con varias ejecuciones.</p><p class="meta"><span>Estadística y simulación</span></p></div></a></li>
+
+<li data-a="geo"><a class="sim" href="simulaciones/identidades-trigonometricas.html">
+<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 32C14 8 22 8 32 32S50 56 58 32"/><path class="d" d="M6 16C16 16 20 50 32 50S48 16 58 16"/></svg>
+<div class="tx"><h2>Demuestra la identidad</h2><p>Juego para demostrar identidades trigonométricas: selecciona una parte de la expresión, aplica una regla y simplifica tú el resto. Niveles y ejercicio aleatorio.</p><p class="meta"><span class="lv">1º Bachillerato</span><span>Trigonometría</span></p></div></a></li>
+
+<li data-a="ana"><a class="sim" href="simulaciones/limites-continuidad.html">
+<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 50C16 48 24 40 30 26"/><path d="M37 22C44 14 52 12 58 12"/><line class="d" x1="33.5" y1="6" x2="33.5" y2="58"/><circle class="o" cx="30" cy="26" r="2.8"/><circle class="f" cx="37" cy="22" r="3"/></svg>
+<div class="tx"><h2>Laboratorio de límites y continuidad</h2><p>Funciones al azar (racionales, a trozos, con parámetro k, exponenciales…). Calcula límites, estudia la continuidad y las asíntotas, corrige y compara con la gráfica.</p><p class="meta"><span class="lv">2º Bachillerato</span><span>Análisis</span></p></div></a></li>
+
+<li data-a="geo"><a class="sim" href="simulaciones/sombra-pergola.html">
+<svg viewBox="0 0 64 64" aria-hidden="true"><path class="s" d="M24 54L52 48L60 56L32 62Z"/><path d="M12 18L42 12L52 20L22 26Z"/><path d="M12 18V36M22 26V44M52 20V38"/></svg>
+<div class="tx"><h2>Sombra de una pérgola</h2><p>Simula la sombra de una pérgola con techo inclinado dentro de un patio cerrado. Cambia la latitud, la posición y el giro; los muros también proyectan sombra.</p><p class="meta"><span>Geometría y modelización</span></p></div></a></li>
+
+<li data-a="ari"><a class="sim" href="simulaciones/calendario-doomsday.html">
+<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="2"/><rect class="f" x="25" y="8" width="14" height="14" rx="2"/><rect x="42" y="8" width="14" height="14" rx="2"/><rect x="8" y="25" width="14" height="14" rx="2"/><rect x="25" y="25" width="14" height="14" rx="2"/><rect class="f" x="42" y="25" width="14" height="14" rx="2"/><rect class="f" x="8" y="42" width="14" height="14" rx="2"/><rect x="25" y="42" width="14" height="14" rx="2"/><rect x="42" y="42" width="14" height="14" rx="2"/></svg>
+<div class="tx"><h2>Calendario gregoriano en tres ejes</h2><p>Cada día es un cubo según su día, mes y año, coloreado por día de la semana. Un tablero para ver por qué funcionan los algoritmos tipo doomsday.</p><p class="meta"><span>Aritmética y calendario</span></p></div></a></li>
+
+</ul>
+</div>
+<script>
+(function(){
+var btns=document.querySelectorAll('#filters button'),items=document.querySelectorAll('#list li'),out=document.querySelector('#count span');
+function show(f){
+ var n=0;
+ items.forEach(function(li){var ok=f==='all'||li.dataset.a===f;li.hidden=!ok;if(ok)n++});
+ btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.f===f))});
+ out.textContent=n===1?'1 simulación':n+' simulaciones';
+}
+btns.forEach(function(b){b.addEventListener('click',function(){show(b.dataset.f)})});
+show('all');
+})();
+</script>
+</body>
+</html>
