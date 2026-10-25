@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radicals · Introducció</title>
+<style>
+:root{
+  --paper:#fbfcff; --grid:#dbe3f5; --ink:#1c3fb7; --text:#1f2430; --muted:#5b6478; --box:#fff7d6; --boxline:#d9b92e;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--paper:#14182a; --grid:#222a45; --ink:#8fa8ff; --text:#e6e9f5; --muted:#9aa3bd; --box:#2a2610; --boxline:#a98f1c;}
+}
+:root[data-theme="dark"]{--paper:#14182a; --grid:#222a45; --ink:#8fa8ff; --text:#e6e9f5; --muted:#9aa3bd; --box:#2a2610; --boxline:#a98f1c;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;color:var(--text);font:18px/1.7 Georgia,"Times New Roman",serif}
+main{max-width:46rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2.4rem;margin:0 0 .25rem;color:var(--ink);text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:8px}
+.sub{color:var(--muted);margin:1rem 0 2rem}
+.index{display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 2.2rem;padding:0;list-style:none;font:15px/1.3 system-ui,sans-serif}
+.index li{padding:.4rem .7rem;border:1.5px solid var(--grid);border-radius:6px;background:var(--paper);color:var(--muted)}
+.index li.on{border-color:var(--ink);color:var(--ink);font-weight:600}
+.index a{color:inherit;text-decoration:none;display:block;padding:.4rem .7rem;margin:-.4rem -.7rem}
+.index a:hover,.index a:focus-visible{text-decoration:underline}
+section{margin:0 0 2.2rem}
+h2{font-size:1.25rem;color:var(--ink);margin:0 0 .6rem}
+p{margin:.4rem 0}
+.eq{overflow-x:auto;padding:.4rem 0}
+math{font-size:1.35em;color:var(--ink)}
+math[display="block"]{margin:.5rem 0}
+.key{background:var(--box);border:2px solid var(--boxline);border-radius:6px;padding:.6rem 1rem;margin:.8rem 0;overflow-x:auto}
+.key .tag{font:600 14px/1 system-ui,sans-serif;color:var(--muted)}
+.why{border-left:4px solid var(--ink);padding-left:1rem}
+footer{color:var(--muted);font:14px/1.4 system-ui,sans-serif;margin-top:3rem}
+
+@font-face{font-family:"LM Math Web";src:url("fonts/lm-math-subset.woff") format("woff");font-display:swap}
+math{font-family:"LM Math Web","Latin Modern Math","STIX Two Math","Cambria Math",math,serif}
+.pnav{position:sticky;top:0;z-index:30;display:flex;gap:.25rem;overflow-x:auto;white-space:nowrap;padding:.5rem .75rem;background:var(--paper);border-bottom:1.5px solid var(--ink);font:14px/1.2 system-ui,sans-serif;-webkit-overflow-scrolling:touch}
+.pnav a{color:var(--ink);text-decoration:none;padding:.4rem .6rem;border-radius:6px;flex:0 0 auto}
+.pnav a[aria-current="page"]{background:var(--ink);color:var(--paper);font-weight:600}
+.pnav a:hover{text-decoration:underline}
+.pnav .out{margin-left:auto;border:1px solid var(--ink)}
+@media print{.pnav{display:none!important}}
+@media (max-width:640px){.it{flex-wrap:wrap}.it .t{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<nav class="pnav" aria-label="Navegació del projecte"><a href="index.html">Inici</a><a href="apunts.html" aria-current="page">Apunts</a><a href="simplificacio.html">1 Simplificació</a><a href="extraccio.html">2 Extracció</a><a href="suma-resta.html">3 Suma i resta</a><a href="mcm.html">4 Producte i quocient</a><a href="aniuats.html">5 Aniuats</a><a href="racionalitzacio.html">6 Racionalització</a><a href="nivell3.html">Nivell 3</a><a href="examen.html">Examen</a><a href="examen-avancat.html">Examen avançat</a><a class="out" href="../index.html">← Totes les simulacions</a></nav>
+
+<main>
+<h1>Radicals</h1>
+<p class="sub">Pàgines 1 a 8 · Dels exponents fraccionaris a la racionalització. Els enllaços de dalt porten als simuladors, al Nivell 3 i als exàmens.</p>
+
+<ul class="index" aria-label="Conceptes del tema">
+  <li class="on">Introducció</li>
+  <li class="on"><a href="simplificacio.html">1 Simplificació</a></li>
+  <li class="on"><a href="extraccio.html">2 Extracció i introducció de factors</a></li>
+  <li class="on"><a href="suma-resta.html">3 Suma i resta</a></li>
+  <li class="on"><a href="mcm.html">4 Producte i quocient amb índex diferent</a></li>
+  <li class="on"><a href="aniuats.html">5 Radicals aniuats</a></li>
+  <li class="on"><a href="racionalitzacio.html">6 Racionalització</a></li>
+  <li class="on"><a href="examen.html">Examen aleatori</a></li>
+  <li class="on"><a href="examen-avancat.html">Examen avançat</a></li>
+  <li class="on"><a href="nivell3.html">Nivell 3 · repte</a></li>
+</ul>
+
+<section>
+  <h2>Què vol dir que √9 = 3?</h2>
+  <p>Vol dir que 3² = 9. I que √2 és un nombre x tal que x² = 2.</p>
+  <p>Però x = 2<sup>1/2</sup> verifica que:</p>
+  <div class="eq"><math display="block"><msup><mrow><mo>(</mo><msup><mn>2</mn><mfrac><mn>1</mn><mn>2</mn></mfrac></msup><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><msup><mn>2</mn><mfrac><mn>2</mn><mn>2</mn></mfrac></msup><mo>=</mo><msup><mn>2</mn><mn>1</mn></msup><mo>=</mo><mn>2</mn></math></div>
+  <p>Ergo:</p>
+  <div class="key"><math display="block"><msqrt><mn>2</mn></msqrt><mo>=</mo><msup><mn>2</mn><mfrac><mn>1</mn><mn>2</mn></mfrac></msup><mspace width="2em"/><msup><mrow><mo>(</mo><msqrt><mn>2</mn></msqrt><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>2</mn></math></div>
+</section>
+
+<section>
+  <h2>Però també per a qualsevol índex n</h2>
+  <div class="key"><math display="block"><mroot><mi>a</mi><mi>n</mi></mroot><mo>=</mo><msup><mi>a</mi><mfrac><mn>1</mn><mi>n</mi></mfrac></msup></math></div>
+  <div class="why">
+    <p>Perquè si <math><mroot><mi>a</mi><mi>n</mi></mroot><mo>=</mo><mi>x</mi></math>, és perquè <math><msup><mi>x</mi><mi>n</mi></msup><mo>=</mo><mi>a</mi></math>.</p>
+    <p>Però:</p>
+    <div class="eq"><math display="block"><msup><mrow><mo>(</mo><msup><mi>a</mi><mrow><mn>1</mn><mo>/</mo><mi>n</mi></mrow></msup><mo>)</mo></mrow><mi>n</mi></msup><mo>=</mo><msup><mi>a</mi><mfrac><mi>n</mi><mi>n</mi></mfrac></msup><mo>=</mo><mi>a</mi></math></div>
+    <p>igual que <math><msup><mrow><mo>(</mo><mroot><mi>a</mi><mi>n</mi></mroot><mo>)</mo></mrow><mi>n</mi></msup><mo>=</mo><mi>a</mi></math>.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Anàlogament, m vegades</h2>
+  <div class="eq"><math display="block"><munder><munder accentunder="true"><mrow><mroot><mi>a</mi><mi>n</mi></mroot><mo>·</mo><mroot><mi>a</mi><mi>n</mi></mroot><mo>·</mo><mo>…</mo><mo>·</mo><mroot><mi>a</mi><mi>n</mi></mroot></mrow><mo>⏟</mo></munder><mtext>m vegades</mtext></munder><mo>=</mo><msup><mrow><mo>(</mo><mroot><mi>a</mi><mi>n</mi></mroot><mo>)</mo></mrow><mi>m</mi></msup></math></div>
+  <p>Però també és:</p>
+  <div class="eq"><math display="block"><munder><munder accentunder="true"><mrow><msup><mi>a</mi><mfrac><mn>1</mn><mi>n</mi></mfrac></msup><mo>·</mo><msup><mi>a</mi><mfrac><mn>1</mn><mi>n</mi></mfrac></msup><mo>·</mo><mo>…</mo><mo>·</mo><msup><mi>a</mi><mfrac><mn>1</mn><mi>n</mi></mfrac></msup></mrow><mo>⏟</mo></munder><mtext>m vegades</mtext></munder><mo>=</mo><msup><mi>a</mi><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><mo>+</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><mo>+</mo><mo>…</mo><mo>+</mo><mfrac><mn>1</mn><mi>n</mi></mfrac></mrow></msup><mo>=</mo><msup><mi>a</mi><mfrac><mi>m</mi><mi>n</mi></mfrac></msup><mo>=</mo><msup><mrow><mo>(</mo><msup><mi>a</mi><mi>m</mi></msup><mo>)</mo></mrow><mfrac><mn>1</mn><mi>n</mi></mfrac></msup><mover><mo>=</mo><mtext>per definició</mtext></mover><mroot><msup><mi>a</mi><mi>m</mi></msup><mi>n</mi></mroot></math></div>
+  <div class="key"><span class="tag">Resum</span><math display="block"><msup><mi>a</mi><mfrac><mi>m</mi><mi>n</mi></mfrac></msup><mo>=</mo><msup><mrow><mo>(</mo><msup><mi>a</mi><mi>m</mi></msup><mo>)</mo></mrow><mfrac><mn>1</mn><mi>n</mi></mfrac></msup><mo>=</mo><mroot><msup><mi>a</mi><mi>m</mi></msup><mi>n</mi></mroot><mo>=</mo><msup><mrow><mo>(</mo><mroot><mi>a</mi><mi>n</mi></mroot><mo>)</mo></mrow><mi>m</mi></msup></math></div>
+</section>
+
+<section>
+  <h2>Notació exponencial</h2>
+  <p>Això motiva la notació exponencial:</p>
+  <div class="key"><math display="block"><mroot><msup><mi>a</mi><mi>m</mi></msup><mi>n</mi></mroot><mo>=</mo><msup><mi>a</mi><mfrac><mi>m</mi><mi>n</mi></mfrac></msup></math></div>
+  <p>És a dir, una potència d’exponent fraccionari és un radical.</p>
+  <p>Els radicals hereten les propietats de les potències.</p>
+</section>
+
+<section>
+  <h2>1. Simplificació</h2>
+  <div class="eq"><math display="block"><mfrac><mn>2</mn><mn>4</mn></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>=</mo><mfrac><mn>10</mn><mn>20</mn></mfrac><mo>=</mo><mo>…</mo></math></div>
+  <div class="eq"><math display="block"><mroot><msup><mn>2</mn><mn>2</mn></msup><mn>4</mn></mroot><mo>=</mo><msup><mn>2</mn><mfrac><mn>2</mn><mn>4</mn></mfrac></msup><mo>=</mo><msup><mn>2</mn><mfrac><mn>1</mn><mn>2</mn></mfrac></msup><mo>=</mo><msup><mn>2</mn><mfrac><mn>10</mn><mn>20</mn></mfrac></msup><mo>=</mo><mo>…</mo></math></div>
+  <div class="key"><math display="block"><mroot><msup><mn>2</mn><mn>2</mn></msup><mn>4</mn></mroot><mo>=</mo><msqrt><mn>2</mn></msqrt><mo>=</mo><mroot><msup><mn>2</mn><mn>10</mn></msup><mn>20</mn></mroot><mo>=</mo><mo>…</mo></math></div>
+</section>
+
+<section>
+  <h2>2. Fraccions impròpies</h2>
+  <div class="eq"><math display="block"><mfrac><mn>7</mn><mn>4</mn></mfrac><mo>=</mo><mn>1</mn><mo>+</mo><mfrac><mn>3</mn><mn>4</mn></mfrac></math></div>
+  <p>Perquè:</p>
+  <div class="eq"><math display="block"><mfrac><mn>7</mn><mn>4</mn></mfrac><mo>=</mo><mfrac><mrow><mn>4</mn><mo>·</mo><mn>1</mn><mo>+</mo><mn>3</mn></mrow><mn>4</mn></mfrac><mo>=</mo><mfrac><mrow><mn>4</mn><mo>·</mo><mn>1</mn></mrow><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>3</mn><mn>4</mn></mfrac><mo>=</mo><mn>1</mn><mo>+</mo><mfrac><mn>3</mn><mn>4</mn></mfrac></math></div>
+  <p>(a la divisió 7 : 4, el quocient és 1 i el residu és 3)</p>
+  <p>Per exemple:</p>
+  <div class="key"><math display="block"><mroot><msup><mn>2</mn><mn>7</mn></msup><mn>4</mn></mroot><mo>=</mo><mn>2</mn><mroot><msup><mn>2</mn><mn>3</mn></msup><mn>4</mn></mroot><mspace width="2em"/><mroot><msup><mn>2</mn><mn>11</mn></msup><mn>6</mn></mroot><mo>=</mo><mn>2</mn><mroot><msup><mn>2</mn><mn>5</mn></msup><mn>6</mn></mroot></math></div>
+  <p>El quocient (1) surt del radical.</p>
+  <p>Amb diversos factors, es fa la divisió de cada exponent entre l’índex:</p>
+  <div class="eq"><math display="block"><mroot><mrow><msup><mn>2</mn><mn>15</mn></msup><mo>·</mo><msup><mn>3</mn><mn>9</mn></msup><mo>·</mo><msup><mn>5</mn><mn>16</mn></msup></mrow><mn>6</mn></mroot><mo>=</mo><msup><mn>2</mn><mn>2</mn></msup><mo>·</mo><mn>3</mn><mo>·</mo><msup><mn>5</mn><mn>2</mn></msup><mroot><mrow><msup><mn>2</mn><mn>3</mn></msup><mo>·</mo><msup><mn>3</mn><mn>3</mn></msup><mo>·</mo><msup><mn>5</mn><mn>4</mn></msup></mrow><mn>6</mn></mroot></math></div>
+  <p>15 : 6 → quocient 2, residu 3 · 9 : 6 → quocient 1, residu 3 · 16 : 6 → quocient 2, residu 4. Els quocients surten; els residus es queden dins.</p>
+</section>
+
+<section>
+  <h2>Extracció amb un nombre gran</h2>
+  <p>Si tenim un nombre gran, el factoritzem:</p>
+  <div class="key"><math display="block"><mroot><mn>6144</mn><mn>4</mn></mroot><mo>=</mo><mroot><mrow><msup><mn>2</mn><mn>11</mn></msup><mo>·</mo><mn>3</mn></mrow><mn>4</mn></mroot><mo>=</mo><msup><mn>2</mn><mn>2</mn></msup><mroot><mrow><msup><mn>2</mn><mn>3</mn></msup><mo>·</mo><mn>3</mn></mrow><mn>4</mn></mroot></math></div>
+  <p>11 : 4 → quocient 2, residu 3.</p>
+</section>
+
+<section>
+  <h2>3. Suma i resta</h2>
+  <p>Si tenim sumes o restes, només podem operar si tenim exactament el mateix radical.</p>
+  <div class="eq"><math display="block"><mroot><mn>2</mn><mn>3</mn></mroot><mo>+</mo><mn>5</mn><mroot><mn>2</mn><mn>3</mn></mroot><mo>=</mo><mn>6</mn><mroot><mn>2</mn><mn>3</mn></mroot></math></div>
+  <p>Per exemple:</p>
+  <div class="key"><math display="block"><mroot><msup><mn>2</mn><mn>11</mn></msup><mn>4</mn></mroot><mo>+</mo><mn>2</mn><mroot><mn>8</mn><mn>4</mn></mroot><mo>=</mo><msup><mn>2</mn><mn>2</mn></msup><mroot><msup><mn>2</mn><mn>3</mn></msup><mn>4</mn></mroot><mo>+</mo><mn>2</mn><mroot><mn>8</mn><mn>4</mn></mroot><mo>=</mo><mn>4</mn><mroot><mn>8</mn><mn>4</mn></mroot><mo>+</mo><mn>2</mn><mroot><mn>8</mn><mn>4</mn></mroot><mo>=</mo><mn>6</mn><mroot><mn>8</mn><mn>4</mn></mroot></math></div>
+  <p>Aquí 2³ = 8, i per això els dos radicals acaben sent el mateix.</p>
+</section>
+
+<section>
+  <h2>3. m.c.m.</h2>
+  <p>Si tenim radicals del mateix índex:</p>
+  <div class="eq"><math display="block"><mroot><mn>2</mn><mn>5</mn></mroot><mo>·</mo><mroot><mn>3</mn><mn>5</mn></mroot><mo>=</mo><mroot><mrow><mn>2</mn><mo>·</mo><mn>3</mn></mrow><mn>5</mn></mroot><mspace width="2em"/><mfrac><mroot><mn>16</mn><mn>5</mn></mroot><mroot><mn>9</mn><mn>5</mn></mroot></mfrac><mo>=</mo><mroot><mfrac><mn>16</mn><mn>9</mn></mfrac><mn>5</mn></mroot></math></div>
+  <p>Es poden multiplicar i dividir fàcilment. Si no tenen el mateix índex, cal fer servir el m.c.m. dels índexs.</p>
+  <p>Per exemple, m.c.m.(5, 10) = 10:</p>
+  <div class="key"><math display="block"><mroot><mn>2</mn><mn>5</mn></mroot><mo>·</mo><mroot><mn>3</mn><mn>10</mn></mroot><mo>=</mo><mroot><msup><mn>2</mn><mn>2</mn></msup><mn>10</mn></mroot><mo>·</mo><mroot><mn>3</mn><mn>10</mn></mroot><mo>=</mo><mroot><mrow><msup><mn>2</mn><mn>2</mn></msup><mo>·</mo><mn>3</mn></mrow><mn>10</mn></mroot></math></div>
+  <p>L’índex 5 es multiplica per 2 per arribar a 10, i l’exponent del radicand també. En forma de potències:</p>
+  <div class="eq"><math display="block"><msup><mn>2</mn><mfrac><mn>1</mn><mn>5</mn></mfrac></msup><mo>·</mo><msup><mn>3</mn><mfrac><mn>1</mn><mn>10</mn></mfrac></msup><mo>=</mo><msup><mn>2</mn><mfrac><mn>2</mn><mn>10</mn></mfrac></msup><mo>·</mo><msup><mn>3</mn><mfrac><mn>1</mn><mn>10</mn></mfrac></msup><mo>=</mo><mroot><mrow><msup><mn>2</mn><mn>2</mn></msup><mo>·</mo><mn>3</mn></mrow><mn>10</mn></mroot></math></div>
+  <p>I analògament per a la divisió.</p>
+</section>
+
+<section>
+  <h2>4. Potència de potència</h2>
+  <div class="key"><math display="block"><mroot><mroot><mi>a</mi><mi>m</mi></mroot><mi>n</mi></mroot><mo>=</mo><msup><mrow><mo>(</mo><msup><mi>a</mi><mfrac><mn>1</mn><mi>m</mi></mfrac></msup><mo>)</mo></mrow><mfrac><mn>1</mn><mi>n</mi></mfrac></msup><mo>=</mo><msup><mi>a</mi><mfrac><mn>1</mn><mrow><mi>n</mi><mo>·</mo><mi>m</mi></mrow></mfrac></msup><mo>=</mo><mroot><mi>a</mi><mrow><mi>n</mi><mo>·</mo><mi>m</mi></mrow></mroot></math></div>
+  <p>Exemple:</p>
+  <div class="eq"><math display="block"><mroot><mroot><mn>3</mn><mn>3</mn></mroot><mn>5</mn></mroot><mo>=</mo><mroot><mn>3</mn><mn>15</mn></mroot></math></div>
+  <p>Si tinc algun factor pel mig, primer introduïm el 2 dins i després multipliquem els índexs:</p>
+  <div class="eq"><math display="block"><mroot><mrow><mn>2</mn><mo>·</mo><mroot><mn>3</mn><mn>3</mn></mroot></mrow><mn>5</mn></mroot><mo>=</mo><mroot><mroot><mrow><msup><mn>2</mn><mn>3</mn></msup><mo>·</mo><mn>3</mn></mrow><mn>3</mn></mroot><mn>5</mn></mroot><mo>=</mo><mroot><mrow><msup><mn>2</mn><mn>3</mn></msup><mo>·</mo><mn>3</mn></mrow><mn>15</mn></mroot></math></div>
+</section>
+
+<section>
+  <h2>Racionalització (llevar arrels del denominador)</h2>
+  <p><strong>Cas A)</strong> Arrels quadrades:</p>
+  <div class="eq"><math display="block"><mfrac><mn>5</mn><msqrt><mn>6</mn></msqrt></mfrac><mo>=</mo><mfrac><mrow><mn>5</mn><mo>·</mo><msqrt><mn>6</mn></msqrt></mrow><mrow><msqrt><mn>6</mn></msqrt><mo>·</mo><msqrt><mn>6</mn></msqrt></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>5</mn><msqrt><mn>6</mn></msqrt></mrow><mn>6</mn></mfrac></math></div>
+  <p>Multipliquem a dalt i a baix pel mateix nombre i la fracció no varia.</p>
+  <p><strong>Cas B)</strong> Arrels no quadrades:</p>
+  <div class="eq"><math display="block"><mfrac><mrow><mn>9</mn><msqrt><mn>2</mn></msqrt></mrow><mroot><mn>2</mn><mn>3</mn></mroot></mfrac><mo>=</mo><mfrac><mrow><mn>9</mn><msqrt><mn>2</mn></msqrt><mo>·</mo><mroot><msup><mn>2</mn><mn>2</mn></msup><mn>3</mn></mroot></mrow><mrow><mroot><mn>2</mn><mn>3</mn></mroot><mo>·</mo><mroot><msup><mn>2</mn><mn>2</mn></msup><mn>3</mn></mroot></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>9</mn><msqrt><mn>2</mn></msqrt><mo>·</mo><mroot><msup><mn>2</mn><mn>2</mn></msup><mn>3</mn></mroot></mrow><mroot><mrow><mn>2</mn><mo>·</mo><msup><mn>2</mn><mn>2</mn></msup></mrow><mn>3</mn></mroot></mfrac><mo>=</mo><mfrac><mrow><mn>9</mn><msqrt><mn>2</mn></msqrt><mo>·</mo><mroot><msup><mn>2</mn><mn>2</mn></msup><mn>3</mn></mroot></mrow><mn>2</mn></mfrac></math></div>
+  <p>Multipliquem per la mateixa arrel i ajustem l’exponent de manera que dins doni el mateix que l’índex: <math><mroot><msup><mn>2</mn><mn>3</mn></msup><mn>3</mn></mroot><mo>=</mo><mn>2</mn></math>.</p>
+  <p><strong>Cas C)</strong> Denominadors amb suma i resta de radicals. Utilitzem la identitat notable:</p>
+  <div class="key"><math display="block"><mo>(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo>)</mo><mo>(</mo><mi>a</mi><mo>−</mo><mi>b</mi><mo>)</mo><mo>=</mo><msup><mi>a</mi><mn>2</mn></msup><mo>−</mo><msup><mi>b</mi><mn>2</mn></msup></math></div>
+  <p>Exemple:</p>
+  <div class="eq"><math display="block"><mfrac><mn>9</mn><mrow><mn>2</mn><mo>+</mo><msqrt><mn>3</mn></msqrt></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>9</mn><mo>(</mo><mn>2</mn><mo>−</mo><msqrt><mn>3</mn></msqrt><mo>)</mo></mrow><mrow><mo>(</mo><mn>2</mn><mo>+</mo><msqrt><mn>3</mn></msqrt><mo>)</mo><mo>(</mo><mn>2</mn><mo>−</mo><msqrt><mn>3</mn></msqrt><mo>)</mo></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>9</mn><mo>(</mo><mn>2</mn><mo>−</mo><msqrt><mn>3</mn></msqrt><mo>)</mo></mrow><mrow><msup><mn>2</mn><mn>2</mn></msup><mo>−</mo><msup><mrow><mo>(</mo><msqrt><mn>3</mn></msqrt><mo>)</mo></mrow><mn>2</mn></msup></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>9</mn><mo>·</mo><mn>2</mn><mo>−</mo><mn>9</mn><msqrt><mn>3</mn></msqrt></mrow><mrow><mn>4</mn><mo>−</mo><mn>3</mn></mrow></mfrac><mo>=</mo><mn>18</mn><mo>−</mo><mn>9</mn><msqrt><mn>3</mn></msqrt></math></div>
+  <p>Un factor és la suma (2 + √3) i l’altre la diferència (2 − √3).</p>
+</section>
+
+<footer>Apunts de la llibreta, pàgines 1 a 8.</footer>
+</main>
+<script>(function(){function fix(r){var l=r.querySelectorAll?r.querySelectorAll('mo'):[];Array.prototype.forEach.call(l,function(m){var t=m.textContent.trim();if(t==='(')m.setAttribute('form','prefix');else if(t===')')m.setAttribute('form','postfix');});}fix(document);new MutationObserver(function(ms){ms.forEach(function(m){Array.prototype.forEach.call(m.addedNodes,function(n){if(n.nodeType===1)fix(n);});});}).observe(document.body,{childList:true,subtree:true});})();</script>
+</body>
+</html>

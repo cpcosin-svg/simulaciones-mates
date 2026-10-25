@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radicals · Nivell 3</title>
+<style>
+:root{
+  --paper:#fbfcff; --grid:#dbe3f5; --ink:#1c3fb7; --text:#1f2430; --muted:#5b6478; --box:#fff7d6; --boxline:#d9b92e; --ok:#12733a; --okbg:#e0f5e8; --warn:#8a5a00; --warnbg:#fff1d1; --bad:#a42222; --badbg:#fde4e4;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--paper:#14182a; --grid:#222a45; --ink:#8fa8ff; --text:#e6e9f5; --muted:#9aa3bd; --box:#2a2610; --boxline:#a98f1c; --ok:#7fe0a5; --okbg:#12301f; --warn:#f0c870; --warnbg:#35290b; --bad:#ff9a9a; --badbg:#3a1616;}
+}
+:root[data-theme="dark"]{--paper:#14182a; --grid:#222a45; --ink:#8fa8ff; --text:#e6e9f5; --muted:#9aa3bd; --box:#2a2610; --boxline:#a98f1c; --ok:#7fe0a5; --okbg:#12301f; --warn:#f0c870; --warnbg:#35290b; --bad:#ff9a9a; --badbg:#3a1616;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;color:var(--text);font:18px/1.6 Georgia,"Times New Roman",serif}
+main{max-width:42rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:1.9rem;margin:0;color:var(--ink)}
+.sub{color:var(--muted);margin:.4rem 0 1.2rem}
+.tabs{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.2rem;font:14px/1.2 system-ui,sans-serif}
+.tabs button,.pal button,.act button{font:inherit;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:8px;padding:.5rem .7rem;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);font-weight:600}
+button:focus-visible,input:focus-visible{outline:3px solid var(--boxline);outline-offset:2px}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:10px;padding:1.2rem}
+.q{font:15px/1.4 system-ui,sans-serif;color:var(--muted);margin:0 0 .6rem}
+.prob{font-size:1.8rem;overflow-x:auto;padding:.3rem 0 .8rem}
+math{color:var(--ink);font-size:1.25em}
+.pal{display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0;font:16px/1 system-ui,sans-serif}
+.pal button{min-width:2.6rem;padding:.45rem .6rem}
+#in{width:100%;padding:.7rem;font:18px/1.2 ui-monospace,Menlo,Consolas,monospace;border:2px solid var(--grid);border-radius:6px;background:var(--paper);color:var(--text)}
+.help{font:13px/1.4 system-ui,sans-serif;color:var(--muted);margin:.3rem 0}
+.prev{min-height:3rem;border:1px dashed var(--grid);border-radius:6px;padding:.3rem .6rem;margin:.5rem 0;overflow-x:auto;font-size:1.4rem}
+.prev small{font:13px system-ui,sans-serif;color:var(--muted)}
+.act{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.6rem;font:16px/1.3 system-ui,sans-serif}
+.act .main{background:var(--ink);color:var(--paper);font-weight:600}
+.fb{margin-top:1rem;padding:.7rem 1rem;border-radius:8px;font:16px/1.45 system-ui,sans-serif;display:none}
+.fb.ok{display:block;background:var(--okbg);color:var(--ok)}
+.fb.warn{display:block;background:var(--warnbg);color:var(--warn)}
+.fb.bad{display:block;background:var(--badbg);color:var(--bad)}
+.sol{margin-top:1rem;background:var(--box);border:2px solid var(--boxline);border-radius:8px;padding:.5rem 1rem;overflow-x:auto;display:none;font-size:1.3rem}
+.sol.on{display:block}
+.score{margin-top:1.2rem;color:var(--muted);font:15px/1.3 system-ui,sans-serif}
+
+@font-face{font-family:"LM Math Web";src:url("fonts/lm-math-subset.woff") format("woff");font-display:swap}
+math{font-family:"LM Math Web","Latin Modern Math","STIX Two Math","Cambria Math",math,serif}
+.pnav{position:sticky;top:0;z-index:30;display:flex;gap:.25rem;overflow-x:auto;white-space:nowrap;padding:.5rem .75rem;background:var(--paper);border-bottom:1.5px solid var(--ink);font:14px/1.2 system-ui,sans-serif;-webkit-overflow-scrolling:touch}
+.pnav a{color:var(--ink);text-decoration:none;padding:.4rem .6rem;border-radius:6px;flex:0 0 auto}
+.pnav a[aria-current="page"]{background:var(--ink);color:var(--paper);font-weight:600}
+.pnav a:hover{text-decoration:underline}
+.pnav .out{margin-left:auto;border:1px solid var(--ink)}
+@media print{.pnav{display:none!important}}
+@media (max-width:640px){.it{flex-wrap:wrap}.it .t{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<nav class="pnav" aria-label="Navegació del projecte"><a href="index.html">Inici</a><a href="apunts.html">Apunts</a><a href="simplificacio.html">1 Simplificació</a><a href="extraccio.html">2 Extracció</a><a href="suma-resta.html">3 Suma i resta</a><a href="mcm.html">4 Producte i quocient</a><a href="aniuats.html">5 Aniuats</a><a href="racionalitzacio.html">6 Racionalització</a><a href="nivell3.html" aria-current="page">Nivell 3</a><a href="examen.html">Examen</a><a href="examen-avancat.html">Examen avançat</a><a class="out" href="../index.html">← Totes les simulacions</a></nav>
+
+<main>
+<h1>Radicals · Nivell 3</h1>
+<p class="sub">Repte sense pistes: escriu la teua solució amb l’editor. El sistema comprova el valor i que estiga en la forma final.</p>
+<div class="tabs" id="tabs" role="group" aria-label="Concepte"></div>
+
+<div class="card">
+  <p class="q" id="q"></p>
+  <div class="prob" id="prob" aria-live="polite"></div>
+  <div class="pal" id="pal" role="group" aria-label="Eines de l’editor"></div>
+  <input id="in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="La teua resposta">
+  <p class="help">Escriu: <b>sqrt(x)</b> o <b>√(x)</b> per a l’arrel quadrada, <b>rt(n,x)</b> per a l’arrel n-èsima, <b>^</b> per a potències, <b>/</b> per a fraccions i <b>*</b> per a multiplicar.</p>
+  <div class="prev" id="prev" aria-live="polite"></div>
+  <div class="act">
+    <button class="main" id="check">Comprova</button>
+    <button id="show">Mostra la solució</button>
+    <button id="next">Nou exercici</button>
+  </div>
+  <div class="fb" id="fb" role="status"></div>
+  <div class="sol" id="sol"></div>
+</div>
+<p class="score" id="score"></p>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[R(0,a.length-1)];
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const F=(n,d=1)=>{if(d<0){n=-n;d=-d;}const g=gcd(n,d)||1;return [n/g,d/g];};
+const fadd=(x,y)=>F(x[0]*y[1]+y[0]*x[1],x[1]*y[1]);
+
+/* ---------- parser ---------- */
+function parse(s){
+  s=s.replace(/−/g,'-').replace(/[·×]/g,'*').replace(/√/g,'sqrt').replace(/\s+/g,'');
+  const T=s.match(/\d+|sqrt|rt|[-+*\/^(),]|./g)||[];let i=0;
+  const peek=()=>T[i],nx=()=>T[i++];
+  const st=t=>t!==undefined&&(/^\d/.test(t)||t==='('||t==='sqrt'||t==='rt');
+  const need=c=>{if(nx()!==c)throw 0;};
+  function expr(){let a=term();while(peek()==='+'||peek()==='-'){const o=nx();a={t:o,a,b:term()};}return a;}
+  function term(){let a=unary();for(;;){const t=peek();if(t==='*'||t==='/'){nx();a={t,a,b:unary()};}else if(st(t)){a={t:'*',a,b:unary()};}else break;}return a;}
+  function unary(){if(peek()==='-'){nx();return {t:'neg',a:unary()};}if(peek()==='+'){nx();return unary();}return pow();}
+  function pow(){const a=atom();if(peek()==='^'){nx();let b;if(peek()==='-'){nx();b={t:'neg',a:atom()};}else b=atom();return {t:'^',a,b};}return a;}
+  function atom(){const t=nx();if(t===undefined)throw 0;
+    if(/^\d+$/.test(t))return {t:'n',v:+t};
+    if(t==='('){const e=expr();need(')');return e;}
+    if(t==='sqrt'){need('(');const x=expr();need(')');return {t:'rt',n:{t:'n',v:2},x};}
+    if(t==='rt'){need('(');const n=expr();need(',');const x=expr();need(')');return {t:'rt',n,x};}
+    throw 0;}
+  const r=expr();if(i<T.length)throw 0;return r;
+}
+/* ---------- àlgebra de monomis ---------- */
+function factor(n){const e={};for(let p=2;p*p<=n;p++)while(n%p===0){e[p]=(e[p]||0)+1;n/=p;}if(n>1)e[n]=(e[n]||0)+1;return e;}
+const neg=x=>x.map(m=>({s:-m.s,e:m.e}));
+const mulM=(a,b)=>{const e={...a.e};for(const p in b.e)e[p]=e[p]?fadd(e[p],b.e[p]):b.e[p];return {s:a.s*b.s,e};};
+const invM=m=>{const e={};for(const p in m.e)e[p]=[-m.e[p][0],m.e[p][1]];return {s:m.s,e};};
+function canon(x){
+  const acc=new Map();
+  for(const m of x){let num=1,den=1;const key=[];
+    for(const p in m.e){const [a,b]=m.e[p];if(!a)continue;const f=Math.floor(a/b),r=F(a-f*b,b);
+      if(f>0)num*=Math.pow(+p,f);else if(f<0)den*=Math.pow(+p,-f);
+      if(r[0])key.push([+p,r[0]+'/'+r[1]]);}
+    key.sort((u,v)=>u[0]-v[0]);const k=key.map(q=>q[0]+':'+q[1]).join(',');
+    if(num>9e15||den>9e15)throw new Error('big');
+    acc.set(k,fadd(acc.get(k)||[0,1],F(m.s*num,den)));}
+  return [...acc].filter(([k,c])=>c[0]!==0).sort((u,v)=>u[0]<v[0]?-1:1);
+}
+function toMono([k,[n,d]]){
+  const e={},add=(p,f)=>{e[p]=e[p]?fadd(e[p],f):f;};
+  const fa=factor(Math.abs(n)),fb=factor(d);
+  for(const p in fa)add(p,[fa[p],1]);for(const p in fb)add(p,[-fb[p],1]);
+  if(k)k.split(',').forEach(x=>{const[p,r]=x.split(':');const[a,b]=r.split('/');add(p,[+a,+b]);});
+  return {s:n<0?-1:1,e};
+}
+function single(x){if(x.length===1)return x[0];const c=canon(x);if(c.length!==1)throw new Error('single');return toMono(c[0]);}
+function constRat(x){const c=canon(x);if(!c.length)return [0,1];if(c.length===1&&c[0][0]==='')return c[0][1];throw new Error('const');}
+function ev(n){
+  switch(n.t){
+    case 'n':if(n.v>1e9)throw new Error('big');if(n.v===0)return [];{const e={};const f=factor(n.v);for(const p in f)e[p]=[f[p],1];return [{s:1,e}];}
+    case '+':return ev(n.a).concat(ev(n.b));
+    case '-':return ev(n.a).concat(neg(ev(n.b)));
+    case 'neg':return neg(ev(n.a));
+    case '*':{const A=ev(n.a),B=ev(n.b),o=[];for(const x of A)for(const y of B)o.push(mulM(x,y));return o;}
+    case '/':{const m=invM(single(ev(n.b)));return ev(n.a).map(x=>mulM(x,m));}
+    case '^':{const A=ev(n.a),q=constRat(ev(n.b));
+      if(canon(A).length>1){if(q[1]!==1||q[0]<0||q[0]>6)throw new Error('pow');let r=[{s:1,e:{}}];for(let i=0;i<q[0];i++){const o=[];for(const x of r)for(const y of A)o.push(mulM(x,y));r=o;}return r;}
+      const m=single(A);if(q[1]!==1&&m.s<0)throw new Error('neg');
+      const s=(m.s<0&&q[0]%2!==0)?-1:1,e={};for(const p in m.e){const [a,b]=m.e[p];e[p]=F(a*q[0],b*q[1]);}return [{s,e}];}
+    case 'rt':{const k=constRat(ev(n.n));if(k[1]!==1||k[0]<1)throw new Error('idx');const m=single(ev(n.x));if(m.s<0)throw new Error('neg');
+      const e={};for(const p in m.e){const [a,b]=m.e[p];e[p]=F(a,b*k[0]);}return [{s:1,e}];}
+  }
+}
+const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+/* ---------- forma final ---------- */
+const kids=n=>n.t==='rt'?[n.n,n.x]:n.t==='n'?[]:[n.a,n.b].filter(Boolean);
+const some=(n,f)=>f(n)||kids(n).some(k=>some(k,f));
+const cnt=n=>n.t==='+'||n.t==='-'?cnt(n.a)+cnt(n.b):n.t==='neg'?cnt(n.a):(n.t==='/'&&n.b.t==='n')?cnt(n.a):1;
+const fracPow=n=>n.t==='^'&&!(n.b.t==='n'||(n.b.t==='neg'&&n.b.a.t==='n'));
+function badForm(ast,fl,len){
+  if(some(ast,fracPow))return true;
+  let bad=false,rts=0;
+  some(ast,n=>{
+    if(n.t==='rt'){rts++;
+      if(some(n.x,k=>k.t==='rt'||k.t==='/'||k.t==='^'&&k.b.t!=='n'))bad=true;
+      else{try{const m=single(ev(n.x)),k=constRat(ev(n.n))[0];const v=Object.values(m.e).map(f=>f[0]);
+        if(m.s<0||!v.length||v.some(x=>x<0||(!fl.top&&x>=k))||gcd(k,v.reduce(gcd,0))!==1)bad=true;}catch(e){bad=true;}}}
+    if(n.t==='/'){if(some(n.b,k=>k.t==='rt'||fracPow(k)))bad=true;
+      if(n.a.t==='n'&&n.b.t==='n'&&gcd(n.a.v,n.b.v)>1)bad=true;}
+    return false;});
+  if(fl.one&&rts>1)bad=true;
+  if(fl.top&&ast.t!=='rt')bad=true;
+  return bad||cnt(ast)!==len;
+}
+/* ---------- render ---------- */
+const pr={'+':1,'-':1,'neg':2,'*':3,'/':3,'^':4};
+const pc=n=>pr[n.t]||9;
+const par=(n,min)=>pc(n)<min?`<mrow><mo>(</mo>${mm(n)}<mo>)</mo></mrow>`:mm(n);
+function mm(n){
+  switch(n.t){
+    case 'n':return `<mn>${n.v}</mn>`;
+    case 'rt':return n.n.t==='n'&&n.n.v===2?`<msqrt>${mm(n.x)}</msqrt>`:`<mroot><mrow>${mm(n.x)}</mrow><mrow>${mm(n.n)}</mrow></mroot>`;
+    case '+':return mm(n.a)+'<mo>+</mo>'+mm(n.b);
+    case '-':return mm(n.a)+'<mo>−</mo>'+par(n.b,2);
+    case 'neg':return '<mo>−</mo>'+par(n.a,3);
+    case '*':{const j=n.a.t==='n'&&(n.b.t==='rt'||pc(n.b)<3);return par(n.a,3)+(j?'':'<mo>·</mo>')+par(n.b,3);}
+    case '/':return `<mfrac><mrow>${mm(n.a)}</mrow><mrow>${mm(n.b)}</mrow></mfrac>`;
+    case '^':return `<msup>${par(n.a,9)}<mrow>${mm(n.b)}</mrow></msup>`;
+  }
+}
+const M=s=>`<math>${mm(parse(s))}</math>`;
+function canonStr(c){
+  if(!c.length)return '0';
+  return c.map(([k,[n,d]],i)=>{
+    let t=String(Math.abs(n));
+    if(k){const ps=k.split(',').map(x=>{const[p,r]=x.split(':');const[a,b]=r.split('/');return [+p,+a,+b];});
+      let L=1;ps.forEach(q=>L=L/gcd(L,q[2])*q[2]);
+      const rad=ps.map(([p,a,b])=>{const e=a*L/b;return e===1?p:p+'^'+e;}).join('*');
+      t=(Math.abs(n)===1?'':Math.abs(n)+'*')+`rt(${L},${rad})`;}
+    if(d!==1)t=`(${t})/${d}`;
+    return (n<0?'-':(i?'+':''))+t;}).join('');
+}
+/* ---------- generadors ---------- */
+const P=(b,k)=>k===1?`${b}`:`${b}^${k}`;
+const rs=(bs,es)=>bs.map((b,i)=>es[i]>0?P(b,es[i]):'').filter(Boolean).join('*');
+const co=c=>c===1?'':c+'*';
+const GEN={
+ simplificacio(){let N0,bs,as;do{N0=pick([3,4,5,6]);bs=shuf([2,3,5,7]).slice(0,R(1,3));as=bs.map(()=>R(1,N0-1));}while(as.reduce(gcd,N0)!==1);
+  const g=R(2,3);return {inst:'Simplifica el radical i escriu-lo com un de sol.',p:`rt(${N0*g},${rs(bs,as.map(a=>a*g))})`,fl:{one:1}};},
+ extraccio(){const n=R(3,5);
+  if(Math.random()<.5){let bs,es;do{bs=shuf([2,3,5]).slice(0,R(2,3));es=bs.map(()=>R(0,2)*n+R(0,n-1));}while(!(es.some(e=>e>=n)&&es.some(e=>e%n>0)));
+    const N=bs.reduce((a,b,i)=>a*Math.pow(b,es[i]),1);
+    return {inst:'Extrau tots els factors possibles del radical.',p:`rt(${n},${N<=2e6?N:rs(bs,es)})`,fl:{}};}
+  let bs,q,r;do{bs=shuf([2,3,5]).slice(0,2);q=bs.map(()=>R(0,2));r=bs.map(()=>R(0,n-1));}while(!(q.some(x=>x>0)&&r.some(x=>x>0)&&r.filter(x=>x>0).reduce(gcd,n)===1));
+  const c=bs.reduce((a,b,i)=>a*Math.pow(b,q[i]),1);
+  return {inst:'Introdueix el factor de fora dins de l’arrel: escriu un sol radical.',p:`${c}*rt(${n},${rs(bs,r)})`,s:`rt(${n},${c}^${n}*${rs(bs,r)})`,fl:{top:1}};},
+ suma(){for(;;){const n=R(3,4),b=pick([2,3]),r=R(1,n-1),two=Math.random()<.5,nt=R(3,4);
+  const ts=[];for(let i=0;i<nt;i++){const c=R(1,5),t=R(1,3),s=i?pick([1,-1]):1;
+    ts.push({s,txt:co(c)+(two&&i===nt-1?`sqrt(${Math.pow(t,2)*pick([3,5,6,7])})`:`rt(${n},${Math.pow(b,r)*Math.pow(t,n)})`)});}
+  const p=ts.map((x,i)=>(i?(x.s>0?'+':'-'):'')+x.txt).join('');
+  try{if(canon(ev(parse(p))).length===(two?2:1))return {inst:'Calcula i simplifica al màxim.',p,fl:{}};}catch(e){}}},
+ mcm(){const [n1,n2]=pick([[2,3],[3,4],[4,6],[3,6],[2,5],[6,8]]),bs=shuf([2,3,5]);
+  const r1=rs(bs.slice(0,2),[R(1,3),R(0,2)]),r2=rs([bs[0],bs[2]],[R(0,2),R(1,3)]);
+  const c1=R(1,4),c2=R(1,4),a=`${co(c1)}rt(${n1},${r1})`,b=`${co(c2)}rt(${n2},${r2})`;
+  return {inst:'Opera i escriu el resultat de la forma més simple (sense arrels al denominador).',p:Math.random()<.5?`${a}*${b}`:`(${a})/(${b})`,fl:{one:1}};},
+ aniuats(){const [c1,c2]=shuf([2,3,5,6]),c3=pick([2,3,5]);
+  return {inst:'Escriu com un sol radical simplificat.',p:`rt(${R(2,3)},${c1}*rt(${R(2,3)},${c2}*rt(${R(2,3)},${P(c3,R(1,2))})))`,fl:{one:1}};},
+ racionalitzacio(){const ty=R(0,2);
+  if(ty===0){const n=R(3,4),a=pick([2,3,5]),e=R(1,n-1),c=R(1,9),k=R(1,3),d=pick([0,2,3,5]);
+    return {inst:'Racionalitza i simplifica al màxim.',p:`(${d?co(c)+`sqrt(${d})`:c})/(${co(k)}rt(${n},${P(a,e)}))`,fl:{}};}
+  for(;;){const d=pick([2,3,5,6,7]),p=R(1,6),q=R(1,3),sg=pick([1,-1]),N=p*p-q*q*d;if(!N||Math.abs(N)>12)continue;
+    const num=ty===1?`${R(1,9)}`:`${R(1,5)}+${co(R(1,5))}sqrt(${d})`;
+    const den=`${p}${sg>0?'+':'-'}${co(q)}sqrt(${d})`,cj=`${p}${sg>0?'-':'+'}${co(q)}sqrt(${d})`;
+    return {inst:'Racionalitza multiplicant pel conjugat i simplifica al màxim.',p:`(${num})/(${den})`,e:`(${num})*(${cj})/(${p}^2-${q*q*d})`,fl:{}};}}
+};
+const C=[['simplificacio','1 Simplificació'],['extraccio','2 Extracció i introducció'],['suma','3 Suma i resta'],['mcm','4 Producte i quocient'],['aniuats','5 Radicals aniuats'],['racionalitzacio','6 Racionalització']];
+const st={c:'simplificacio',ok:0,tot:0,cur:null,exp:null,done:false};
+function fb(cls,t){const f=$('#fb');f.className='fb '+cls;f.textContent=t;}
+function next(){
+  st.cur=GEN[st.c]();st.exp=canon(ev(parse(st.cur.e||st.cur.p)));st.done=false;
+  $('#q').textContent=st.cur.inst;$('#prob').innerHTML=M(st.cur.p);
+  $('#in').value='';$('#prev').innerHTML='';$('#fb').className='fb';$('#sol').className='sol';$('#in').focus();
+}
+function setC(k){st.c=k;[...$('#tabs').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k));next();}
+function preview(){const v=$('#in').value.trim();if(!v){$('#prev').innerHTML='';return;}
+  try{$('#prev').innerHTML=`<small>Així ho llig el sistema:</small><br>${M(v)}`;}catch(e){$('#prev').innerHTML='<small>Expressió incompleta…</small>';}}
+function check(){
+  const v=$('#in').value.trim();if(!v){fb('warn','Escriu la teua resposta.');return;}
+  let ast,val;try{ast=parse(v);val=canon(ev(ast));}catch(e){fb('warn','No entenc l’expressió. Revisa els parèntesis i la sintaxi.');return;}
+  let res=!same(val,st.exp)?'bad':badForm(ast,st.cur.fl,val.length)?'form':'ok';
+  if(!st.done){st.tot++;if(res==='ok')st.ok++;st.done=true;}
+  if(res==='ok'){fb('ok','Correcte!');show();}
+  else if(res==='form')fb('warn','El valor és correcte, però la resposta no està en la forma final demanada.');
+  else fb('bad','No és correcte.');
+  $('#score').textContent=`Encerts: ${st.ok} de ${st.tot}`;
+}
+function show(){$('#sol').innerHTML=M(st.cur.s||canonStr(st.exp));$('#sol').className='sol on';}
+function ins(t,back){const el=$('#in'),s=el.selectionStart,e=el.selectionEnd;el.value=el.value.slice(0,s)+t+el.value.slice(e);const p=s+t.length-back;el.setSelectionRange(p,p);el.focus();preview();}
+$('#tabs').innerHTML=C.map(([k,l])=>`<button type="button" data-k="${k}" aria-pressed="false">${l}</button>`).join('');
+$('#tabs').onclick=e=>{if(e.target.dataset.k)setC(e.target.dataset.k);};
+[['√( )','sqrt()',1],['ⁿ√','rt(,)',2],['xʸ','^',0],['a/b','/',0],['( )','()',1],['·','*',0],['+','+',0],['−','-',0]].forEach(([l,t,b])=>{
+  const x=document.createElement('button');x.type='button';x.textContent=l;x.setAttribute('aria-label','Insereix '+l);x.onclick=()=>ins(t,b);$('#pal').appendChild(x);});
+$('#in').oninput=preview;
+$('#check').onclick=check;$('#show').onclick=show;$('#next').onclick=next;
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='in')check();});
+const h=location.hash.replace('#','');setC(C.some(c=>c[0]===h)?h:'simplificacio');
+window.addEventListener('hashchange',()=>{const g=location.hash.replace('#','');if(C.some(c=>c[0]===g))setC(g);});
+</script>
+<script>(function(){function fix(r){var l=r.querySelectorAll?r.querySelectorAll('mo'):[];Array.prototype.forEach.call(l,function(m){var t=m.textContent.trim();if(t==='(')m.setAttribute('form','prefix');else if(t===')')m.setAttribute('form','postfix');});}fix(document);new MutationObserver(function(ms){ms.forEach(function(m){Array.prototype.forEach.call(m.addedNodes,function(n){if(n.nodeType===1)fix(n);});});}).observe(document.body,{childList:true,subtree:true});})();</script>
+</body>
+</html>

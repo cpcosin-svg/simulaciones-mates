@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radicals · Suma i resta</title>
+<style>
+:root{
+  --paper:#fbfcff; --grid:#dbe3f5; --ink:#1c3fb7; --text:#1f2430; --muted:#5b6478; --box:#fff7d6; --boxline:#d9b92e; --ok:#12733a; --okbg:#e0f5e8; --warn:#8a5a00; --warnbg:#fff1d1; --bad:#a42222; --badbg:#fde4e4;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--paper:#14182a; --grid:#222a45; --ink:#8fa8ff; --text:#e6e9f5; --muted:#9aa3bd; --box:#2a2610; --boxline:#a98f1c; --ok:#7fe0a5; --okbg:#12301f; --warn:#f0c870; --warnbg:#35290b; --bad:#ff9a9a; --badbg:#3a1616;}
+}
+:root[data-theme="dark"]{--paper:#14182a; --grid:#222a45; --ink:#8fa8ff; --text:#e6e9f5; --muted:#9aa3bd; --box:#2a2610; --boxline:#a98f1c; --ok:#7fe0a5; --okbg:#12301f; --warn:#f0c870; --warnbg:#35290b; --bad:#ff9a9a; --badbg:#3a1616;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;color:var(--text);font:18px/1.6 Georgia,"Times New Roman",serif}
+main{max-width:40rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2rem;margin:0;color:var(--ink)}
+.sub{color:var(--muted);margin:.4rem 0 1.4rem}
+.bar{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.2rem;font:15px/1.3 system-ui,sans-serif}
+.seg{display:flex;border:1.5px solid var(--ink);border-radius:8px;overflow:hidden;background:var(--paper)}
+.seg button{border:0;background:transparent;color:var(--ink);padding:.55rem .9rem;font:inherit;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);font-weight:600}
+button:focus-visible,input:focus-visible{outline:3px solid var(--boxline);outline-offset:2px}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:10px;padding:1.2rem 1.2rem 1.4rem}
+.q{font:15px/1.4 system-ui,sans-serif;color:var(--muted);margin:0 0 .6rem}
+.prob{font-size:2rem;overflow-x:auto;padding:.3rem 0}
+math{color:var(--ink);font-size:1.3em}
+.ans{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem;margin:1rem 0 .4rem;font:16px/1.3 system-ui,sans-serif}
+.ans span{color:var(--muted)}
+input{width:4.5rem;padding:.5rem;font:20px/1 system-ui,sans-serif;border:2px solid var(--grid);border-radius:6px;background:var(--paper);color:var(--text);text-align:center}
+.act{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem;font:16px/1.3 system-ui,sans-serif}
+.act button{padding:.6rem 1rem;border-radius:8px;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer;font:inherit}
+.act .main{background:var(--ink);color:var(--paper);font-weight:600}
+.fb{margin-top:1rem;padding:.7rem 1rem;border-radius:8px;font:16px/1.45 system-ui,sans-serif;display:none}
+.fb.ok{display:block;background:var(--okbg);color:var(--ok)}
+.fb.warn{display:block;background:var(--warnbg);color:var(--warn)}
+.fb.bad{display:block;background:var(--badbg);color:var(--bad)}
+.sol{margin-top:1rem;background:var(--box);border:2px solid var(--boxline);border-radius:8px;padding:.5rem 1rem;overflow-x:auto;display:none}
+.sol.on{display:block}
+.sol p{margin:.3rem 0;font-size:16px}
+.score{margin-top:1.2rem;color:var(--muted);font:15px/1.3 system-ui,sans-serif}
+
+@font-face{font-family:"LM Math Web";src:url("fonts/lm-math-subset.woff") format("woff");font-display:swap}
+math{font-family:"LM Math Web","Latin Modern Math","STIX Two Math","Cambria Math",math,serif}
+.pnav{position:sticky;top:0;z-index:30;display:flex;gap:.25rem;overflow-x:auto;white-space:nowrap;padding:.5rem .75rem;background:var(--paper);border-bottom:1.5px solid var(--ink);font:14px/1.2 system-ui,sans-serif;-webkit-overflow-scrolling:touch}
+.pnav a{color:var(--ink);text-decoration:none;padding:.4rem .6rem;border-radius:6px;flex:0 0 auto}
+.pnav a[aria-current="page"]{background:var(--ink);color:var(--paper);font-weight:600}
+.pnav a:hover{text-decoration:underline}
+.pnav .out{margin-left:auto;border:1px solid var(--ink)}
+@media print{.pnav{display:none!important}}
+@media (max-width:640px){.it{flex-wrap:wrap}.it .t{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<nav class="pnav" aria-label="Navegació del projecte"><a href="index.html">Inici</a><a href="apunts.html">Apunts</a><a href="simplificacio.html">1 Simplificació</a><a href="extraccio.html">2 Extracció</a><a href="suma-resta.html" aria-current="page">3 Suma i resta</a><a href="mcm.html">4 Producte i quocient</a><a href="aniuats.html">5 Aniuats</a><a href="racionalitzacio.html">6 Racionalització</a><a href="nivell3.html">Nivell 3</a><a href="examen.html">Examen</a><a href="examen-avancat.html">Examen avançat</a><a class="out" href="../index.html">← Totes les simulacions</a></nav>
+
+<main>
+<h1>Suma i resta de radicals</h1>
+<p class="sub">Només es poden operar radicals exactament iguals: se sumen o es resten els coeficients.</p>
+
+<div class="bar">
+  <div class="seg" role="group" aria-label="Nivell">
+    <button id="l-1" aria-pressed="true">Nivell 1 · radicals iguals</button>
+    <button id="l-2" aria-pressed="false">Nivell 2 · amb extracció</button>
+  </div>
+</div>
+
+<p style="margin:-.4rem 0 1.2rem;font:600 15px/1.3 system-ui,sans-serif"><a href="nivell3.html#suma" style="display:inline-block;padding:.55rem .9rem;border:1.5px dashed var(--ink);border-radius:8px;color:var(--ink);text-decoration:none">Nivell 3 · repte sense pistes ↗</a></p>
+
+<div class="card">
+  <p class="q" id="q"></p>
+  <div class="prob" id="prob" aria-live="polite"></div>
+  <div class="ans" id="ans"></div>
+  <div class="act">
+    <button class="main" id="check">Comprova</button>
+    <button id="show">Mostra la solució</button>
+    <button id="next">Nou exercici</button>
+  </div>
+  <div class="fb" id="fb" role="status"></div>
+  <div class="sol" id="sol"></div>
+</div>
+<p class="score" id="score"></p>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const M=x=>`<math>${x}</math>`;
+const mn=x=>`<mn>${x}</mn>`;
+const pwr=(b,e)=>`<msup>${mn(b)}${mn(e)}</msup>`;
+const root=(inner,n)=>n===2?`<msqrt>${inner}</msqrt>`:`<mroot><mrow>${inner}</mrow>${mn(n)}</mroot>`;
+const coef=c=>c===1?'':mn(c);
+const st={lvl:1,ok:0,tot:0,cur:null,answered:false};
+
+function gen(){
+  const sign=Math.random()<.5?1:-1;
+  if(st.lvl===1){
+    const b=[2,3,5,7][R(0,3)], n=R(2,4), c2=R(1,5); let c1=R(1,6);
+    if(sign<0&&c1<=c2)c1=c2+R(1,4);
+    return {b,n,r:1,k:0,e:1,c1,c2,m:c2,sign,N:b,T:c1+sign*c2};
+  }
+  const b=[2,3][R(0,1)], n=R(3,4), r=R(1,n-1), k=R(1,2), e=r+k*n, c2=R(1,3), m=c2*Math.pow(b,k);
+  let c1=R(1,5); if(sign<0&&c1<=m)c1=m+R(1,4);
+  return {b,n,r,k,e,c1,c2,m,sign,N:Math.pow(b,r),T:c1+sign*m};
+}
+const op=s=>`<mo>${s>0?'+':'−'}</mo>`;
+function render(){
+  const c=st.cur; st.answered=false;
+  $('#fb').className='fb'; $('#sol').className='sol'; $('#sol').innerHTML='';
+  const t1=coef(c.c1)+root(mn(c.N),c.n);
+  const t2=coef(c.c2)+root(st.lvl===1?mn(c.b):pwr(c.b,c.e),c.n);
+  $('#q').textContent=st.lvl===1?'Calcula i escriu el resultat com un únic radical: coeficient i radicand.':'Primer fes que els radicals siguin iguals (extrau factors) i després opera. Escriu el resultat: coeficient i radicand.';
+  $('#prob').innerHTML=M(t1+op(c.sign)+t2);
+  $('#ans').innerHTML=`<span>coeficient</span><input id="t" inputmode="numeric" aria-label="Coeficient del resultat"><span>radicand (índex ${c.n})</span><input id="u" inputmode="numeric" aria-label="Radicand del resultat">`;
+  $('#t').focus();
+}
+function solution(){
+  const c=st.cur, r=root(mn(c.N),c.n);
+  const fin=M(mn(c.T)+r);
+  if(st.lvl===1)
+    return M('<mo>(</mo>'+mn(c.c1)+op(c.sign)+mn(c.c2)+'<mo>)</mo>'+r+'<mo>=</mo>'+mn(c.T)+r)+'<p>Els radicals són iguals: operem només els coeficients.</p>';
+  return '<p>'+M(root(pwr(c.b,c.e),c.n)+'<mo>=</mo>'+mn(Math.pow(c.b,c.k))+r)+` perquè ${c.e} : ${c.n} → quocient ${c.k}, residu ${c.r}.</p>`
+    +`<p>El segon terme: ${c.c2} · ${Math.pow(c.b,c.k)} = ${c.m}.</p>`
+    +'<p>'+M(mn(c.c1)+op(c.sign)+mn(c.m)+'<mo>=</mo>'+mn(c.T))+'</p>'+fin;
+}
+function fb(cls,txt){const f=$('#fb');f.className='fb '+cls;f.textContent=txt;}
+function check(){
+  const c=st.cur, t=parseInt($('#t').value,10), u=parseInt($('#u').value,10);
+  if(isNaN(t)||isNaN(u)){fb('warn','Omple els dos camps abans de comprovar.');return;}
+  const ok=t===c.T&&u===c.N;
+  if(!st.answered){st.tot++;if(ok)st.ok++;st.answered=true;}
+  if(ok){fb('ok','Correcte!');$('#sol').innerHTML=solution();$('#sol').className='sol on';}
+  else if(u!==c.N)fb('bad',st.lvl===1?'El radical del resultat ha de ser el mateix que el dels dos termes.':'Només es poden operar radicals iguals. Extrau factors del segon terme fins que tingui el mateix radical que el primer.');
+  else fb('bad',st.lvl===1?'El radical està bé. Revisa l’operació amb els coeficients.':'El radical està bé. Revisa el coeficient: has tingut en compte el factor que ha eixit del segon radical?');
+  score();
+}
+function score(){$('#score').textContent=`Encerts: ${st.ok} de ${st.tot}`;}
+function setLvl(l){st.lvl=l;$('#l-1').setAttribute('aria-pressed',l===1);$('#l-2').setAttribute('aria-pressed',l===2);next();}
+function next(){st.cur=gen();render();}
+$('#l-1').onclick=()=>setLvl(1);$('#l-2').onclick=()=>setLvl(2);
+$('#check').onclick=check;$('#next').onclick=next;
+$('#show').onclick=()=>{$('#sol').innerHTML=solution();$('#sol').className='sol on';};
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT')check();});
+score();next();
+</script>
+<script>(function(){function fix(r){var l=r.querySelectorAll?r.querySelectorAll('mo'):[];Array.prototype.forEach.call(l,function(m){var t=m.textContent.trim();if(t==='(')m.setAttribute('form','prefix');else if(t===')')m.setAttribute('form','postfix');});}fix(document);new MutationObserver(function(ms){ms.forEach(function(m){Array.prototype.forEach.call(m.addedNodes,function(n){if(n.nodeType===1)fix(n);});});}).observe(document.body,{childList:true,subtree:true});})();</script>
+</body>
+</html>

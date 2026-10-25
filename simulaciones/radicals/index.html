@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radicals · 4t ESO</title>
+<style>
+:root{--paper:#fbfcff;--grid:#dbe3f5;--ink:#1c3fb7;--text:#1f2430;--muted:#5b6478;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root{--paper:#14182a;--grid:#222a45;--ink:#8fa8ff;--text:#e6e9f5;--muted:#9aa3bd}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;color:var(--text);font:18px/1.6 Georgia,"Times New Roman",serif}
+main{max-width:46rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2.2rem;margin:0;color:var(--ink)}
+.sub{color:var(--muted);margin:.4rem 0 1.6rem}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.8rem}
+.c{display:flex;flex-direction:column;gap:.3rem;padding:.9rem 1rem;border:2px solid var(--ink);border-radius:10px;background:var(--paper);color:var(--text);text-decoration:none}
+.c b{color:var(--ink);font-size:1.05rem}
+.c span{font:14px/1.4 system-ui,sans-serif;color:var(--muted)}
+.c:hover,.c:focus-visible{background:var(--grid)}
+
+@font-face{font-family:"LM Math Web";src:url("fonts/lm-math-subset.woff") format("woff");font-display:swap}
+math{font-family:"LM Math Web","Latin Modern Math","STIX Two Math","Cambria Math",math,serif}
+.pnav{position:sticky;top:0;z-index:30;display:flex;gap:.25rem;overflow-x:auto;white-space:nowrap;padding:.5rem .75rem;background:var(--paper);border-bottom:1.5px solid var(--ink);font:14px/1.2 system-ui,sans-serif;-webkit-overflow-scrolling:touch}
+.pnav a{color:var(--ink);text-decoration:none;padding:.4rem .6rem;border-radius:6px;flex:0 0 auto}
+.pnav a[aria-current="page"]{background:var(--ink);color:var(--paper);font-weight:600}
+.pnav a:hover{text-decoration:underline}
+.pnav .out{margin-left:auto;border:1px solid var(--ink)}
+@media print{.pnav{display:none!important}}
+@media (max-width:640px){.it{flex-wrap:wrap}.it .t{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<nav class="pnav" aria-label="Navegació del projecte"><a href="index.html" aria-current="page">Inici</a><a href="apunts.html">Apunts</a><a href="simplificacio.html">1 Simplificació</a><a href="extraccio.html">2 Extracció</a><a href="suma-resta.html">3 Suma i resta</a><a href="mcm.html">4 Producte i quocient</a><a href="aniuats.html">5 Aniuats</a><a href="racionalitzacio.html">6 Racionalització</a><a href="nivell3.html">Nivell 3</a><a href="examen.html">Examen</a><a href="examen-avancat.html">Examen avançat</a><a class="out" href="../index.html">← Totes les simulacions</a></nav>
+<main>
+<h1>Radicals · 4t ESO</h1>
+<p class="sub">Apunts, simuladors per concepte, un repte sense pistes i generadors d’exàmens.</p>
+<div class="g"><a class="c" href="apunts.html"><b>Apunts</b><span>Els apunts de la llibreta, de l’arrel a l’exponent fraccionari fins a la racionalització (pàgines 1 a 8).</span></a><a class="c" href="simplificacio.html"><b>1 · Simplificació</b><span>Simplificar i ampliar radicals amb fraccions equivalents.</span></a><a class="c" href="extraccio.html"><b>2 · Extracció i introducció de factors</b><span>Treure i ficar factors: quocient i residu de l’exponent entre l’índex.</span></a><a class="c" href="suma-resta.html"><b>3 · Suma i resta</b><span>Només es poden operar radicals iguals; amb extracció prèvia al nivell 2.</span></a><a class="c" href="mcm.html"><b>4 · Producte i quocient amb índex diferent</b><span>Passar els índexs al m.c.m. abans d’operar.</span></a><a class="c" href="aniuats.html"><b>5 · Radicals aniuats</b><span>Multiplicar índexs i introduir factors pel mig.</span></a><a class="c" href="racionalitzacio.html"><b>6 · Racionalització</b><span>Els tres casos: arrel quadrada, arrel no quadrada i suma o resta amb conjugat.</span></a><a class="c" href="nivell3.html"><b>Nivell 3 · Repte sense pistes</b><span>Escriu la solució amb un editor; el sistema comprova el valor i la forma final.</span></a><a class="c" href="examen.html"><b>Examen aleatori</b><span>Un examen nou en cada pulsació, amb solucionari i descàrrega en PDF.</span></a><a class="c" href="examen-avancat.html"><b>Examen avançat</b><span>Exercicis que barregen conceptes, amb solucionari i PDF.</span></a></div>
+</main>
+</body>
+</html>
