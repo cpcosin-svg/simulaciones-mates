@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ca"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Càlcul diferencial i continuïtat · 2n Batxillerat</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--tx:#16233b;--mu:#566480;--ac:#2f5bd8;--ok:#2e7d4f;--ko:#b3402f;--bd:#d3dcea;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--card:#172138;--tx:#e8eefb;--mu:#9fb0cf;--ac:#8aa9ff;--ok:#6cc48d;--ko:#e8806f;--bd:#26355a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1626;--card:#172138;--tx:#e8eefb;--mu:#9fb0cf;--ac:#8aa9ff;--ok:#6cc48d;--ko:#e8806f;--bd:#26355a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0 2px}.sub{color:var(--mu);font-size:14px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:5px 11px;border-radius:99px;font-size:14px;cursor:pointer}
+.chip.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
+select{padding:7px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:15px}
+button.b{padding:9px 16px;border-radius:8px;border:1px solid var(--ac);background:var(--ac);color:var(--bg);font-size:15px;cursor:pointer}
+button.b.s{background:transparent;color:var(--ac)}
+.ex{margin:14px 0;padding-bottom:12px;border-bottom:1px solid var(--bd)}
+.ex h3{font-size:16px;margin:0 0 4px}.ex p{margin:3px 0;font-family:"Cambria Math",Cambria,Georgia,serif;font-size:17px}
+.src{font-size:13px;color:var(--mu);font-style:italic}.sol{margin-top:6px;padding:8px 12px;border-left:3px solid var(--ok);font-size:15px}
+.note{font-size:13px;color:var(--mu);margin-top:10px}
+a{color:var(--ac)}a.chip{text-decoration:none;color:var(--ac)}.nt .card h3{margin:0 0 6px;font-size:16px}.nt ul{margin:0;padding-left:20px;font-size:15px}.nt li{margin:3px 0}.nt .k{font-family:"Cambria Math",Cambria,Georgia,serif}
+.tag{font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em}
+.m{font-family:"Cambria Math",Cambria,Georgia,serif;font-size:18px;margin:8px 0}
+.pw{display:flex;align-items:center;gap:8px;margin:6px 0 6px 12px}.pw>span{font-size:44px;font-weight:200;line-height:1}
+.ins{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.ins label{font-size:14px;color:var(--mu);display:flex;flex-direction:column;gap:3px}
+.ins input{width:110px;padding:8px;border:1.5px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:16px}
+.ins input.ok{border-color:var(--ok)}.ins input.ko{border-color:var(--ko)}
+#s_msg{margin-top:10px;font-weight:600}.ok-t{color:var(--ok)}.ko-t{color:var(--ko)}
+#s_sol{display:none;margin-top:12px;padding:12px;border-left:3px solid var(--ac);background:var(--bg);border-radius:6px;font-size:15px}
+.sc{margin-left:auto;font-size:14px;color:var(--mu)}
+.row .chip{text-decoration:none}
+.back{display:inline-block;margin-bottom:6px;font-size:14px;color:var(--ac);text-decoration:none}.back:hover{text-decoration:underline}
+</style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+</head><body><main>
+<a class="back" href="../index.html">← Simulacions de matemàtiques</a>
+<h1>Càlcul diferencial i continuïtat · PAU</h1>
+<div class="sub">Apunts, simulador d’exercicis i generador d’exàmens a partir de problemes reals de PAU/EBAU, amb l’origen de cadascun.</div>
+<div class="chips"><button class="chip on" id="t0">Apunts</button><button class="chip" id="t1">Simulador d’exercicis</button><button class="chip" id="t2">Generador d’exàmens</button></div>
+<div id="p_sim" style="display:none">
+<div class="chips" id="s_chips"></div>
+<div class="card">
+ <div class="row"><span class="tag" id="s_tag"></span><span class="sc" id="s_sc"></span></div>
+ <div class="m" id="s_q"></div>
+ <div class="ins" id="s_ins"></div>
+ <div class="row">
+  <button class="b" id="s_chk">Comprovar</button>
+  <button class="b s" id="s_shw">Veure la solució</button>
+  <button class="b s" id="s_nxt">Altre exercici</button>
+ </div>
+ <div id="s_msg"></div><div id="s_sol"></div>
+</div>
+</div>
+<div id="gt" style="display:none"><div class="card">
+ <div class="chips" id="chips"></div>
+ <div class="row">
+  <label>Exercicis <select id="n"><option>3</option><option selected>4</option><option>5</option></select></label>
+  <label><input type="checkbox" id="sol" checked> Inclou solucions</label>
+  <button class="b" id="gen">Generar examen</button>
+  <button class="b s" id="pdf">Descarregar PDF</button>
+ </div>
+ <div class="note" id="st"></div>
+</div>
+<div class="card" id="prev"></div></div>
+<div id="nt"><div class="row"><a class="chip" href="apunts-calcul-diferencial.pdf" download>⬇ Descarrega els apunts en PDF</a></div><iframe src="apunts-calcul-diferencial.pdf" title="Apunts de càlcul diferencial" style="width:100%;height:78vh;border:1px solid var(--bd);border-radius:10px;background:#fff"></iframe></div>
+<div class="note">Enunciats traduïts i adaptats. Les solucions segueixen els solucionaris de R. Núñez Nogales (2023–2024) i la recopilació de yoquieroaprobar.es. Contrasteu-los amb els originals oficials abans d’usar-los en una avaluació.</div>
+</main>
+<script>
+const TOP=["Límits","Continuïtat","Derivabilitat","Teoremes","Estudi de funcions","Recta tangent","Optimització"];
+const BANK=[
+{t:"Estudi de funcions",src:"PAU València · Matemàtiques II · juny 2024 · Problema 5",
+q:["Siga f(x) = kx / e^(2x), on k és un paràmetre real.","a) Obtín el domini i les asímptotes de f(x).","b) Estudia els intervals de creixement i decreixement de f(x) i els seus màxims i mínims.","c) Justifica que la funció s’anul·la en algun punt de l’interval [−1, 1]."],
+s:["a) Dom f = ℝ; no hi ha asímptotes verticals. En +∞ el límit és 0: A.H. y = 0. En −∞ el límit és infinit i no hi ha asímptota oblíqua.","b) f′(x) = k(1 − 2x)/e^(2x). Si k > 0: creix en (−∞, 1/2), decreix en (1/2, +∞), màxim en (1/2, k/(2e)). Si k < 0 és al revés i hi ha un mínim en eixe punt.","c) f és contínua en ℝ i, per a k ≠ 0, f(−1)·f(1) = −k² < 0: pel teorema de Bolzano hi ha c ∈ (−1, 1) amb f(c) = 0. Si k = 0 és immediat."]},
+{t:"Estudi de funcions",src:"PAU València · Matemàtiques II · juny 2023 (ordinària) · Problema 5, apartats a i b",
+q:["Siga f(x) = 1/x + ln(x + 1).","a) Obtín el domini i les asímptotes de f(x).","b) Estudia els intervals de creixement i decreixement de f(x) i els seus màxims i mínims."],
+s:["a) Dom f = (−1, +∞) − {0}. A.V. x = 0 i x = −1. En +∞ el límit és +∞: no hi ha A.H. ni A.O.","b) f′(x) = (x² − x − 1)/(x²(x + 1)) = 0 ⇒ x = (1 ± √5)/2. Creix en (−1, (1−√5)/2) i en ((1+√5)/2, +∞); decreix en ((1−√5)/2, (1+√5)/2) − {0}. Màxim relatiu en x ≈ −0,62 (f ≈ −2,58); mínim relatiu en x ≈ 1,62 (f ≈ 1,58)."]},
+{t:"Estudi de funcions",src:"PAU València · Matemàtiques II · juliol 2024 (extraordinària) · Problema 5, apartat a",
+q:["Siga h(x) = ax + x², on a és un paràmetre real. Troba el valor d’a perquè la gràfica de h tinga un mínim relatiu en l’abscissa x = −3/4."],
+s:["h′(x) = a + 2x = 0 ⇔ x = −a/2; h″(x) = 2 > 0, així que és mínim. Cal −a/2 = −3/4, per tant a = 3/2."]},
+{t:"Continuïtat",src:"PAU/Selectivitat València · Matemàtiques II · juny 2005 · Exercici B, Problema 3",
+q:["Troba les constants reals a i b perquè la funció","f(x) = sin(πx)/x si x < 0;   f(x) = b si x = 0;   f(x) = x·ln x + a si x > 0","siga contínua per a tot x real."],
+s:["Fora de 0 és contínua. En x = 0: f(0) = b. Per l’esquerra, sin(πx)/x → π. Per la dreta, x·ln x → 0, així que el límit és a. Cal b = a = π."]},
+{t:"Estudi de funcions",src:"PAU/Selectivitat València · Matemàtiques II · juny 2014 · Problema A.3, apartat b",
+q:["Estudia els intervals de creixement i decreixement de la funció f(x) = (x + 1)·e^(2x)."],
+s:["Dom f = ℝ. f′(x) = e^(2x)(2x + 3) s’anul·la en x = −3/2. Decreix en (−∞, −3/2) i creix en (−3/2, +∞); hi ha un mínim relatiu en x = −3/2."]},
+{t:"Derivabilitat",src:"PAU Madrid · Matemàtiques II · juliol 2023 (extraordinària) · Exercici B.2, apartat a",
+q:["Siga f(x) = 2 + 2x − 2x². Estudia la derivabilitat de la funció h(x) = |f(x)|."],
+s:["h és contínua en ℝ. f(x) = 0 ⇔ x² − x − 1 = 0 ⇒ x₁ = (1 − √5)/2, x₂ = (1 + √5)/2. h = f dins de [x₁, x₂] i h = −f fora. Les derivades laterals en x₁ i x₂ són distintes (punts angulosos): h és derivable només en ℝ − {x₁, x₂}."]},
+{t:"Límits",src:"PAU Navarra · Matemàtiques II · juliol 2024 (extraordinària) · P5",
+q:["Calcula els límits següents:","a) lim (x→+∞) (ln x)² / √x","b) lim (x→1) x^(2x/(x − 1))"],
+s:["a) Indeterminació ∞/∞. Aplicant L’Hôpital dues vegades s’arriba a 8/√x → 0. El límit és 0.","b) Indeterminació 1^∞. Si L és el límit, ln L = lim 2x·ln x/(x − 1) = 2 (0/0, L’Hôpital). Per tant L = e²."]},
+{t:"Continuïtat",src:"PAU Navarra · Matemàtiques II · juliol 2024 (extraordinària) · P6",
+q:["Siga f(x) = cos(πx) + sin(πx).","a) Estudia la continuïtat de f en l’interval [0, 1].","b) Troba’n els extrems relatius i absoluts en eixe interval. Enuncia els resultats teòrics utilitzats i justifica’n l’ús."],
+s:["a) f és contínua en ℝ (suma de contínues), en particular en [0, 1].","b) Pel teorema de Weierstrass hi ha màxim i mínim absoluts. f′(x) = π(cos πx − sin πx) = 0 ⇒ x = 1/4; f″(1/4) < 0: màxim relatiu en (1/4, √2); no hi ha mínim relatiu. Com f(0) = 1 i f(1) = −1: màxim absolut en (1/4, √2) i mínim absolut en (1, −1)."]},
+{t:"Teoremes",src:"PAU Navarra · Matemàtiques II · juliol 2024 (extraordinària) · P7",
+q:["Siga f(x) = √(2x² + 2x + 3).","a) Demostra que f és contínua en [−1, 3] i derivable en (−1, 3).","b) Comprova que existeix α ∈ (−1, 3) tal que f′(α) = √3/2. Enuncia el teorema utilitzat i justifica’n l’ús."],
+s:["a) El radicand té discriminant negatiu, així que és sempre positiu: Dom f = ℝ i f és contínua i derivable en ℝ.","b) Teorema del valor mitjà de Lagrange: si f és contínua en [a, b] i derivable en (a, b), existeix c ∈ (a, b) amb f′(c) = (f(b) − f(a))/(b − a). Ací f(−1) = √3, f(3) = 3√3 i (3√3 − √3)/4 = √3/2."]},
+{t:"Recta tangent",src:"PAU Catalunya · Matemàtiques · juliol 2023 (extraordinària) · Exercici 2",
+q:["Siga f(x) = 1/x.","a) Calcula l’equació de la recta tangent a la gràfica de f en el punt d’abscissa x = 2.","b) Calcula l’equació de la recta tangent en el punt d’abscissa x = k, amb k > 0.","c) Comprova que la recta de l’apartat b) determina, amb els semieixos positius, un triangle d’àrea constant i calcula-la."],
+s:["a) f′(x) = −1/x²; y = −(1/4)(x − 2) + 1/2 = (4 − x)/4.","b) y = −(1/k²)(x − k) + 1/k = (2k − x)/k².","c) Talls amb els eixos: (2k, 0) i (0, 2/k). Àrea = ½·2k·2/k = 2 u², independent de k."]},
+{t:`Optimització`,src:`PAU València · Matemàtiques II · juny 2023 (ordinària) · Problema 6, apartat a`,q:[`L’entrada d’una plaça emmurallada té un tall vertical en forma de paràbola d’equació y = −x² + 12 (x, y en metres; y = 0 és el terra). Es vol col·locar una porta rectangular amb les dues cantonades superiors en la paràbola i les inferiors en el terra.`,`a) Calcula les dimensions de la porta perquè tinga la major superfície possible.`],s:[`Base 2x i alçada 12 − x². S(x) = 24x − 2x³; S′(x) = 24 − 6x² = 0 ⇒ x = 2 (x > 0); S″(2) = −24 < 0: màxim. La porta fa 4 m d’ample i 8 m d’alt (superfície 32 m²).`]},
+{t:`Optimització`,src:`PAU València · Matemàtiques II · juliol 2024 (extraordinària) · Problema 6`,q:[`Es construeix una caixa de cartó sense tapa a partir d’una fulla rectangular de 16 cm per 10 cm, retallant un quadrat de costat x en cada cantonada i doblegant els laterals.`,`a) Calcula les dimensions de la caixa perquè tinga el major volum possible.`,`b) Calcula eixe volum.`],s:[`V(x) = (16 − 2x)(10 − 2x)x = 4x³ − 52x² + 160x, amb 0 < x < 5. V′(x) = 12x² − 104x + 160 = 0 ⇔ 3x² − 26x + 40 = 0 ⇒ x = 2 (x = 20/3 no és vàlid). V″(2) = −56 < 0: màxim.`,`Dimensions: 12 × 6 × 2 cm. Volum màxim: 144 cm³.`]},
+{t:`Optimització`,src:`PAU Catalunya · Matemàtiques · juliol 2023 (extraordinària) · Exercici 6`,q:[`Es vol construir una peça metàl·lica la secció de la qual és un trapezi isòsceles amb la base superior tres vegades més llarga que la inferior. Els altres dos costats mesuren 10 mm.`,`a) Expressa l’altura del trapezi en funció de la longitud x de la base inferior.`,`b) Calcula la longitud de la base inferior perquè l’àrea de la peça siga màxima i el valor d’eixa àrea.`],s:[`a) Per Pitàgores, h = √(100 − x²), amb 0 < x < 10.`,`b) A(x) = (3x + x)/2 · h = 2x√(100 − x²). A′(x) = (200 − 4x²)/√(100 − x²) = 0 ⇒ x = √50 ≈ 7,07 mm. A′ > 0 abans i A′ < 0 després: màxim. Àrea màxima = 2·√50·√50 = 100 mm².`]},
+{t:`Optimització`,src:`PAU Madrid · Matemàtiques II · juliol 2023 (extraordinària) · Exercici A.2`,q:[`Es fan proves de consum d’un vehicle híbrid. El consum en litres per cada 100 km en funció de la velocitat v, mesurada en desenes de km/h, és c(v) = 5v/3 si 0 ≤ v < 3, i c(v) = 14 − 4v + v²/3 si v ≥ 3.`,`a) Si el vehicle ha de circular a més de 3 desenes de km/h, a quina velocitat ha d’anar per obtindre el consum mínim?`,`b) Si ha de circular a una velocitat 1 ≤ v ≤ 8, quins són el consum màxim i el mínim possibles?`],s:[`a) Per a v > 3: c′(v) = −4 + 2v/3 = 0 ⇒ v = 6; c″ = 2/3 > 0: mínim. Ha d’anar a 60 km/h i el consum és c(6) = 2 L.`,`b) Es comparen c(1) = 5/3 ≈ 1,67, c(3) = 5, c(6) = 2 i c(8) ≈ 3,33. Consum màxim: 5 L (v = 3); mínim: ≈ 1,67 L (v = 1).`]},
+{t:`Derivabilitat`,src:`PAU Canàries · Matemàtiques II · juliol 2024 (extraordinària) · Pregunta 1A`,q:[`Siga f(x) = (x² − bx + 9)/(x² + 3) si x ≤ 0; f(x) = ax/(e^x − 1) + 2 si x > 0.`,`a) Estudia els valors dels paràmetres a i b perquè f siga contínua i derivable en x = 0.`,`b) Per a a = 1 i b = −2, troba l’equació de la recta tangent a f en x = −1.`],s:[`a) f(0) = 3 i lim (x→0⁺) ax/(e^x − 1) = a (L’Hôpital), així que a + 2 = 3 ⇒ a = 1. Derivades laterals: f′(0⁻) = −b/3 i f′(0⁺) = −1/2 ⇒ b = 3/2.`,`b) f(−1) = 2 i f′(x) = (−2x² − 12x + 6)/(x² + 3)² per a x < 0, així que f′(−1) = 16/16 = 1. Recta: y = x + 3.`]},
+{t:`Estudi de funcions`,src:`PAU Astúries · Matemàtiques II · juliol 2023 (extraordinària) · Pregunta 3, apartats a i b`,q:[`Siguen A, B ∈ ℝ i f(x) = (x² + A)/(Bx − 1).`,`a) Calcula A i B perquè la gràfica de f passe pel punt (0, −3) i tinga un extrem relatiu en x = −1.`,`b) Per a eixos valors d’A i B, estudia si f té asímptotes i extrems relatius.`],s:[`a) f(0) = −A = −3 ⇒ A = 3. f′(x) = (Bx² − 2x − AB)/(Bx − 1)²; f′(−1) = (2 − 2B)/(B + 1)² = 0 ⇒ B = 1.`,`b) f(x) = (x² + 3)/(x − 1). A.V.: x = 1. No hi ha A.H. A.O.: y = x + 1. f′(x) = (x² − 2x − 3)/(x − 1)² = 0 ⇒ x = −1, x = 3. Màxim relatiu en (−1, −2) i mínim relatiu en (3, 6).`]},
+{t:`Continuïtat`,src:`PAU Madrid · Matemàtiques aplicades a les CCSS II · juliol 2024 (extraordinària) · Exercici 2, apartat b`,q:[`Siga f(x) = x² − b si x < 0; f(x) = 3x + 2 si x ≥ 0. Determina per a quins valors del paràmetre b la funció f és contínua en el seu domini i estudia’n la derivabilitat per a eixos valors.`],s:[`Cal que lim (x→0⁻) f = f(0): −b = 2 ⇒ b = −2. Llavors f′(x) = 2x si x < 0 i f′(x) = 3 si x > 0: f′(0⁻) = 0 ≠ 3 = f′(0⁺). f no és derivable en x = 0 (sí en ℝ − {0}).`]},
+{t:`Estudi de funcions`,src:`PAU Madrid · Matemàtiques aplicades a les CCSS II · juliol 2024 (extraordinària) · Exercici 4`,q:[`Siga f(x) = (x² + 4)/(x² − 4).`,`a) Determina’n les asímptotes.`,`b) Obtín l’equació de la recta tangent en el punt d’abscissa x = 1.`],s:[`a) A.V.: x = −2 i x = 2 (el denominador s’anul·la i el numerador val 8). A.H.: y = 1 en ±∞; la gràfica queda per damunt perquè f − 1 = 8/(x² − 4) > 0 en ±∞.`,`b) f′(x) = −16x/(x² − 4)²; f(1) = −5/3 i f′(1) = −16/9. Recta: y = −(16/9)(x − 1) − 5/3 = (−16x + 1)/9.`]},
+{t:`Estudi de funcions`,src:`PAU Castella i Lleó · Matemàtiques II · juliol 2025 (extraordinària) · Problema 2B, apartat a`,q:[`Siga f(x) = x²·e^(−x). Determina’n el domini, els intervals de creixement i decreixement, els màxims i mínims relatius i les asímptotes.`],s:[`Dom f = ℝ. f′(x) = x(2 − x)e^(−x) = 0 ⇒ x = 0, x = 2. Decreix en (−∞, 0) ∪ (2, +∞) i creix en (0, 2). Mínim relatiu en (0, 0); màxim relatiu en (2, 4/e²).`,`No hi ha A.V. (f és contínua). En +∞, f → 0: A.H. y = 0. En −∞, f → +∞ i f(x)/x → −∞: no hi ha A.H. ni A.O.`]},
+{t:`Límits`,src:`PAU Castella i Lleó · Matemàtiques II · juliol 2025 (extraordinària) · Problema 2A, apartat b`,q:[`Siga f(x) = 12x + 3x² − 2x³. Calcula lim (x→0) ln(1 + x²) / (x·f(x)).`],s:[`Indeterminació 0/0; el denominador és 12x² + 3x³ − 2x⁴. Per L’Hôpital: (2x/(1 + x²)) / (24x + 9x² − 8x³) = 2/((1 + x²)(24 + 9x − 8x²)) → 2/24 = 1/12.`]}
+];
+let sel=new Set(TOP),cur=[];
+const $=id=>document.getElementById(id);
+const pp=n=>(10/n).toFixed(2).replace(".",",").replace(/,00$/,"").replace(/(,\d)0$/,"$1");
+function chips(){$("chips").innerHTML="";TOP.forEach(t=>{const c=BANK.filter(e=>e.t==t).length,b=document.createElement("button");b.className="chip"+(sel.has(t)?" on":"");b.textContent=`${t} (${c})`;b.onclick=()=>{sel.has(t)?sel.delete(t):sel.add(t);if(!sel.size)sel.add(t);chips()};$("chips").appendChild(b)})}
+function gen(){const n=+$("n").value;let pool=BANK.filter(e=>sel.has(e.t)).sort(()=>Math.random()-.5);
+const seen=new Set(),pick=[];pool.forEach(e=>{if(pick.length<n&&!seen.has(e.t)){seen.add(e.t);pick.push(e)}});pool.forEach(e=>{if(pick.length<n&&!pick.includes(e))pick.push(e)});
+cur=pick;$("st").textContent=pick.length<n?`Només hi ha ${pick.length} exercicis amb els blocs triats.`:"";render()}
+function render(){const p=$("prev");p.innerHTML="";const n=cur.length,sol=$("sol").checked;
+cur.forEach((e,i)=>{const d=document.createElement("div");d.className="ex";const h=document.createElement("h3");h.textContent=`Exercici ${i+1} (${pp(n)} punts)`;d.appendChild(h);
+e.q.forEach(l=>{const q=document.createElement("p");q.textContent=l;d.appendChild(q)});
+const s=document.createElement("div");s.className="src";s.textContent="Origen: "+e.src;d.appendChild(s);
+if(sol){const v=document.createElement("div");v.className="sol";e.s.forEach(l=>{const q=document.createElement("div");q.textContent=l;v.appendChild(q)});d.appendChild(v)}
+p.appendChild(d)})}
+/* ---- PDF: pàgines dibuixades en canvas i incrustades com a JPEG ---- */
+function pages(){const W=1240,H=1754,M=110,out=[],n=cur.length;let c,x,y;
+const np=()=>{c=document.createElement("canvas");c.width=W;c.height=H;x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);y=M;out.push(c)};
+const T=(s,o={})=>{const sz=o.sz||28,ind=o.ind||0,f=`${o.it?"italic ":""}${o.b?"bold ":""}${sz}px Georgia,serif`,lh=sz*1.45;x.font=f;const mw=W-2*M-ind,L=[];let ln="";
+s.split(" ").forEach(w=>{const t=ln?ln+" "+w:w;if(x.measureText(t).width>mw&&ln){L.push(ln);ln=w}else ln=t});L.push(ln);
+L.forEach(l=>{if(y+lh>H-M){np()}x.font=f;x.fillStyle=o.col||"#111";x.fillText(l,M+ind,y+sz);y+=lh});y+=o.gap||0};
+np();T("Examen de càlcul diferencial i continuïtat",{sz:40,b:1,gap:6});T("2n de Batxillerat · Matemàtiques II · Format PAU/EBAU",{it:1,gap:14});
+T("Nom: ______________________________   Grup: ________   Data: ______________",{gap:12});T("Justifica tots els passos del raonament. Calculadora no gràfica ni programable.",{sz:24,it:1,gap:26});
+cur.forEach((e,i)=>{T(`Exercici ${i+1} (${pp(n)} punts)`,{b:1,sz:30,gap:6});e.q.forEach(l=>T(l,{ind:/^[a-c]\) /.test(l)?30:0,gap:6}));T("Origen: "+e.src,{sz:22,it:1,col:"#555",gap:30})});
+if($("sol").checked){np();T("Solucions",{sz:40,b:1,gap:16});cur.forEach((e,i)=>{T(`Exercici ${i+1}`,{b:1,sz:28,gap:4});T(e.src,{sz:21,it:1,col:"#555",gap:6});e.s.forEach(l=>T(l,{sz:26,ind:20,gap:6}));y+=18});
+T("Enunciats traduïts i adaptats; solucions segons R. Núñez Nogales (2023–2024) i yoquieroaprobar.es. Contrasteu-les amb els originals oficials.",{sz:20,it:1,col:"#555"})}
+out.forEach((cv,i)=>{const g=cv.getContext("2d");g.font="22px Georgia,serif";g.fillStyle="#666";g.fillText(`${i+1} / ${out.length}`,W/2-30,H-50)});return out}
+function buildPdf(cs){const enc=new TextEncoder(),parts=[],off=[];let len=0;
+const push=v=>{const b=typeof v=="string"?enc.encode(v):v;parts.push(b);len+=b.length};
+const N=cs.length;push("%PDF-1.4\n");
+off[1]=len;push("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+off[2]=len;push(`2 0 obj\n<< /Type /Pages /Count ${N} /Kids [${cs.map((_,i)=>`${3+3*i} 0 R`).join(" ")}] >>\nendobj\n`);
+cs.forEach((cv,i)=>{const p=3+3*i,b=atob(cv.toDataURL("image/jpeg",.92).split(",")[1]),jb=Uint8Array.from(b,ch=>ch.charCodeAt(0)),ct="q 595 0 0 842 0 0 cm /Im0 Do Q";
+off[p]=len;push(`${p} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /XObject << /Im0 ${p+2} 0 R >> >> /Contents ${p+1} 0 R >>\nendobj\n`);
+off[p+1]=len;push(`${p+1} 0 obj\n<< /Length ${ct.length} >>\nstream\n${ct}\nendstream\nendobj\n`);
+off[p+2]=len;push(`${p+2} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${cv.width} /Height ${cv.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jb.length} >>\nstream\n`);push(jb);push("\nendstream\nendobj\n")});
+const xr=len,tot=3+3*N;push(`xref\n0 ${tot}\n0000000000 65535 f \n`);for(let i=1;i<tot;i++)push(String(off[i]).padStart(10,"0")+" 00000 n \n");
+push(`trailer\n<< /Size ${tot} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`);return new Blob(parts,{type:"application/pdf"})}
+async function pdf(){if(!cur.length)gen();$("st").textContent="";
+try{const d=await (window.claude&&claude.use?claude.use("downloads"):null);if(!d){const u=URL.createObjectURL(buildPdf(pages())),a=document.createElement("a");a.href=u;a.download="examen-calcul-diferencial-pau.pdf";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);$("st").textContent="PDF generat.";return}
+await d.save({filename:"examen-calcul-diferencial-pau.pdf",data:buildPdf(pages())});$("st").textContent="PDF generat."}
+catch(e){$("st").textContent=e&&e.code=="declined"?"Descàrrega cancel·lada.":"No s’ha pogut generar el PDF ("+((e&&e.code)||"error")+")."}}
+$("gen").onclick=gen;$("pdf").onclick=pdf;$("sol").onchange=render;$("n").onchange=gen;
+function tab(k){["nt","p_sim","gt"].forEach((id,i)=>$(id).style.display=i==k?"":"none");["t0","t1","t2"].forEach((id,i)=>$(id).className="chip"+(i==k?" on":""))}
+$("t0").onclick=()=>tab(0);$("t1").onclick=()=>tab(1);$("t2").onclick=()=>tab(2);
+chips();gen();
+</script>
+<script>
+(()=>{
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),P=a=>a[R(0,a.length-1)],NZ=(a,b)=>{let v=0;while(!v)v=R(a,b);return v};
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const fr=(n,d)=>{const g=gcd(n,d)||1;n/=g;d/=g;if(d<0){n=-n;d=-d}return N(d==1?n:n+'/'+d)};
+const N=x=>String(x).replace('-','−');
+const sg=n=>n==0?'':(n<0?' − ':' + ')+Math.abs(n);
+const xs=c=>'x'+sg(-c);
+const sup={2:'²',3:'³'};
+const poly=cs=>{let s='';cs.forEach(([c,p])=>{if(!c)return;const a=Math.abs(c);let t=(p==0||a!=1)?a:'';if(p>0)t+='x'+(sup[p]||'');s+=s?(c<0?' − ':' + ')+t:(c<0?'−':'')+t});return s||'0'};
+const pw=l=>`<div class="pw"><span>{</span><div>${l.join('<br>')}</div></div>`;
+const lim=(x,e)=>`lim<sub>x→${x}</sub> ${e}`;
+
+const cont=()=>{const c=P([1,2,3]),m=NZ(-3,3),k=R(-4,4),n=c*c+k*c-m*c;
+return{pts:2,q:`f(x) = ${pw([`x² + kx &nbsp; si x &lt; ${c}`,`${poly([[m,1],[n,0]])} &nbsp; si x ≥ ${c}`])}Troba k perquè f siga contínua en x = ${c}.`,
+in:[['k',k]],s:`Per l’esquerra: ${c*c} + ${c}k. Per la dreta i en el punt: ${N(m*c+n)}. Igualant: ${c*c} + ${c}k = ${N(m*c+n)} ⇒ <b>k = ${N(k)}</b>.`}};
+
+const cd=()=>{const c=P([1,2]),a=NZ(-3,3),p=R(-4,4),q=p-a*c*c,b=2*a*c;
+return{pts:2.5,q:`f(x) = ${pw([`ax²${sg(p)} &nbsp; si x ≤ ${c}`,`bx${sg(q)} &nbsp; si x &gt; ${c}`])}Determina a i b perquè f siga contínua i derivable en x = ${c}.`,
+in:[['a',a],['b',b]],s:`Continuïtat: a·${c*c}${sg(p)} = ${c}b${sg(q)}. Derivabilitat: f′(x) = 2ax (esq.) i b (dre.), per tant 2a·${c} = b. Substituint b = ${2*c}a: ${c*c}a${sg(p)} = ${2*c*c}a${sg(q)} ⇒ <b>a = ${N(a)}</b>, <b>b = ${N(b)}</b>.`}};
+
+const tan=()=>{const p=R(-3,3),q=R(-4,4),r=R(-3,3),x0=R(-2,2),m=3*x0*x0+2*p*x0+q,y0=x0**3+p*x0*x0+q*x0+r,n=y0-m*x0;
+return{pts:2,q:`Troba la recta tangent a f(x) = ${poly([[1,3],[p,2],[q,1],[r,0]])} en x = ${x0}. Escriu-la com y = mx + n.`,
+in:[['m',m],['n',n]],s:`f(${x0}) = ${N(y0)}. f′(x) = ${poly([[3,2],[2*p,1],[q,0]])} ⇒ m = f′(${x0}) = ${N(m)}. Recta: y − ${N(y0)} = ${N(m)}(x − ${N(x0)}) ⇒ <b>y = ${N(m)}x ${n<0?'−':'+'} ${Math.abs(n)}</b>.`}};
+
+const ext=()=>{const r1=R(-3,1),r2=r1+2*R(1,3),r=R(-3,3),A=-3*(r1+r2)/2,B=3*r1*r2,fv=r1**3+A*r1*r1+B*r1+r;
+return{pts:2.5,q:`Per a f(x) = ${poly([[1,3],[A,2],[B,1],[r,0]])}, estudia la monotonia i troba l’abscissa del màxim relatiu, la del mínim relatiu i el valor de f en el màxim.`,
+in:[['x del màx',r1],['x del mín',r2],['f(màx)',fv]],s:`f′(x) = ${poly([[3,2],[2*A,1],[B,0]])} = 3(${xs(r1)})(${xs(r2)}). f′ &gt; 0 en (−∞, ${N(r1)}) ∪ (${N(r2)}, ∞): creix; f′ &lt; 0 en (${N(r1)}, ${N(r2)}): decreix. Màxim en x = ${N(r1)}, mínim en x = ${N(r2)}. f(${N(r1)}) = <b>${N(fv)}</b>.`}};
+
+const asi=()=>{let a,c,p,q;do{a=R(1,3);c=NZ(-3,3);p=R(-4,4);q=R(-4,4)}while(a*c*c+p*c+q==0);const n=p+a*c;
+return{pts:2,q:`Donada f(x) = (${poly([[a,2],[p,1],[q,0]])}) / (${xs(c)}), troba la seua asímptota vertical x = k i la seua asímptota obliqua y = mx + n.`,
+in:[['k',c],['m',a],['n',n]],s:`El denominador s’anul·la en x = ${N(c)} i el numerador no (valor ${N(a*c*c+p*c+q)}): <b>A.V. x = ${N(c)}</b>. En dividir: f(x) = ${poly([[a,1],[n,0]])} + residu/(${xs(c)}), així que <b>y = ${poly([[a,1],[n,0]])}</b> (m = ${a}, n = ${N(n)}).`}};
+
+const lm=()=>{const k=R(0,5);let q,s,v;
+if(k==0){const c=R(-3,3),d=c+NZ(-3,3);v=c-d;q=lim(N(c),`(${poly([[1,2],[-(c+d),1],[c*d,0]])}) / (${xs(c)})`);s=`Indeterminació 0/0. Numerador = (${xs(c)})(${xs(d)}); simplificant queda ${xs(d)} → <b>${N(v)}</b>.`}
+else if(k==1){const a=R(1,5),b=R(1,5);v=a/b;q=lim(0,`sin(${a==1?'':a}x) / (${b==1?'':b}x)`);s=`Límit notable sin(u)/u → 1: = ${a}/${b} · [sin(${a}x)/(${a}x)] → <b>${fr(a,b)}</b>.`}
+else if(k==2){const a=R(1,5),b=R(1,5);v=a/b;q=lim(0,`(e<sup>${a==1?'':a}x</sup> − 1) / (${b==1?'':b}x)`);s=`Límit notable (e<sup>u</sup> − 1)/u → 1 ⇒ <b>${fr(a,b)}</b>.`}
+else if(k==3){const a=R(1,4);v=a*a/2;q=lim(0,`(1 − cos(${a==1?'':a}x)) / x²`);s=`(1 − cos u)/u² → 1/2 amb u = ${a}x: = ${a}²·(1/2) → <b>${fr(a*a,2)}</b>.`}
+else if(k==4){const a=NZ(-4,4),b=NZ(-4,4),p=R(-3,3),r=R(-3,3);v=a/b;q=lim('+∞',`(${poly([[a,2],[p,1]])}) / (${poly([[b,2],[r,0]])})`);s=`Mateix grau: quocient dels coeficients principals ⇒ <b>${fr(a,b)}</b>.`}
+else{const a=NZ(-3,3),b=NZ(-3,3);v=a*b;return{pts:2,q:`Si ${lim('+∞',`(1 + ${a<0?'(−'+(-a)+')':a}/x)<sup>${b==1?'':b<0?'(−'+(-b)+')':b}x</sup>`)} = e<sup>k</sup>, troba k.`,in:[['k',v]],s:`Tipus 1<sup>∞</sup>: (1 + a/x)<sup>x</sup> → e<sup>a</sup>. Ací e<sup>${N(a)}·${N(b)}</sup> ⇒ <b>k = ${N(v)}</b>.`}}
+return{pts:1.5,q:`Calcula ${q}.`,in:[['Límit',v]],s}};
+
+const der=()=>{const k=R(0,2);let q,v,s;
+if(k==0){const x0=R(1,3),a=R(1,5);v=2*x0/(x0*x0+a);q=`f(x) = ln(x² + ${a}), x = ${x0}`;s=`f′(x) = 2x/(x² + ${a}) ⇒ f′(${x0}) = <b>${fr(2*x0,x0*x0+a)}</b>.`}
+else if(k==1){const [x0,a,rt]=P([[3,16,5],[4,9,5],[2,5,3],[6,64,10],[5,144,13],[1,3,2]]);v=x0/rt;q=`f(x) = √(x² + ${a}), x = ${x0}`;s=`f′(x) = x/√(x² + ${a}) ⇒ f′(${x0}) = ${x0}/${rt} = <b>${fr(x0,rt)}</b>.`}
+else{const a=R(-4,4),b=R(1,3),x0=R(0,3),nu=2*x0*(x0+b)-(x0*x0+a),de=(x0+b)**2;v=nu/de;q=`f(x) = (x² ${a<0?'−':'+'} ${Math.abs(a)}) / (x + ${b}), x = ${x0}`;s=`f′(x) = [2x(x + ${b}) − (x² ${a<0?'−':'+'} ${Math.abs(a)})] / (x + ${b})² ⇒ f′(${x0}) = ${N(nu)}/${de} = <b>${fr(nu,de)}</b>.`}
+return{pts:1.5,q:`Calcula f′ en el punt indicat: ${q}.`,in:[['f′(x₀)',v]],s}};
+
+const tvm=()=>{const m=R(-3,0),n=m+R(2,5),ro=Math.random()<.5,p=ro?-(m+n):R(-4,4),q=R(-3,3),f=poly([[1,2],[p,1],[q,0]]),c=(m+n)/2;
+return{pts:2,q:`Comprova que f(x) = ${f} compleix les hipòtesis del teorema ${ro?'de Rolle':'del valor mitjà de Lagrange'} en [${N(m)}, ${n}] i troba el punt c de la tesi.`,
+in:[['c',c]],s:`f és polinòmica: contínua en [${N(m)}, ${n}] i derivable en (${N(m)}, ${n}).${ro?` A més, f(${N(m)}) = f(${n}) = ${N(q-m*n)}.`:''} f′(c) = ${ro?'0':`[f(${n}) − f(${N(m)})]/${n-m}`}; f′(x) = ${poly([[2,1],[p,0]])}. ${ro?`2c ${p<0?'−':'+'} ${Math.abs(p)} = 0`:`2c${sg(p)} = ${N(m+n+p)}`} ⇒ <b>c = ${N(c)}</b>.`}};
+
+const bol=()=>{let a,b,n0;do{a=R(1,4);b=NZ(-14,14);n0=null;const g=x=>x**3+a*x+b;for(let n=-6;n<6;n++)if(g(n)*g(n+1)<0){n0=n;break}}while(n0==null);
+const g=x=>x**3+a*x+b;
+return{pts:2,q:`Demostra que f(x) = ${poly([[1,3],[a,1],[b,0]])} té una única arrel real i troba l’enter n tal que l’arrel està en (n, n + 1).`,
+in:[['n',n0]],s:`f és contínua; f(${n0}) = ${N(g(n0))} i f(${n0+1}) = ${N(g(n0+1))} tenen signe distint ⇒ (Bolzano) hi ha arrel en (${n0}, ${n0+1}). Com f′(x) = 3x² + ${a} &gt; 0, f és estrictament creixent i l’arrel és única. <b>n = ${N(n0)}</b>.`}};
+
+const GEN=[['Límits',lm],['Continuïtat',cont],['Continuïtat',bol],['Derivades',cd],['Derivades',der],['Derivades',tan],['Teoremes',tvm],['Estudi de funcions',ext],['Estudi de funcions',asi]];
+const TOP=[...new Set(GEN.map(g=>g[0]))];let sel=new Set(TOP),cur,ok=0,tot=0,done=false;
+const $=id=>document.getElementById(id);
+const parse=s=>{s=s.trim().replace(/−/g,'-').replace(',','.');if(!s)return NaN;if(s.includes('/')){const [a,b]=s.split('/');return parseFloat(a)/parseFloat(b)}return Number(s)};
+function chips(){$('s_chips').innerHTML='';TOP.forEach(t=>{const b=document.createElement('button');b.className='chip'+(sel.has(t)?' on':'');b.textContent=t;b.onclick=()=>{sel.has(t)?sel.delete(t):sel.add(t);if(!sel.size)sel.add(t);chips();nuevo()};$('s_chips').appendChild(b)})}
+function nuevo(){const pool=GEN.filter(g=>sel.has(g[0]));const [t,f]=P(pool);cur=f();cur.t=t;done=false;
+$('s_tag').textContent=`${t} · ${String(cur.pts).replace('.',',')} punts`;$('s_q').innerHTML=cur.q;
+$('s_ins').innerHTML=cur.in.map((x,i)=>`<label>${x[0]}<input id="i${i}" autocomplete="off" inputmode="text"></label>`).join('');
+$('s_msg').textContent='';$('s_sol').style.display='none';$('s_sol').innerHTML=cur.s;
+$('s_ins').querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')check()}));sc()}
+function sc(){$('s_sc').textContent=`Encerts a la primera: ${ok} / ${tot}`}
+function check(){let all=true;cur.in.forEach((x,i)=>{const el=$('i'+i),v=parse(el.value),good=Math.abs(v-x[1])<0.011;el.className=good?'ok':'ko';if(!good)all=false});
+if(!done){tot++;if(all)ok++;done=true;sc()}
+$('s_msg').className=all?'ok-t':'ko-t';$('s_msg').textContent=all?'Correcte!':'Algun resultat no quadra. Revisa’l o consulta la solució.'}
+$('s_chk').onclick=check;$('s_nxt').onclick=nuevo;
+$('s_shw').onclick=()=>{if(!done){tot++;done=true;sc()}$('s_sol').style.display='block'};
+chips();nuevo();
+})();
+</script></body></html>
