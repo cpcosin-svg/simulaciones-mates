@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ca"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Geometria analítica: la recta</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fafaf7;--fg:#1d1d1b;--card:#fff;--bd:#d8d6cc;--ac:#1f5fae;--g:#e4e2d8;--m:#c2410c;--n:#15803d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181a;--fg:#ecebe6;--card:#222427;--bd:#3a3d42;--ac:#7db3f0;--g:#2e3136;--m:#fb923c;--n:#4ade80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17181a;--fg:#ecebe6;--card:#222427;--bd:#3a3d42;--ac:#7db3f0;--g:#2e3136;--m:#fb923c;--n:#4ade80;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 Georgia,serif}
+main{max-width:860px;margin:auto;padding:12px 16px 40px}
+h1,h2,h3{font-family:system-ui,sans-serif;line-height:1.25}
+h2{margin-top:2em;border-bottom:2px solid var(--ac);padding-bottom:4px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin:12px 0}
+.eq{font-family:ui-monospace,Menlo,monospace;background:var(--g);padding:2px 6px;border-radius:4px;display:inline-block;margin:2px 0}
+.m{color:var(--m);font-weight:700}.n{color:var(--n);font-weight:700}
+.sim{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+canvas{width:100%;max-width:420px;height:auto;aspect-ratio:1;background:var(--card);border:1px solid var(--bd);border-radius:8px;cursor:crosshair;touch-action:none}
+.pan{flex:1;min-width:260px}
+.pan div{margin:6px 0}
+button,select,input{font:inherit;font-size:15px}
+button{background:var(--ac);color:var(--bg);border:0;border-radius:6px;padding:5px 12px;cursor:pointer;margin:3px 3px 3px 0}
+input{width:4.2em;padding:3px;border:1px solid var(--bd);border-radius:4px;background:var(--card);color:var(--fg);margin-right:4px}
+.r{margin:6px 0}.r label{display:inline-block;min-width:11em}.fb{font-weight:700}
+.so{margin-top:6px;color:var(--n)}
+.tbl{overflow-x:auto}
+#exam .q{margin:14px 0}#exam .s{display:none;color:var(--n)}#exam.sh .s{display:block}
+@media print{body *{visibility:hidden}#examBox,#examBox *{visibility:visible}#examBox{position:absolute;left:0;top:0;width:100%;border:0;background:#fff;color:#000}#examBox .s{color:#000}}
+</style></head><body><main>
+<h1>📐 Geometria analítica: la recta</h1>
+
+<h2>0. D’on ve la idea: Descartes</h2>
+<div class="card">
+<p>Al començament del llibre primer de <em>La Geometria</em> (AT VI, 369-370), Descartes afirma que tots els problemes de geometria es poden reduir a uns termes tan simples que només cal conéixer la longitud d’alguns segments per construir-los. Així com l’aritmètica té només unes poques operacions (suma, resta, multiplicació, divisió i extracció d’arrels), també en geometria n’hi ha prou amb unes poques operacions amb segments, fixant un segment <b>unitat</b> que permet relacionar-los amb els nombres.</p>
+<p>Aquest pas, <b>traduir figures en nombres i operacions</b>, és la base de la geometria analítica: una recta deixa de ser només un dibuix i passa a ser una equació que podem manipular.</p>
+</div>
+
+<h2>1. De la vectorial a la general</h2>
+<div class="card">
+<p>Una recta queda determinada per un punt <b>P(p₁, p₂)</b> i un vector director <b>v(v₁, v₂)</b>. Un punt qualsevol <b>Q(x, y)</b> és de la recta si i només si s’hi arriba des de P avançant un múltiple de v.</p>
+<p><b>Vectorial:</b> <span class="eq">(x, y) = (p₁, p₂) + λ·(v₁, v₂)</span>, amb λ ∈ ℝ.</p>
+<p><b>Paramètriques:</b> igualem component a component: <span class="eq">x = p₁ + λv₁</span> <span class="eq">y = p₂ + λv₂</span></p>
+<p><b>Contínua:</b> aïllem λ en cada equació (si v₁ i v₂ no són 0) i igualem: <span class="eq">(x − p₁)/v₁ = (y − p₂)/v₂</span></p>
+<p><b>General (implícita):</b> multipliquem en creu: v₂(x − p₁) = v₁(y − p₂), i passem-ho tot a un costat: <span class="eq">v₂·x − v₁·y + (v₁p₂ − v₂p₁) = 0</span>, és a dir, <span class="eq">Ax + By + C = 0</span> amb A = v₂, B = −v₁.</p>
+<p>Si v₁ = 0 la recta és vertical (x = p₁); si v₂ = 0 és horitzontal (y = p₂): la contínua no té sentit, però la general sí.</p>
+</div>
+
+<h2>2. Explícita i punt-pendent</h2>
+<div class="card">
+<p>Si B ≠ 0 podem aïllar y: <span class="eq">y = <span class="m">m</span>·x + <span class="n">n</span></span>.</p>
+<p><span class="m">m = pendent</span> = v₂/v₁ = −A/B: quant puja (o baixa) y quan x augmenta 1 unitat. <span class="n">n = ordenada a l’origen</span> = −C/B: és el valor de y quan x = 0, és a dir, on la recta talla l’eix OY, punt (0, n).</p>
+<p><b>Punt-pendent:</b> si coneixem un punt P(p₁, p₂) i el pendent m, <span class="eq">y − p₂ = m·(x − p₁)</span>. Desenvolupant s’obté l’explícita, amb n = p₂ − m·p₁.</p>
+</div>
+
+<h2>3. Simulador 1: de la geometria a les equacions</h2>
+<div class="card">
+<p>Clica a la quadrícula per triar el punt <b>P</b> i torna a clicar per marcar l’extrem del vector <b>v</b> (que es dibuixa des de P). També pots escriure els valors.</p>
+<div class="sim"><canvas id="c1" width="420" height="420"></canvas>
+<div class="pan"><div>P = (<input id="p1" type="number" value="1">, <input id="p2" type="number" value="2">) &nbsp; v = (<input id="v1" type="number" value="3">, <input id="v2" type="number" value="-2">)</div><div id="o1"></div></div></div>
+</div>
+
+<h3>Exercicis</h3>
+<div class="card"><select id="t1"><option value="A">Tipus 1: dono elements, demano equacions</option><option value="B">Tipus 2: dono equacions, demano elements</option></select>
+<div id="e1"></div><p><small>Format: nombres enters o fraccions (3/2, −1/4).</small></p></div>
+
+<h2>4. Mediatriu i altura</h2>
+<div class="card">
+<p><b>Mediatriu</b> d’un segment AB: és la recta perpendicular a AB que passa pel seu punt mitjà. Tots els seus punts equidisten d’A i de B. Per trobar-ne l’equació, només cal un punt i un vector director:</p><ol><li><b>Punt:</b> el punt mig M = (A + B)/2.</li><li><b>Vector del segment:</b> AB = B − A = (a, b).</li><li><b>Vector perpendicular:</b> girem AB 90°: (a, b) → (−b, a). Aquest és el vector director de la mediatriu.</li><li><b>Equació vectorial:</b> <span class="eq">(x, y) = M + λ·(−b, a)</span>. A partir d’ací, paramètriques, contínua i general com a l’apartat 1.</li></ol>
+<p><b>Altura</b> des d’un vèrtex C d’un triangle: és la recta que passa per C i és perpendicular al costat oposat AB. Es fa igual:</p><ol><li><b>Punt:</b> el propi vèrtex C.</li><li><b>Vector del costat oposat:</b> AB = B − A = (a, b).</li><li><b>Vector perpendicular:</b> (−b, a), que és el vector director de l’altura.</li><li><b>Equació vectorial:</b> <span class="eq">(x, y) = C + λ·(−b, a)</span>, i després paramètriques, contínua i general.</li></ol>
+<p>Clau: la diferència entre mediatriu i altura és només el <b>punt</b> pel qual passa (el punt mig o el vèrtex); el vector director és el mateix: perpendicular al costat.</p>
+</div>
+
+<h2>5. Simulador 2: alçades i mediatrius d’un triangle</h2>
+<div class="card"><p>Clica tres punts per definir un triangle nou i tria l’element.</p>
+<div class="sim"><canvas id="c2" width="420" height="420"></canvas>
+<div class="pan"><select id="s2"></select><div id="o2"></div></div></div></div>
+<h3>Exercicis</h3><div class="card"><div id="e2"></div></div>
+
+<h2>6. Activitat de consolidació (examen)</h2>
+<div class="card"><p>Examen de 4 preguntes generat a l’atzar. «Descarrega PDF» obri el diàleg d’impressió: tria «Desa com a PDF».</p>
+<p>Llavor: <input id="seed" type="number" style="width:6em"> <button id="gen">Examen nou</button> <button id="solb">Mostra/amaga solucions</button> <button id="pdf">Descarrega PDF</button></p></div>
+<div class="card" id="examBox"><div id="exam"></div></div>
+</main>
+<script>
+const $=s=>document.querySelector(s),gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a),M=s=>String(s).replace(/-/g,'−');
+const R=(n,d)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return[n/g,d/g]},rs=r=>M(r[1]==1?r[0]:r[0]+'/'+r[1]),ra=r=>Math.abs(r[0])+(r[1]==1?'':'/'+r[1]);
+const sp=(c,t)=>`<span class="${c}">${t}</span>`,eqr=(a,b)=>a[0]==b[0]&&a[1]==b[1];
+const sub=(t,p)=>p==0?t:p>0?`${t} − ${p}`:`${t} + ${-p}`,den=v=>v<0?`(${M(v)})`:v,nu=(t,p)=>p==0?t:`(${sub(t,p)})`;
+function parse(s){s=s.replace(/[−–]/g,'-').replace(/\s/g,'');const m=s.match(/^(-?\d+)(?:\/(-?\d+))?$/);if(!m)return null;const d=m[2]?+m[2]:1;return d?R(+m[1],d):null}
+function red(A,B,C){const g=gcd(gcd(A,B),C)||1;A/=g;B/=g;C/=g;if(A<0||(A==0&&B<0)){A=-A;B=-B;C=-C}return[A,B,C]}
+function gen([A,B,C]){let s='';const add=(c,t)=>{if(!c)return;const a=Math.abs(c),k=(a==1&&t)?'':a;s+=s?(c<0?' − ':' + ')+k+t:(c<0?'−':'')+k+t};add(A,'x');add(B,'y');add(C,'');return(s||'0')+' = 0'}
+function expl(m,n){let s='y = ';const h=m[0]!=0;if(h)s+=sp('m',(m[0]<0?'−':'')+(ra(m)=='1'?'':ra(m))+'x');if(n[0]!=0)s+=h?(n[0]<0?' − ':' + ')+sp('n',ra(n)):sp('n',rs(n));if(!h&&!n[0])s+='0';return s}
+function F(P,v){const[p,q]=P,[a,b]=v,G=red(b,-a,a*q-b*p),o={G};
+o.vec=`(x, y) = (${M(p)}, ${M(q)}) + λ·(${M(a)}, ${M(b)})`;
+o.par=`x = ${M(p)} ${a<0?'−':'+'} ${Math.abs(a)}λ &nbsp; y = ${M(q)} ${b<0?'−':'+'} ${Math.abs(b)}λ`;
+o.con=a&&b?`${nu('x',p)}/${den(a)} = ${nu('y',q)}/${den(b)}`:a==0?`No té (v₁ = 0). Recta vertical: x = ${M(p)}`:`No té (v₂ = 0). Recta horitzontal: y = ${M(q)}`;
+o.gen=gen(G);
+if(a){o.m=R(b,a);o.n=R(q*a-b*p,a);const mm=o.m[0]<0?`(${rs(o.m)})`:rs(o.m);o.exp=expl(o.m,o.n);o.pp=`${sub('y',q)} = ${mm}·(${sub('x',p)})`}
+return o}
+const par3=(u,w)=>{const z=(a,b)=>Math.abs(a-b)<1e-9;return(u[0]||u[1]||u[2])&&z(u[0]*w[1],u[1]*w[0])&&z(u[0]*w[2],u[2]*w[0])&&z(u[1]*w[2],u[2]*w[1])};
+const fl=r=>r[0]/r[1];
+function seeded(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const ri=(r,a,b)=>a+Math.floor(r()*(b-a+1)),nz=(r,a,b)=>{let x;do x=ri(r,a,b);while(!x);return x};
+const strip=s=>s.replace(/<[^>]+>/g,'');
+function line(r){return{P:[ri(r,-6,6),ri(r,-6,6)],v:[nz(r,-4,4),nz(r,-4,4)]}}
+function tri(r){let T;do T=[0,1,2].map(()=>[ri(r,-7,7),ri(r,-7,7)]);while((T[1][0]-T[0][0])*(T[2][1]-T[0][1])-(T[1][1]-T[0][1])*(T[2][0]-T[0][0])==0);return T}
+const NM='ABC';
+// element del triangle: kind 0 altura des del vèrtex i; 1 mediatriu del costat i→i+1
+function elem(T,k,i){let h;if(k==0){const C=T[i],B=T[(i+2)%3],A=T[(i+1)%3],dx=B[0]-A[0],dy=B[1]-A[1],c=-(dx*C[0]+dy*C[1]);
+h={name:`altura des de ${NM[i]}`,P:C,v:[-dy,dx],G:red(dx,dy,c),st:`1) Punt: ${NM[i]}${pt(C)}.<br>2) Costat oposat ${NM[(i+1)%3]}${NM[(i+2)%3]} = ${NM[(i+2)%3]} − ${NM[(i+1)%3]} = (${M(dx)}, ${M(dy)}).<br>3) Perpendicular: (a, b) → (−b, a) = ${pt([-dy,dx])}.<br>4) Vectorial: (x, y) = ${pt(C)} + λ·${pt([-dy,dx])}`}}
+else{const A=T[i],B=T[(i+1)%3],dx=B[0]-A[0],dy=B[1]-A[1],sx=A[0]+B[0],sy=A[1]+B[1],c=-(dx*sx+dy*sy);
+h={name:`mediatriu de ${NM[i]}${NM[(i+1)%3]}`,P:[sx/2,sy/2],v:[-dy,dx],G:red(2*dx,2*dy,c),st:`1) Punt mig: M = (${NM[i]} + ${NM[(i+1)%3]})/2 = ${pt([sx/2,sy/2])}.<br>2) ${NM[i]}${NM[(i+1)%3]} = ${NM[(i+1)%3]} − ${NM[i]} = (${M(dx)}, ${M(dy)}).<br>3) Perpendicular: (a, b) → (−b, a) = ${pt([-dy,dx])}.<br>4) Vectorial: (x, y) = ${pt([sx/2,sy/2])} + λ·${pt([-dy,dx])}`}}
+h.st=h.st.replace(/ − −/g,' + ').replace(/ \+ −/g,' − ');h.gen=gen(h.G);return h}
+// dibuix
+function plot(cv,o){const x=cv.getContext('2d'),W=cv.width,S=W/24,cs=getComputedStyle(document.documentElement),g=cs.getPropertyValue('--g'),fg=cs.getPropertyValue('--fg'),X=a=>W/2+a*S,Y=a=>W/2-a*S;
+x.clearRect(0,0,W,W);x.lineWidth=1;for(let i=-12;i<=12;i++){x.strokeStyle=i?g:fg;x.beginPath();x.moveTo(X(i),0);x.lineTo(X(i),W);x.moveTo(0,Y(i));x.lineTo(W,Y(i));x.stroke()}
+x.fillStyle=fg;x.font='11px sans-serif';for(let i=-10;i<=10;i+=2)if(i){x.fillText(M(i),X(i)-4,Y(0)+13);x.fillText(M(i),X(0)+4,Y(i)+4)}
+(o.lines||[]).forEach(l=>{x.strokeStyle=l.c;x.lineWidth=2;x.beginPath();x.moveTo(X(l.P[0]-40*l.v[0]),Y(l.P[1]-40*l.v[1]));x.lineTo(X(l.P[0]+40*l.v[0]),Y(l.P[1]+40*l.v[1]));x.stroke()});
+(o.segs||[]).forEach(s=>{x.strokeStyle=s[2]||fg;x.lineWidth=2;x.beginPath();x.moveTo(X(s[0][0]),Y(s[0][1]));x.lineTo(X(s[1][0]),Y(s[1][1]));x.stroke()});
+if(o.arrow){const[P,v]=o.arrow,a=X(P[0]),b=Y(P[1]),c=X(P[0]+v[0]),d=Y(P[1]+v[1]),t=Math.atan2(d-b,c-a);x.strokeStyle=x.fillStyle=cs.getPropertyValue('--m');x.lineWidth=3;x.beginPath();x.moveTo(a,b);x.lineTo(c,d);x.stroke();x.beginPath();x.moveTo(c,d);x.lineTo(c-10*Math.cos(t-.4),d-10*Math.sin(t-.4));x.lineTo(c-10*Math.cos(t+.4),d-10*Math.sin(t+.4));x.fill()}
+(o.pts||[]).forEach(p=>{x.fillStyle=p[2]||fg;x.beginPath();x.arc(X(p[0][0]),Y(p[0][1]),4.5,0,7);x.fill();x.font='bold 14px sans-serif';x.fillText(p[1],X(p[0][0])+7,Y(p[0][1])-7)})}
+function pick(cv,e){const r=cv.getBoundingClientRect();return[Math.round((e.clientX-r.left)/r.width*24-12),Math.round(12-(e.clientY-r.top)/r.height*24)]}
+const AC=()=>getComputedStyle(document.documentElement).getPropertyValue('--ac');
+// SIM 1
+let st1=0;const ids=['p1','p2','v1','v2'];
+function s1(){const P=[+$('#p1').value,+$('#p2').value],v=[+$('#v1').value,+$('#v2').value];
+if(!v[0]&&!v[1]){$('#o1').innerHTML='El vector v no pot ser (0, 0).';return}
+const o=F(P,v);plot($('#c1'),{lines:[{P,v,c:AC()}],arrow:[P,v],pts:[[P,'P']]});
+$('#o1').innerHTML=`<div><b>Vectorial</b><br><span class="eq">${o.vec}</span></div><div><b>Paramètriques</b><br><span class="eq">${o.par}</span></div><div><b>Contínua</b><br><span class="eq">${o.con}</span></div><div><b>Punt-pendent</b><br><span class="eq">${o.pp||'recta vertical: no té pendent'}</span></div><div><b>Explícita</b><br><span class="eq">${o.exp||'no existeix (recta vertical)'}</span></div><div><b>General / implícita</b><br><span class="eq">${o.gen}</span>${o.m?`<br>${sp('m','pendent m = −A/B = '+rs(o.m))} · ${sp('n','ordenada a l’origen n = −C/B = '+rs(o.n))}`:''}</div>`}
+ids.forEach(i=>$('#'+i).oninput=s1);
+$('#c1').onclick=e=>{const q=pick($('#c1'),e);if(!st1){$('#p1').value=q[0];$('#p2').value=q[1];$('#v1').value=0;$('#v2').value=0;st1=1;plot($('#c1'),{pts:[[q,'P']]});$('#o1').innerHTML='Ara clica l’extrem del vector.'}else{const v=[q[0]-(+$('#p1').value),q[1]-(+$('#p2').value)];if(!v[0]&&!v[1])return;$('#v1').value=v[0];$('#v2').value=v[1];st1=0;s1()}};
+s1();
+// motor d'exercicis
+function mkEx(id,g){const el=$('#'+id);let cur;function nw(){cur=g();el.innerHTML=`<p>${cur.text}</p>`+cur.f.map((f,i)=>`<div class="r"><label>${f.l}</label>${('<input data-i="'+i+'">').repeat(f.k)}<span class="fb"></span></div>`).join('')+'<button class="chk">Comprova</button><button class="sol">Solució</button><button class="nxt">Un altre</button><div class="so"></div>';
+el.querySelector('.chk').onclick=()=>cur.f.forEach((f,i)=>{const r=[...el.querySelectorAll(`input[data-i="${i}"]`)].map(x=>parse(x.value));el.querySelectorAll('.fb')[i].textContent=!r.includes(null)&&f.c(r)?'✓':'✗'});
+el.querySelector('.sol').onclick=()=>el.querySelector('.so').innerHTML=cur.f.map(f=>f.l+': '+f.s).join('<br>');el.querySelector('.nxt').onclick=nw}nw();return nw}
+const pt=p=>`(${M(p[0])}, ${M(p[1])})`;
+function exA(r){const{P,v}=line(r),o=F(P,v),k=ri(r,0,2);let t;
+t=k==0?`Recta que passa per P${pt(P)} i té vector director v${pt(v)}.`:k==1?`Recta que passa pels punts P${pt(P)} i Q${pt([P[0]+v[0],P[1]+v[1]])}.`:`Recta que passa per P${pt(P)} i té pendent m = ${rs(o.m)}.`;
+return{text:t+' Troba:',f:[{l:'General: A, B, C',k:3,c:q=>par3(q.map(fl),o.G),s:o.gen},{l:'Pendent m',k:1,c:q=>eqr(q[0],o.m),s:rs(o.m)},{l:'Ordenada n',k:1,c:q=>eqr(q[0],o.n),s:rs(o.n)}]}}
+function exB(r,asTxt){const{P,v}=line(r),o=F(P,v),k=ri(r,0,3),G=o.G;const s=[o.vec,o.par,o.gen,strip(o.exp)][k];
+return{text:`Donada la recta <span class="eq">${s}</span>, troba:`,f:[{l:'Pendent m',k:1,c:q=>eqr(q[0],o.m),s:rs(o.m)},{l:'Ordenada n',k:1,c:q=>eqr(q[0],o.n),s:rs(o.n)},{l:'Un punt (x, y)',k:2,c:q=>Math.abs(G[0]*fl(q[0])+G[1]*fl(q[1])+G[2])<1e-9,s:'per ex. '+pt(P)},{l:'Un vector director',k:2,c:q=>(q[0][0]||q[1][0])&&Math.abs(G[0]*fl(q[0])+G[1]*fl(q[1]))<1e-9,s:'per ex. '+pt(v)}]}}
+const rnd=()=>Math.random;
+const nx1=mkEx('e1',()=>($('#t1').value=='A'?exA:exB)(Math.random));$('#t1').onchange=()=>mkEx('e1',()=>($('#t1').value=='A'?exA:exB)(Math.random));
+// SIM 2
+let T2=[[-3,-2],[5,-1],[1,6]],cl=[];
+$('#s2').innerHTML=[0,1,2].map(i=>`<option value="0,${i}">Altura des de ${NM[i]}</option>`).join('')+[0,1,2].map(i=>`<option value="1,${i}">Mediatriu de ${NM[i]}${NM[(i+1)%3]}</option>`).join('');
+function s2(){const[k,i]=$('#s2').value.split(',').map(Number),h=elem(T2,k,i);
+plot($('#c2'),{segs:[[T2[0],T2[1]],[T2[1],T2[2]],[T2[2],T2[0]]],lines:[{P:h.P,v:h.v,c:getComputedStyle(document.documentElement).getPropertyValue('--m')}],pts:T2.map((p,j)=>[p,NM[j]+pt(p)])});
+$('#o2').innerHTML=`<div><b>${h.name[0].toUpperCase()+h.name.slice(1)}</b></div><div>${h.st}</div><div>General: <span class="eq">${h.gen}</span></div><div>Vector director: <span class="eq">${pt(h.v)}</span></div>`}
+$('#s2').onchange=s2;$('#c2').onclick=e=>{cl.push(pick($('#c2'),e));if(cl.length==3){const[a,b,c]=cl;if((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])!=0)T2=cl;cl=[];s2()}else plot($('#c2'),{pts:cl.map((p,j)=>[p,NM[j]])})};
+s2();
+mkEx('e2',()=>{const r=Math.random,T=tri(r),k=ri(r,0,1),i=ri(r,0,2),h=elem(T,k,i);return{text:`Triangle ${T.map((p,j)=>NM[j]+pt(p)).join(', ')}. Calcula l’equació general de la ${h.name}.`,f:[{l:'General: A, B, C',k:3,c:q=>par3(q.map(fl),h.G),s:h.gen+'<br>'+h.st}]}});
+// EXAMEN
+function exam(seed){const r=seeded(seed),a=line(r),oa=F(a.P,a.v),b=exB(r),l=line(r),A=l.P,B=[A[0]+l.v[0],A[1]+l.v[1]],ol=F(A,l.v),T=tri(r),h1=elem(T,0,ri(r,0,2)),h2=elem(T,1,ri(r,0,2));
+const sB=b.f.map(f=>f.l+': '+f.s).join(' · ');
+$('#exam').innerHTML=`<h3>Geometria analítica: la recta · Examen (llavor ${seed})</h3><p>Nom: ______________________ &nbsp; Data: ____________</p>
+<div class="q"><b>1.</b> (2,5 p) Una recta passa per P${pt(a.P)} amb vector director v${pt(a.v)}. Escriu-ne les equacions vectorial, paramètriques, contínua, general i explícita.<div class="s">${oa.vec}<br>${oa.par}<br>${oa.con}<br>${oa.gen}<br>${strip(oa.exp)}</div></div>
+<div class="q"><b>2.</b> (2,5 p) ${b.text.replace('troba:','indica el pendent, l’ordenada a l’origen, un punt i un vector director.')}<div class="s">${sB}</div></div>
+<div class="q"><b>3.</b> (2,5 p) Troba l’equació punt-pendent i la general de la recta que passa pels punts A${pt(A)} i B${pt(B)}.<div class="s">${ol.pp}<br>${ol.gen}</div></div>
+<div class="q"><b>4.</b> (2,5 p) Triangle ${T.map((p,j)=>NM[j]+pt(p)).join(', ')}. Calcula l’equació general de la ${h1.name} i de la ${h2.name}.<div class="s">${h1.gen}<br>${h2.gen}</div></div>`}
+function newExam(){const s=Math.floor(Math.random()*90000)+10000;$('#seed').value=s;exam(s)}
+$('#gen').onclick=newExam;$('#seed').onchange=()=>exam(+$('#seed').value||1);$('#solb').onclick=()=>$('#exam').classList.toggle('sh');$('#pdf').onclick=()=>window.print();
+newExam();
+</script></body></html>
