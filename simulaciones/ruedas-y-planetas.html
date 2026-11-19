@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ruedas que dibujan: de Ptolomeo a los planetas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f7fb;--panel:#fff;--ink:#16233b;--mu:#566480;--line:#d3dcea;--ac:#2f5bd8;--och:#e0a100;--ok:#15935a;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--panel:#172138;--ink:#e8eefb;--mu:#9fb0cf;--line:#26355a;--ac:#8aa9ff;--och:#f2c04a;--ok:#4cd39a;--on:#0f1626;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1626;--panel:#172138;--ink:#e8eefb;--mu:#9fb0cf;--line:#26355a;--ac:#8aa9ff;--och:#f2c04a;--ok:#4cd39a;--on:#0f1626;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.6 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px;background-position:-1px -1px}
+.wrap{max-width:960px;margin:0 auto;padding:30px 16px 56px}
+.back{display:inline-block;background:var(--bg);color:var(--ac);font-size:.92rem;margin-bottom:14px}
+h1{font-size:clamp(1.9rem,5.4vw,3.1rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 10px;background:var(--bg);display:inline;padding:2px 8px 2px 0;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.lead{max-width:58ch;margin:16px 0 26px;color:var(--mu);font-size:1.1rem}
+.lead span{background:var(--bg)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px;margin:0 0 16px}
+h2{font-size:1.3rem;margin:0 0 8px;line-height:1.25}
+h2 small{display:inline-block;background:var(--ac);color:var(--on);font-size:.8rem;padding:1px 8px;border-radius:3px;margin-right:8px;vertical-align:2px}
+p{margin:0 0 10px}
+.tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:12px}
+.tl div{border-left:4px solid var(--och);padding:2px 0 2px 10px;font-size:.95rem}
+.tl b{display:block;color:var(--ac)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+button{font:inherit;font-size:.95rem;padding:7px 13px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--ac)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+canvas{width:100%;height:56vh;min-height:280px;display:block;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.ctl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0}
+.ctl label{display:flex;gap:10px;align-items:center;flex:1 1 300px}
+.ctl input{flex:1;accent-color:var(--ac)}
+.leg{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.95rem;margin:6px 0}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+#say{background:var(--bg);border-left:4px solid var(--ac);padding:8px 12px;border-radius:0 4px 4px 0;min-height:3.4em}
+ol{padding-left:1.3em;margin:6px 0}
+li{margin:4px 0}
+footer{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);color:var(--mu);font-size:.9rem;background:var(--bg)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.two canvas{height:330px;min-height:0}@media(max-width:720px){.two{grid-template-columns:1fr}}
+#rs{background:var(--bg);border-left:4px solid var(--och);padding:8px 12px;border-radius:0 4px 4px 0;min-height:3.4em;margin-top:8px}
+details{margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 12px}summary{cursor:pointer;font-weight:700}
+#ex{font-size:.97rem}#ex h3{margin:0 0 6px;font-size:1.1rem}#ex p{margin:0 0 8px}.two{align-items:start}
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:.95rem;margin-right:10px}.chk input{accent-color:var(--ac)}.zc{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:6px 0}.zc label{display:flex;gap:8px;align-items:center}select,input[type=date]{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink)}
+table{border-collapse:collapse;width:100%;font-size:.95rem}td,th{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}th{background:var(--bg)}.tw{overflow-x:auto;margin:8px 0}td button{padding:2px 8px;font-size:.85rem}
+.note{font-size:.88rem;color:var(--mu)}.note a{color:var(--ac)}
+</style></head>
+<body><div class="wrap">
+<a class="back" href="../index.html">← Simulaciones de matemáticas</a><br>
+<h1>Ruedas que dibujan: de Ptolomeo a los planetas</h1>
+<p class="lead"><span>Una rueda que rueda y un punto marcado dibujan curvas sorprendentes. Hace casi 2000 años, astrónomos como Ptolomeo usaron ruedas sobre ruedas para explicar el cielo.</span></p>
+
+<section class="panel">
+<h2><small>Observa</small>El cielo desde Benicarló, como lo veían los griegos</h2>
+<p>Los antiguos solo tenían lo que veían: el cielo era su pantalla, una cúpula de estrellas que gira sobre sus cabezas. No podían salir de la Tierra y mirarla desde fuera, así que era muy difícil darse cuenta de que la que se mueve es ella. Esta simulación te pone en su lugar, mirando el cielo desde Benicarló.</p>
+<div class="tabs" role="group" aria-label="Modo"><button id="zmA" aria-pressed="true">Una noche</button><button id="zmB" aria-pressed="false">Meses y años</button></div>
+<canvas id="cz" role="img" aria-label="Cielo visto desde Benicarló"></canvas>
+<div class="zc"><label>Fecha <input type="date" id="zdate"></label>
+<span id="ga" class="zc"><label>Hora solar <input type="range" id="zt" min="18" max="30" step="0.05" value="18"> <b id="ztv"></b></label><label class="chk"><input type="checkbox" id="ztr" checked> Ver las trazas</label><button id="zday">Pasar los días</button></span>
+<span id="gb" class="zc" style="display:none"><label>Duración <select id="zs"><option value="1">1 año</option><option value="2" selected>2 años</option><option value="5">5 años</option><option value="12">12 años</option></select></label><span id="zpl" class="zc"></span><label>Tiempo <input type="range" id="zc" min="0" max="1" step="0.001" value="0"></label></span>
+<button id="zplay">Pasar la noche</button></div>
+<p id="zx" class="note"></p>
+<ol><li>Pulsa <b>Pasar la noche</b>. Las estrellas dibujan arcos de circunferencia alrededor de un punto casi quieto: la <b>Estrella Polar</b>. Localiza la Osa Mayor (el Carro), la Osa Menor y el cinturón de Orión, tres estrellas en fila.</li>
+<li>Cambia la fecha un mes y vuelve a pasar la noche. A la misma hora las estrellas han girado un poco: cada día salen unos 4 minutos antes, porque la Tierra avanza en su órbita alrededor del Sol. Pulsa <b>Pasar los días</b> para verlo: el fondo de estrellas se desplaza poco a poco mientras la Tierra da la vuelta al Sol, y los planetas se mueven entre ellas.</li>
+<li>Pasa a <b>Meses y años</b>. Ahora el fondo de estrellas queda quieto y verás cómo los planetas avanzan entre ellas, y a veces se paran, retroceden y vuelven a avanzar. Esos son los caminos extraños que Ptolomeo quiso explicar.</li></ol>
+</section>
+
+<section class="panel">
+<h2><small>Historia</small>Ptolomeo y los planetas “locos”</h2>
+<p>Los antiguos observaron que Marte, Júpiter y Saturno avanzan por el cielo, se detienen, <b>retroceden unas semanas</b> y vuelven a avanzar. A esos astros los llamaron <i>planetas</i>, que en griego significa “errantes”. ¿Cómo explicar esos bucles?</p>
+<p>Claudio Ptolomeo, que trabajó en Alejandría (Egipto) hacia el año 150, lo resolvió con un modelo geométrico en su libro el <i>Almagesto</i>: la Tierra está quieta en el centro. Cada planeta gira sobre una circunferencia pequeña, el <b>epiciclo</b>, cuyo centro a su vez gira alrededor de la Tierra sobre una circunferencia grande, el <b>deferente</b>. Con esas dos rotaciones, el planeta dibuja bucles y parece ir hacia atrás.</p>
+<div class="tl">
+<div><b>c. 200 a. C.</b>Apolonio de Perge estudia los movimientos con epiciclos.</div>
+<div><b>c. 150 a. C.</b>Hiparco mide el cielo y mejora el modelo.</div>
+<div><b>c. 150 d. C.</b>Ptolomeo reúne todo en el <i>Almagesto</i>.</div>
+<div><b>1543</b>Copérnico pone el Sol en el centro.</div>
+<div><b>1609</b>Kepler descubre que las órbitas son elipses.</div>
+</div>
+<p style="margin-top:12px">Hoy sabemos que los bucles son un efecto óptico: la Tierra también se mueve alrededor del Sol y “adelanta” a Marte, como cuando adelantas a un coche en la autopista y parece que va hacia atrás. Aun así, el modelo de Ptolomeo predecía muy bien las posiciones y se usó durante más de mil años.</p>
+</section>
+
+<section class="panel">
+<h2><small>Simulación</small>La rueda que rueda</h2>
+<p>Una rueda rueda sin resbalar. Pintamos en ella un <b>punto P</b> (el naranja). Mueve el deslizador y observa la curva que dibuja.</p>
+<div class="tabs" role="group" aria-label="Tipo de movimiento">
+<button id="m0" aria-pressed="true">Rueda sobre una recta</button>
+<button id="m1" aria-pressed="false">Rueda sobre una circunferencia (epiciclo)</button>
+</div>
+<canvas id="cv" role="img" aria-label="Rueda dibujando una curva"></canvas>
+<div class="leg">
+<span><i class="dot" style="background:var(--ac)"></i>C: centro de la rueda</span>
+<span><i class="dot" style="background:var(--och)"></i>P: punto que dibuja</span>
+<span><i class="dot" style="background:var(--ok)"></i>T: punto de contacto</span>
+<span>Las bolitas de colores marcan los giros de la rueda</span>
+</div>
+<div class="ctl">
+<label>Distancia de P al centro <input id="lam" type="range" min="0" max="3" step="0.01" value="1" aria-label="Distancia de P al centro"> <b id="lv">1,00</b></label>
+</div>
+<div class="tabs">
+<button data-l="0">0 (en el centro)</button><button data-l="0.5">0,5</button><button data-l="1">1 (en el borde)</button><button data-l="2">2 (fuera)</button>
+<button id="pl" aria-pressed="false">Pausa</button>
+</div>
+<div id="say" aria-live="polite"></div>
+</section>
+
+<section class="panel">
+<h2><small>Reto</small><span id="rn">Sé Ptolomeo: atrapa a Marte</span></h2>
+<div class="tabs" id="psel" role="group" aria-label="Planeta"></div>
+<div id="ri"><p>Ahora te toca a ti. Abajo tienes el camino de Marte en el cielo entre octubre de 2024 y abril de 2025, un punto cada 4 días. Marte avanza, se para el 6 de diciembre, <b>retrocede hasta el 23 de febrero</b> y vuelve a avanzar: el mismo bucle que intrigó a los griegos.</p>
+<p>Tu misión: ajustar un epiciclo para que el camino naranja (el modelo) pase por los puntos azules (la realidad). Tienes tres mandos: el <b>tamaño del epiciclo</b>, <b>dónde empieza Marte</b> en el deferente y <b>cuánto tarda</b> en dar la vuelta. La regla de Ptolomeo: el radio del epiciclo apunta siempre hacia el Sol.</p>
+</div>
+<div class="two"><canvas id="sk" role="img" aria-label="Camino de Marte en el cielo, real y del modelo"></canvas><canvas id="dg" role="img" aria-label="Deferente y epiciclo vistos desde arriba"></canvas></div>
+<div class="leg"><span><i class="dot" style="background:var(--ac)"></i><span id="lg1">Marte real</span></span><span><i class="dot" style="background:var(--och)"></i>Tu modelo</span><span>Fecha: <b id="dl"></b></span></div>
+<div class="ctl">
+<label>Tamaño del epiciclo <input id="pr" type="range" min="0.3" max="1" step="0.01" value="0.5"> <b id="prv"></b></label>
+<label>Posición inicial (°) <input id="pth" type="range" min="0" max="360" step="1" value="0"> <b id="pthv"></b></label>
+<label>Días por vuelta <input id="pP" type="range" min="600" max="900" step="1" value="687"> <b id="pPv"></b></label>
+<label>Fecha <input id="pd" type="range" min="0" max="52" step="1" value="0"> </label>
+</div>
+<div class="tabs"><button id="rpl" aria-pressed="false">Pausa</button><button id="rau">Ajuste automático</button><button id="rpt">Valores de Ptolomeo</button><button id="rre">Empezar de nuevo</button><label class="chk"><input type="checkbox" id="lg"> Ver los años siguientes</label></div>
+<div id="rs" aria-live="polite"></div>
+<div id="lgt" class="note" style="display:none;margin-top:8px"><b>Un trocito de un dibujo mayor.</b> Lo que ves en el cielo, y lo que intenta el modelo, es solo un tramo de la curva completa. Si dejas correr los años, el modelo (naranja) dibuja bucle tras bucle, cada uno en un sitio distinto, y los lazos se van superponiendo. La realidad (gris) hace lo mismo, pero poco a poco se separa del modelo: ajustaste un tramo, y fuera de él el modelo falla más. Para mejorarlo, Ptolomeo añadió más círculos y el ecuante.</div>
+<div class="two" style="margin-top:14px">
+<canvas id="rl" role="img" aria-label="El Sol en el centro, con la Tierra y Marte en sus órbitas, vistos desde arriba"></canvas>
+<div id="ex">
+<h3>El mismo Marte, dos dibujos</h3>
+<p><b>A la izquierda, la realidad:</b> el Sol está en el centro, la Tierra gira en una órbita de radio 1 y Marte en otra de radio 1,52 (unidades astronómicas). Cuando la Tierra adelanta a Marte, desde la Tierra parece que Marte retrocede.</p>
+<p>Lo que ves en el cielo es la flecha negra <b>Tierra→Marte</b>. Se puede partir en dos: <b style="color:var(--ac)">Tierra→Sol</b> (azul) más <b style="color:var(--ok)">Sol→Marte</b> (verde).</p>
+<p><b>El dibujo de Ptolomeo hace esa misma suma</b>, pero empezando siempre en la Tierra. El <i>deferente</i> es la flecha verde (Sol→Marte, que cambia despacio) y el <i>epiciclo</i> es la azul (Tierra→Sol, que da una vuelta al año y apunta siempre al Sol). Si colocas las dos flechas una tras otra desde la Tierra, llegas al mismo Marte. En el esquema de arriba, el paralelogramo punteado lo muestra.</p>
+<p>Por eso el epiciclo mide 1/1,52 ≈ 0,66 del deferente: es la órbita de la Tierra, pero girada media vuelta, porque la flecha va de la Tierra al Sol y no del Sol a la Tierra. Ptolomeo dibujó el epiciclo sin saber de dónde salía su tamaño.</p>
+</div></div>
+<details id="dtl"><summary>¿Por qué el ajuste libre da otros números?</summary>
+<p>Con los valores “de libro” (0,66 y 687 días) el error queda en torno a 2°. Son valores medios, y la órbita de Marte es una elipse: su distancia al Sol y su velocidad cambian a lo largo de su año.</p>
+<p>En estos meses Marte se aleja del Sol, de 1,50 a 1,67 unidades astronómicas (su punto más lejano, el afelio, es en abril de 2025). Más lejos, el epiciclo parece más pequeño (1/1,6 ≈ 0,6) y Marte va más despacio (segunda ley de Kepler), unos 800 días por vuelta en vez de 687.</p>
+<p>El ajuste libre no esconde el error: encuentra la distancia y la velocidad que Marte tiene <b>en esas fechas</b>. Con otros meses saldrían otros números. Para un modelo válido todo el año hacen falta elipses (Kepler, 1609), o el truco de Ptolomeo, el <i>ecuante</i>: un punto descentrado desde el que el movimiento parece uniforme.</p>
+</details>
+<p class="note" id="nt">Los datos no son fotografías: son posiciones calculadas con elementos orbitales aproximados del JPL y contrastadas con las fechas publicadas (paradas el 6 de diciembre de 2024 y el 23 de febrero de 2025, oposición el 16 de enero de 2025; ver <a href="https://spider.seds.org/spider/Mars/mars2025.html" rel="noopener">SEDS</a> y <a href="https://nightsky.jpl.nasa.gov/news/425/" rel="noopener">NASA Night Sky Network</a>). La latitud se toma del dato real: Ptolomeo la trataba aparte con otro mecanismo.</p>
+</section>
+
+<section class="panel">
+<h2><small>Reto 2</small>¿Podía Ptolomeo predecir alineamientos?</h2>
+<p>Una alumna preguntó si con este modelo se podían predecir alineamientos de planetas. Vamos a comprobarlo. Cuando dos planetas están en la misma dirección del cielo decimos que hay una <b>conjunción</b>. El modelo es el que ya conoces (un deferente y un epiciclo para cada planeta, con movimiento uniforme), y la realidad es la efeméride.</p>
+<div class="tabs" id="apre" role="group" aria-label="Casos"></div>
+<div class="zc"><label>Primer planeta <select id="aA"></select></label><label>Segundo planeta <select id="aB"></select></label><label>Desde el año <input type="number" id="ay" min="1990" max="2045" value="2019" style="width:5.5em"></label><label>Duración <select id="an"><option value="1">1 año</option><option value="2">2 años</option><option value="3" selected>3 años</option><option value="5">5 años</option><option value="10">10 años</option></select></label><label class="chk"><input type="checkbox" id="ae"> Con ecuante</label></div>
+<canvas id="ac" role="img" aria-label="Diferencia de longitud entre dos planetas, realidad y modelo" style="height:300px;min-height:0"></canvas>
+<div class="leg"><span><i class="dot" style="background:var(--ac)"></i>Realidad</span><span><i class="dot" style="background:var(--och)"></i>Modelo de Ptolomeo</span><span>Una conjunción es un punto donde la línea cruza el cero</span></div>
+<div id="ar"></div>
+<h3 style="margin:14px 0 6px;font-size:1.1rem">Para investigar</h3>
+<ol><li>Pulsa <b>Júpiter–Saturno</b>. ¿Cuándo cruzan el cero la línea azul y la naranja? Anota las dos fechas y la diferencia en días.</li>
+<li>Pulsa <b>real</b> en esa fila: el cielo de Benicarló salta a ese día. Comprueba que los dos planetas están juntos (si el Sol no los tapa). Haz lo mismo con <b>modelo</b>: ¿qué ves?</li>
+<li>Marca <b>Con ecuante</b>. ¿Mejora la predicción? ¿Cuántos días?</li>
+<li>Prueba los otros casos. ¿En cuáles falla más el modelo? Pista: un planeta lento se mueve poco cada día, así que un error de unos grados en su posición se convierte en muchos días.</li>
+<li>Contrasta con datos publicados (abajo). ¿Coinciden con la efeméride de la página? Las conjunciones pueden definirse de varias maneras (por longitud, por ascensión recta o por mínima distancia), y por eso las fechas pueden diferir uno o dos días.</li>
+<li>Responde con tus datos: ¿podía Ptolomeo predecir alineamientos? ¿Con qué precisión?</li></ol>
+<div class="tw"><table><tr><th>Conjunción</th><th>Fecha publicada</th></tr><tr><td>Júpiter y Saturno (la «gran conjunción»)</td><td>21 de diciembre de 2020 (a 0,1°)</td></tr><tr><td>Venus y Marte</td><td>13 de julio de 2021</td></tr><tr><td>Marte y Saturno</td><td>5 de abril de 2022</td></tr><tr><td>Venus y Júpiter</td><td>30 de abril de 2022</td></tr><tr><td>Marte y Júpiter</td><td>29 de mayo de 2022</td></tr></table></div>
+<p class="note">Fuentes de las fechas: <a href="https://www.TimeAndDate.com/astronomy/planets/great-conjunction" rel="noopener">timeanddate.com</a> y un calendario de conjunciones de <a href="https://www.eetindia.co.in/?p=10987" rel="noopener">eetindia.co.in</a>. El modelo usa los tamaños y los periodos reales de las órbitas, con movimiento uniforme sobre circunferencias. «Con ecuante» añade la corrección de primer orden de Ptolomeo para que la velocidad cambie a lo largo de la órbita. Ptolomeo usaba además parámetros sacados de observaciones antiguas.</p>
+</section>
+
+<section class="panel">
+<h2><small>Investiga</small>Preguntas</h2>
+<ol>
+<li>Pon P en el centro. ¿Qué curva dibuja? ¿Y si lo pones en el borde de la rueda?</li>
+<li>Con P en el borde (distancia 1) aparecen unos picos. ¿Dónde está el punto P en ese momento? ¿Qué punto es?</li>
+<li>Con una distancia mayor que 1 aparecen bucles. ¿En esos tramos el punto va hacia adelante o hacia atrás?</li>
+<li>Con el epiciclo y distancia 2, ¿cuántos bucles se forman en una vuelta completa? Cuéntalos con ayuda de la pausa.</li>
+<li>¿Qué tiene que ver esto con Marte “yendo hacia atrás” en el cielo?</li>
+</ol>
+</section>
+<section class="panel">
+<h2><small>Para terminar</small>Una conjunción de historias</h2>
+<p>Cuando dos planetas coinciden en el cielo decimos que hay una conjunción. Yo intento algo parecido en clase. Me gusta mucho la historia y, siempre que puedo, busco una conjunción entre la historia de las matemáticas y mi historia personal.</p>
+<p>En esta página, la historia de las matemáticas es la de <b>Claudio Ptolomeo</b> y su <i>Almagesto</i>: dos mil años atrás alguien miró el cielo, vio caminos extraños y los explicó con círculos sobre círculos, y su modelo funcionó durante más de mil años.</p>
+<p>Mi historia personal pasa por <b>Martin Gardner</b>. En 1989 leí <i>Ruedas, vida y otras diversiones matemáticas</i>, y sin ese libro no tendría el interés que tengo por las curvas que dibuja una rueda al rodar. Gardner escribió durante 25 años la sección «Juegos matemáticos» de la revista <i>Scientific American</i> y enseñó a muchísima gente que las matemáticas pueden ser una diversión. Su influencia fue decisiva en mi vocación por las matemáticas y por enseñarlas. Esta página es un pequeño homenaje a Martin.</p>
+<p>Quiero que te lleves tres ideas. Una: las matemáticas son personas intentando entender lo que ven, y Ptolomeo no se equivocó por tonto, sino porque solo veía el cielo desde la Tierra. Dos: cambiar de punto de vista, mirar desde fuera y poner el Sol en el centro, cambia las preguntas. Tres: un modelo puede predecir bien y aun así no explicar bien.</p>
+<p class="note">Una nota final. Como Theodore, el protagonista de la película <i>Her</i>, estoy reconstruyendo y ordenando mis experiencias personales y docentes con ayuda de una inteligencia artificial. Esta página la he construido conversando con Claude, de Anthropic: yo ponía las ideas, los recuerdos y las preguntas, y la IA las convertía en simulaciones y las contrastaba con datos reales. Nos equivocamos por el camino más de una vez y lo corregimos, que también es hacer matemáticas.</p>
+</section>
+<footer>Material de aula de Matemáticas. Crédito de ampliación, 2º ESO. Posiciones de los planetas calculadas con elementos orbitales aproximados del JPL (válidos entre 1800 y 2050).</footer>
+</div>
+<script>const EPH=(()=>{const R=Math.PI/180,EL={Me:[.38709927,.00000037,.20563593,.00001906,7.00497902,-.00594749,252.2503235,149472.67411175,77.45779628,.16047689,48.33076593,-.12534081],Ve:[.72333566,.0000039,.00677672,-.00004107,3.39467605,-.0007889,181.9790995,58517.81538729,131.60246718,.00268329,76.67984255,-.27769418],Ea:[1.00000261,.00000562,.01671123,-.00004392,-.00001531,-.01294668,100.46457166,35999.37244981,102.93768193,.32327364,0,0],Ma:[1.52371034,.00001847,.0933941,.00007882,1.84969142,-.00813131,-4.55343205,19140.30268499,-23.94362959,.44441088,49.55953891,-.29257343],Ju:[5.202887,-.00011607,.04838624,-.00013253,1.30439695,-.00183714,34.39644051,3034.74612775,14.72847983,.21252668,100.47390909,.20469106],Sa:[9.53667594,-.0012506,.05386179,-.00050991,2.48599187,.00193609,49.95424423,1222.49362201,92.59887831,-.41897216,113.66242448,-.28867794]};
+function hel(b,T){const q=EL[b],g=i=>q[i]+q[i+1]*T,a=g(0),e=g(2),I=g(4),L=g(6),w=g(8),O=g(10);let M=(L-w)%360;if(M>180)M-=360;const Mr=M*R;let E=Mr;for(let k=0;k<30;k++)E-=(E-e*Math.sin(E)-Mr)/(1-e*Math.cos(E));const xp=a*(Math.cos(E)-e),yp=a*Math.sqrt(1-e*e)*Math.sin(E),om=(w-O)*R,Om=O*R,i=I*R,co=Math.cos(om),so=Math.sin(om),cO=Math.cos(Om),sO=Math.sin(Om),ci=Math.cos(i),si=Math.sin(i);return[(co*cO-so*sO*ci)*xp+(-so*cO-co*sO*ci)*yp,(co*sO+so*cO*ci)*xp+(-so*sO+co*cO*ci)*yp,so*si*xp+co*si*yp]}
+const jdOf=ms=>ms/864e5+2440587.5;
+function gv(b,jd){const T=(jd-2451545)/36525,e=hel('Ea',T),p=hel(b,T);return[p[0]-e[0],p[1]-e[1],p[2]-e[2]]}
+function info(b,jd){const T=(jd-2451545)/36525,e=hel('Ea',T),p=hel(b,T),x=p[0]-e[0],y=p[1]-e[1],z=p[2]-e[2],pr=1.396971*T;return{lon:((Math.atan2(y,x)/R+pr)%360+360)%360,lat:Math.atan2(z,Math.hypot(x,y))/R,sun:((Math.atan2(-e[1],-e[0])/R+pr)%360+360)%360,h:((Math.atan2(p[1],p[0])/R+pr)%360+360)%360,r:Math.hypot(p[0],p[1]),gx:x,gy:y}}
+function eq(v){const c=Math.cos(23.43929*R),s=Math.sin(23.43929*R),y=v[1]*c-v[2]*s,z=v[1]*s+v[2]*c;return{ra:((Math.atan2(y,v[0])/R)%360+360)%360/15,dec:Math.atan2(z,Math.hypot(v[0],y))/R}}
+function sunEq(jd){const e=hel('Ea',(jd-2451545)/36525);return eq([-e[0],-e[1],-e[2]])}
+function elem(b,jd){const T=(jd-2451545)/36525,q=EL[b];return{L:q[6]+q[7]*T,w:q[8]+q[9]*T,e:q[2]+q[3]*T}}
+return{jdOf,gv,info,eq,sunEq,elem}})();
+</script>
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),$=id=>document.getElementById(id);
+let lam=1,mode=0,t=0,play=true;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const K=()=>mode?0.25:0;
+function pt(tt){const k=K();
+ if(!k)return{P:[tt-lam*Math.sin(tt),1-lam*Math.cos(tt)],C:[tt,1],u:[-Math.sin(tt),-Math.cos(tt)],T:[tt,0]};
+ const rho=1/k,phi=tt*k,a=rho+1,c=Math.cos(phi),s=Math.sin(phi),w=a*phi,u=[-Math.cos(w),-Math.sin(w)],C=[a*c,a*s];
+ return{P:[C[0]+lam*u[0],C[1]+lam*u[1]],C,u,T:[rho*c,rho*s]};}
+function say(){
+ const a=lam;let s;
+ if(a<0.005)s=mode?'P está en el centro de la rueda: dibuja una circunferencia perfecta.':'P está en el centro: la rueda lo lleva en línea recta.';
+ else if(Math.abs(a-1)<0.01)s=mode?'P está en el borde: toca la circunferencia grande y da media vuelta atrás. Eso forma picos (epicicloide).':'P está en el borde: cada vez que toca el suelo se detiene un instante y forma un pico. Es la cicloide.';
+ else if(a<1)s='P está dentro de la rueda: la curva es suave, una onda sin picos ni bucles.';
+ else s=mode?'P está fuera de la rueda: aparecen bucles. En cada bucle el punto retrocede, como Marte en el cielo.':'P está fuera de la rueda: aparecen bucles. En cada bucle el punto retrocede un poco.';
+ $('say').textContent=s;$('lv').textContent=lam.toFixed(2).replace('.',',');}
+function draw(){
+ const dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;
+ if(cv.width!==Math.round(W*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+ const k=K(),rho=k?1/k:0,Tm=k?2*Math.PI/k:6*Math.PI,N=2000;
+ let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;const pts=[];
+ const bb=(p,m)=>{x0=Math.min(x0,p[0]-m);x1=Math.max(x1,p[0]+m);y0=Math.min(y0,p[1]-m);y1=Math.max(y1,p[1]+m)};
+ for(let i=0;i<=N;i++){const q=pt(Tm*i/N);pts.push(q.P);bb(q.P,0);bb(q.C,1)}
+ if(k)bb([0,0],rho);
+ const sc=Math.min((W-24)/(x1-x0),(H-24)/(y1-y0)),cx=(x0+x1)/2,cy=(y0+y1)/2;
+ const X=x=>(x-cx)*sc+W/2,Y=y=>H/2-(y-cy)*sc;
+ ctx.strokeStyle=css('--mu');ctx.lineWidth=2;ctx.beginPath();
+ if(k)ctx.arc(X(0),Y(0),rho*sc,0,2*Math.PI);else{ctx.moveTo(0,Y(0));ctx.lineTo(W,Y(0))}
+ ctx.stroke();
+ const path=(m,col,w)=>{ctx.beginPath();for(let i=0;i<=m;i++){const p=pts[i];i?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1]))}ctx.strokeStyle=col;ctx.lineWidth=w;ctx.stroke()};
+ path(N,css('--line'),2);
+ path(Math.min(N,Math.floor(t/Tm*N)),css('--och'),3);
+ const q=pt(t),cc=[X(q.C[0]),Y(q.C[1])];
+ ctx.strokeStyle=css('--ac');ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cc[0],cc[1],sc,0,2*Math.PI);ctx.stroke();
+ for(let j=0;j<8;j++){const g=j*Math.PI/4,c=Math.cos(g),s=Math.sin(g),v=[q.u[0]*c-q.u[1]*s,q.u[0]*s+q.u[1]*c];
+  ctx.strokeStyle=css('--line');ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cc[0],cc[1]);ctx.lineTo(cc[0]+v[0]*sc,cc[1]-v[1]*sc);ctx.stroke();
+  ctx.fillStyle='hsl('+(j*45)+',70%,55%)';ctx.beginPath();ctx.arc(cc[0]+v[0]*sc,cc[1]-v[1]*sc,6,0,2*Math.PI);ctx.fill();}
+ const P=[X(q.P[0]),Y(q.P[1])],T=[X(q.T[0]),Y(q.T[1])];
+ ctx.strokeStyle=css('--och');ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cc[0],cc[1]);ctx.lineTo(P[0],P[1]);ctx.stroke();
+ const dot=(p,col,r,lb)=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(p[0],p[1],r,0,2*Math.PI);ctx.fill();ctx.fillStyle=css('--ink');ctx.font='bold 15px "Atkinson Hyperlegible",sans-serif';ctx.fillText(lb,p[0]+9,p[1]-9)};
+ dot(T,css('--ok'),6,'T');dot(cc,css('--ac'),6,'C');dot(P,css('--och'),7,'P');
+ if(play){t+=Tm/900;if(t>Tm)t=0}
+ requestAnimationFrame(draw);}
+function setMode(m){mode=m;t=0;$('m0').setAttribute('aria-pressed',String(!m));$('m1').setAttribute('aria-pressed',String(!!m));say()}
+$('m0').onclick=()=>setMode(0);$('m1').onclick=()=>setMode(1);
+$('lam').oninput=e=>{lam=+e.target.value;say()};
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{lam=+b.dataset.l;$('lam').value=lam;say()});
+$('pl').onclick=()=>{play=!play;$('pl').textContent=play?'Pausa':'Seguir';$('pl').setAttribute('aria-pressed',String(!play))};
+say();draw();
+(function(){
+const PL_={Me:{n:'Mercurio',a:0.387,inn:1,d:[2025,1,10],s:2,N:48,P:[60,120],R:[0.2,0.7],ref:{r:0.375,P:88}},Ve:{n:'Venus',a:0.723,inn:1,d:[2025,0,10],s:3,N:48,P:[150,320],R:[0.3,1],ref:{r:0.72,P:225}},Ma:{n:'Marte',a:1.524,inn:0,d:[2024,9,1],s:4,N:53,P:[600,900],R:[0.3,1],ref:{r:0.66,P:687}},Ju:{n:'Júpiter',a:5.203,inn:0,d:[2025,8,1],s:6,N:48,P:[3500,5500],R:[0.1,0.5],ref:{r:0.19,P:4333}},Sa:{n:'Saturno',a:9.537,inn:0,d:[2025,4,1],s:7,N:48,P:[8000,14000],R:[0.05,0.3],ref:{r:0.108,P:10759}}};
+const NM={},REF={};for(const k in PL_){NM[k]=PL_[k].n;REF[k]=PL_[k].ref}
+const SPAN={Me:700,Ve:3500,Ma:4700,Ju:2400,Sa:2270};
+const uw=a=>{for(let i=1;i<a.length;i++){while(a[i]-a[i-1]<-180)a[i]+=360;while(a[i]-a[i-1]>180)a[i]-=360}return a};
+let LON,LAT,SUN,MH,MR,STEP,D0,N,LMID,LO,HI,LAO,LAH,K='Ma',PL=600,PH=900,RL=0.3,RH=1;
+function load(k){K=k;const c=PL_[k];STEP=c.s;D0=Date.UTC(c.d[0],c.d[1],c.d[2]);N=c.N;PL=c.P[0];PH=c.P[1];RL=c.R[0];RH=c.R[1];LON=[];LAT=[];SUN=[];MH=[];MR=[];
+ for(let i=0;i<N;i++){const o=EPH.info(k,EPH.jdOf(D0+i*STEP*864e5));LON.push(o.lon);LAT.push(+o.lat.toFixed(2));SUN.push(o.sun);MH.push(o.h);MR.push(o.r)}
+ uw(LON);uw(SUN);uw(MH);const a=Math.min(...LON),b=Math.max(...LON);LMID=(a+b)/2;LO=Math.floor(a-4);HI=Math.ceil(b+4);LAO=Math.min(...LAT)-0.8;LAH=Math.max(...LAT)+0.8}
+const IDS=['ri','ex','dtl','nt'],TX={Ma:{}};IDS.forEach(i=>TX.Ma[i]=$(i).innerHTML);
+TX.Ve={ri:`<p>Venus también hace un bucle, pero distinto del de Marte: nunca se aleja mucho del Sol y se ve como lucero de la tarde o de la mañana. Abajo tienes su camino entre el 10 de enero y el 1 de junio de 2025, un punto cada 3 días. Venus avanza, se para el 2 de marzo, <b>retrocede hasta el 13 de abril</b> y vuelve a avanzar. El 23 de marzo pasa entre la Tierra y el Sol y pasa de lucero de la tarde a lucero de la mañana.</p><p>Tu misión es la misma: ajustar el epiciclo para que el camino naranja (el modelo) pase por los puntos azules. Pero el reparto de papeles es otro: el <b>deferente</b> es la vuelta del Sol alrededor de la Tierra (Venus siempre acompaña al Sol) y el <b>epiciclo</b> es la vuelta de Venus alrededor del Sol. Regla de Ptolomeo: el centro del epiciclo está siempre sobre la línea Tierra-Sol.</p>`,
+ex:`<h3>El mismo Venus, dos dibujos</h3><p><b>A la izquierda, la realidad:</b> el Sol en el centro, Venus en una órbita de radio 0,72 y la Tierra en la de radio 1 (unidades astronómicas). Venus es más rápida y nos adelanta por dentro: en ese momento parece ir hacia atrás.</p><p>La flecha negra <b>Tierra→Venus</b> es la suma de <b style="color:var(--ac)">Tierra→Sol</b> (azul) y <b style="color:var(--ok)">Sol→Venus</b> (verde).</p><p><b>Aquí el dibujo de Ptolomeo coincide con la realidad:</b> el deferente es la flecha azul (el centro del epiciclo es el propio Sol) y el epiciclo es la verde, la órbita de Venus tal cual. Con Marte había que cambiar los papeles de las flechas, y por eso salía el paralelogramo.</p><p>Ptolomeo tomó unos 43 sobre 60 ≈ 0,72 para el epiciclo, justo la razón real entre las órbitas de Venus y de la Tierra (0,72 a 1), sin saber de dónde salía ese número.</p>`,
+dtl:`<summary>¿Por qué con Venus sale tan bien?</summary><p>Con los valores “de libro” (0,72 y 225 días) el error es de unos 0,9°, menos de la mitad que con Marte (2°). La órbita de Venus es la más circular de todos los planetas y la de la Tierra también es casi una circunferencia, así que un círculo a velocidad constante casi basta.</p><p>El pequeño error que queda viene de que esas órbitas no son círculos perfectos. Por eso Ptolomeo usó también el <i>ecuante</i> para Venus.</p><p>Fíjate en el camino: Venus sube hasta unos 8,5° de latitud y su bucle es más ancho y rápido que el de Marte. Es porque en la conjunción inferior pasa muy cerca de la Tierra (a 0,28 unidades astronómicas).</p>`,
+nt:`Los datos no son fotografías: son posiciones calculadas con elementos orbitales aproximados del JPL y contrastadas con fechas publicadas (paradas el 2 de marzo y el 13 de abril de 2025, conjunción inferior el 23 de marzo; ver <a href="https://obliquity.com/skyeye/archive/2025/venus.html" rel="noopener">obliquity.com</a>). La latitud se toma del dato real, como con Marte.`};
+const SRC='<a href="https://www.astromitra.com/transit/retrograde/2025/" rel="noopener">astromitra.com</a>';
+const NOTA=(f)=>'Los datos no son fotografías: son posiciones calculadas con elementos orbitales aproximados del JPL y contrastadas con fechas publicadas ('+f+'; ver '+SRC+'). La latitud se toma del dato real, como con Marte.';
+const SUPX=(n,a,pt,pp)=>'<h3>El mismo '+n+', dos dibujos</h3><p><b>A la izquierda, la realidad:</b> el Sol en el centro, la Tierra en una órbita de radio 1 y '+n+' en la de radio '+a+' (unidades astronómicas). Cuando la Tierra lo adelanta, parece retroceder.</p><p>La flecha negra <b>Tierra→'+n+'</b> es la suma de <b style="color:var(--ac)">Tierra→Sol</b> (azul) y <b style="color:var(--ok)">Sol→'+n+'</b> (verde).</p><p><b>Ptolomeo hace esa suma desde la Tierra</b>, igual que con Marte: el deferente es la flecha verde y el epiciclo la azul, que da una vuelta al año y apunta siempre al Sol (el paralelogramo punteado lo muestra).</p><p>El epiciclo mide 1/'+a+' ≈ '+pt+' del deferente. Ptolomeo tomó '+pp+' sobre 60, casi el mismo número, sin saber de dónde salía.</p>';
+TX.Me={ri:'<p>Mercurio es el planeta más rápido: da la vuelta al Sol en 88 días y hace un bucle cada 116 días, tres o cuatro veces al año. Abajo tienes su camino entre el 10 de febrero y el 15 de mayo de 2025, un punto cada 2 días. Avanza, se para el 15 de marzo, <b>retrocede hasta el 7 de abril</b> y vuelve a avanzar. Como Venus, nunca se aleja mucho del Sol.</p><p>El reparto de papeles es el de Venus: el <b>deferente</b> es la vuelta del Sol alrededor de la Tierra y el <b>epiciclo</b> es la vuelta de Mercurio alrededor del Sol. Prepárate: Mercurio es el más rebelde.</p>',
+ex:'<h3>El mismo Mercurio, dos dibujos</h3><p><b>A la izquierda, la realidad:</b> el Sol en el centro, Mercurio en una órbita de radio 0,39 y la Tierra en la de radio 1 (unidades astronómicas). Mercurio nos adelanta por dentro y en ese momento parece ir hacia atrás.</p><p>La flecha negra <b>Tierra→Mercurio</b> es la suma de <b style="color:var(--ac)">Tierra→Sol</b> (azul) y <b style="color:var(--ok)">Sol→Mercurio</b> (verde). Igual que con Venus, el dibujo de Ptolomeo coincide con la realidad: el deferente es la flecha azul y el epiciclo es la verde.</p><p>Ptolomeo tomó 22,5 sobre 60 = 0,375 para el epiciclo, casi la razón real entre las órbitas de Mercurio y de la Tierra (0,39 a 1).</p>',
+dtl:'<summary>¿Por qué Mercurio no se deja ajustar?</summary><p>Aunque pruebes los mejores valores, el error se queda en unos 6° (doce veces el diámetro de la Luna). La órbita de Mercurio es la más achatada de los planetas (excentricidad 0,21): su velocidad cambia mucho entre el punto más cercano al Sol y el más lejano, y una circunferencia a velocidad constante no puede seguirlo.</p><p>Ptolomeo lo sabía. Para Mercurio inventó un modelo propio en el que el centro del deferente se mueve a su vez en un pequeño círculo. Es una pista de que una sola circunferencia no basta.</p>',
+nt:NOTA('paradas el 15 de marzo y el 7 de abril de 2025')};
+TX.Ju={ri:'<p>Júpiter también retrocede, una vez al año, aunque con bucles más pequeños y lentos que los de Marte. Abajo tienes su camino entre el 1 de septiembre de 2025 y el 10 de junio de 2026, un punto cada 6 días: se para el 11 de noviembre, <b>retrocede hasta el 11 de marzo</b> y vuelve a avanzar.</p><p>Tu misión es la misma que con Marte: ajusta el epiciclo para que el camino naranja pase por los puntos azules. Júpiter tarda casi 12 años en dar la vuelta al Sol, así que su deferente se mueve muy despacio y casi todo el bucle lo dibuja el epiciclo, es decir, el movimiento de la Tierra.</p>',
+ex:SUPX('Júpiter','5,2','0,19','11,5'),
+dtl:'<summary>¿Por qué con Júpiter sale tan bien?</summary><p>Con los valores “de libro” (0,19 y 4333 días) el error es de unos 0,2°, de los mejores de los cinco planetas. Júpiter va tan despacio que durante el bucle apenas cambia de sitio: casi toda la forma la pone la Tierra, y la Tierra se mueve casi en una circunferencia perfecta.</p><p>Sus bucles son pequeños, de unos 10° de ancho, pero se repiten cada 13 meses.</p>',
+nt:NOTA('paradas el 11 de noviembre de 2025 y el 11 de marzo de 2026')};
+TX.Sa={ri:'<p>Saturno es el más lento de los planetas que conocían los antiguos: tarda casi 30 años en dar la vuelta al Sol. Abajo tienes su camino entre el 1 de mayo de 2025 y el 26 de marzo de 2026, un punto cada 7 días: se para el 13 de julio, <b>retrocede hasta el 28 de noviembre</b> y vuelve a avanzar.</p><p>Tu misión es ajustar el epiciclo. Fíjate en lo pequeño que sale: el epiciclo de Saturno es unas diez veces menor que su deferente.</p>',
+ex:SUPX('Saturno','9,5','0,10','6,5'),
+dtl:'<summary>¿Por qué el epiciclo de Saturno es tan pequeño?</summary><p>El epiciclo es la órbita de la Tierra (1 unidad) y el deferente es la de Saturno (9,5 unidades), de modo que sale 1/9,5 ≈ 0,10 veces más pequeño. Cuanto más lejos está el planeta, más pequeño es su epiciclo y más pequeño su bucle (unos 7° de ancho en el cielo).</p><p>Con los valores “de libro” (0,11 y 10759 días) el error es de unos 0,2°. Saturno es tan lento que en un año casi no se mueve de sitio: el bucle es casi un reflejo del movimiento de la Tierra.</p>',
+nt:NOTA('paradas el 13 de julio y el 28 de noviembre de 2025')};
+
+const RAD=Math.PI/180,MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const ds=i=>{const d=new Date(D0+i*STEP*864e5);return d.getUTCDate()+' '+MES[d.getUTCMonth()]+' '+d.getUTCFullYear()};
+const sk=$('sk'),dg=$('dg'),rl=$('rl'),cs=sk.getContext('2d'),cd=dg.getContext('2d'),cr=rl.getContext('2d');
+let p={r:0.5,th:0,P:687},cur=0,run=true;
+const sunAt=t=>{if(t>N-1)return SUN[N-1]+(t-(N-1))*STEP*0.98565;const i=Math.min(N-2,Math.floor(t)),f=t-i;return SUN[i]*(1-f)+SUN[i+1]*f};
+function model(t,q){q=q||p;const sn=sunAt(t)*RAD,a=(q.th+360*STEP*t/q.P)*RAD;let ax,ay,bx,by;
+ if(!PL_[K].inn){ax=Math.cos(a);ay=Math.sin(a);bx=q.r*Math.cos(sn);by=q.r*Math.sin(sn)}else{ax=Math.cos(sn);ay=Math.sin(sn);bx=q.r*Math.cos(a);by=q.r*Math.sin(a)}
+ const x=ax+bx,y=ay+by;let l=Math.atan2(y,x)/RAD;l+=360*Math.round((LMID-l)/360);return{x,y,dx:ax,dy:ay,ex:bx,ey:by,lon:l}}
+function rms(q){let s=0;for(let i=0;i<N;i++){const e=(model(i,q).lon-LON[i]+540)%360-180;s+=e*e}return Math.sqrt(s/N)}
+function fit(){let b={v:1e9};for(let th=0;th<360;th+=2)for(let r=RL;r<=RH+1e-9;r+=(RH-RL)/35)for(let P=PL;P<=PH;P+=(PH-PL)/30){const v=rms({th,r,P});if(v<b.v)b={v,th,r,P}}
+ let st=[1,(RH-RL)/70,(PH-PL)/60];for(let k=0;k<4;k++){let imp=true;while(imp){imp=false;for(const d of [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]){const c={th:b.th+d[0]*st[0],r:Math.min(RH,Math.max(RL,b.r+d[1]*st[1])),P:Math.min(PH,Math.max(PL,b.P+d[2]*st[2]))};const v=rms(c);if(v<b.v-1e-6){b={v,th:c.th,r:c.r,P:c.P};imp=true}}}st=st.map(x=>x/2)}
+ return b}
+function setup(c,x){const dpr=window.devicePixelRatio||1,W=c.clientWidth,H=c.clientHeight;if(c.width!==Math.round(W*dpr)){c.width=Math.round(W*dpr);c.height=Math.round(H*dpr)}x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);return[W,H]}
+function upd(){
+ $('prv').textContent=p.r.toFixed(2).replace('.',',');$('pthv').textContent=Math.round(p.th%360)+'°';$('pPv').textContent=Math.round(p.P)+' d';
+ $('dl').textContent=ds(Math.round(cur));
+ const e=rms(p),f=e.toFixed(1).replace('.',',')+'°';let s;
+ if(e<1)s='Error medio: '+f+'. ¡Excelente! Es menos de 1°, dos veces el diámetro de la Luna. Ptolomeo habría firmado este resultado.';
+ else if(e<2)s='Error medio: '+f+'. Muy bien, ya se parece mucho. Sigue afinando.';
+ else if(e<5)s='Error medio: '+f+'. Se acerca, pero el modelo aún se separa de Marte. Mueve la posición inicial y el tamaño.';
+ else s='Error medio: '+f+'. Aún lejos. Empieza buscando la posición inicial que acerque el modelo a los puntos azules.';
+ $('rs').textContent=s}
+function drawSky(){
+ const[W,H]=setup(sk,cs),mL=40,mR=12,mT=12,mB=34,X=l=>mL+(HI-l)/(HI-LO)*(W-mL-mR),Y=b=>H-mB-(b-LAO)/(LAH-LAO)*(H-mT-mB);
+ cs.font='12px "Atkinson Hyperlegible",sans-serif';cs.lineWidth=1;cs.strokeStyle=css('--line');cs.fillStyle=css('--mu');
+ const tl=HI-LO>40?10:5;for(let l=Math.ceil(LO/tl)*tl;l<=HI;l+=tl){cs.beginPath();cs.moveTo(X(l),mT);cs.lineTo(X(l),H-mB);cs.stroke();cs.textAlign='center';cs.fillText((((l%360)+360)%360)+'°',X(l),H-mB+15)}
+ const ts=LAH-LAO>8?2:(LAH-LAO>3?1:0.5);for(let b=Math.ceil(LAO/ts)*ts;b<=LAH;b+=ts){cs.beginPath();cs.moveTo(mL,Y(b));cs.lineTo(W-mR,Y(b));cs.stroke();cs.textAlign='right';cs.fillText(b+'°',mL-6,Y(b)+4)}
+ cs.textAlign='center';cs.fillText('longitud (aumenta hacia la izquierda)',(W+mL)/2,H-3);
+ cs.save();cs.beginPath();cs.rect(mL,mT,W-mL-mR,H-mT-mB);cs.clip();
+ const M=[];for(let i=0;i<N;i++)M.push(model(i));
+ cs.strokeStyle=css('--mu');cs.globalAlpha=0.45;for(let i=0;i<N;i++){cs.beginPath();cs.moveTo(X(LON[i]),Y(LAT[i]));cs.lineTo(X(M[i].lon),Y(LAT[i]));cs.stroke()}cs.globalAlpha=1;
+ const pa=(f,col)=>{cs.beginPath();for(let i=0;i<N;i++){const x=X(f(i)),y=Y(LAT[i]);i?cs.lineTo(x,y):cs.moveTo(x,y)}cs.strokeStyle=col;cs.lineWidth=2.5;cs.stroke()};
+ pa(i=>LON[i],css('--ac'));pa(i=>M[i].lon,css('--och'));
+ for(let i=0;i<N;i++){cs.fillStyle=css('--ac');cs.beginPath();cs.arc(X(LON[i]),Y(LAT[i]),3,0,7);cs.fill();cs.fillStyle=css('--och');cs.beginPath();cs.arc(X(M[i].lon),Y(LAT[i]),2.5,0,7);cs.fill()}
+ cs.fillStyle=css('--ink');cs.textAlign='center';for(let i=0;i<N;i+=7)cs.fillText(ds(i).slice(0,-5),X(LON[i]),Y(LAT[i])-9);
+ const k=Math.round(cur),m=model(k);cs.lineWidth=3;cs.strokeStyle=css('--ink');cs.beginPath();cs.arc(X(LON[k]),Y(LAT[k]),8,0,7);cs.stroke();cs.beginPath();cs.arc(X(m.lon),Y(LAT[k]),8,0,7);cs.stroke();
+ cs.restore()}
+function drawDg(){
+ const[W,H]=setup(dg,cd),sc=Math.min(W,H)/2*0.9/(1+p.r),cx=W/2,cy=H/2,X=x=>cx+x*sc,Y=y=>cy-y*sc;
+ const ci=(x,y,r,col,w,dash)=>{cd.beginPath();cd.arc(X(x),Y(y),r*sc,0,7);cd.strokeStyle=col;cd.lineWidth=w;cd.setLineDash(dash||[]);cd.stroke();cd.setLineDash([])};
+ const ln=(a,b,c,d,col,w,dash)=>{cd.beginPath();cd.moveTo(X(a),Y(b));cd.lineTo(X(c),Y(d));cd.strokeStyle=col;cd.lineWidth=w;cd.setLineDash(dash||[]);cd.stroke();cd.setLineDash([])};
+ const dt=(x,y,r,col,lb)=>{cd.fillStyle=col;cd.beginPath();cd.arc(X(x),Y(y),r,0,7);cd.fill();cd.strokeStyle=css('--ink');cd.lineWidth=1.5;cd.stroke();if(lb){cd.fillStyle=css('--ink');cd.font='bold 13px "Atkinson Hyperlegible",sans-serif';cd.textAlign='left';cd.fillText(lb,X(x)+9,Y(y)-8)}};
+ ci(0,0,1,css('--mu'),1.5,[5,5]);
+ const ext=$('lg').checked;
+ if(ext){const sp=SPAN[K]/STEP,nn=500,pa=(fn,col,w,al)=>{cd.beginPath();for(let j=0;j<=nn;j++){const q=fn(sp*j/nn);j?cd.lineTo(X(q[0]),Y(q[1])):cd.moveTo(X(q[0]),Y(q[1]))}cd.strokeStyle=col;cd.lineWidth=w;cd.globalAlpha=al;cd.stroke();cd.globalAlpha=1};
+  const nrm=PL_[K].inn?1:PL_[K].a;pa(t=>{const jd=EPH.jdOf(D0+t*STEP*864e5),o=EPH.info(K,jd),a=1.396971*(jd-2451545)/36525*RAD;return[(o.gx*Math.cos(a)-o.gy*Math.sin(a))/nrm,(o.gx*Math.sin(a)+o.gy*Math.cos(a))/nrm]},css('--mu'),1.5,0.9);pa(t=>{const q=model(t);return[q.x,q.y]},css('--och'),1.5,0.5)}
+ cd.beginPath();for(let i=0;i<N;i++){const m=model(i);i?cd.lineTo(X(m.x),Y(m.y)):cd.moveTo(X(m.x),Y(m.y))}cd.strokeStyle=css('--och');cd.globalAlpha=ext?1:0.5;cd.lineWidth=ext?3.5:2;cd.stroke();cd.globalAlpha=1;
+ const m=model(cur),V=PL_[K].inn,sx=V?m.dx:m.ex,sy=V?m.dy:m.ey;
+ ci(m.dx,m.dy,p.r,css(V?'--ok':'--ac'),1,[3,4]);
+ if(V){ln(0,0,sx,sy,css('--ac'),3.5);ln(sx,sy,m.x,m.y,css('--ok'),3.5)}else{ln(sx,sy,m.x,m.y,css('--ok'),1.5,[4,4]);ln(m.dx,m.dy,m.x,m.y,css('--ac'),1.5,[4,4]);ln(0,0,m.dx,m.dy,css('--ok'),3.5);ln(0,0,sx,sy,css('--ac'),3.5)}
+ ln(0,0,m.x,m.y,css('--ink'),2);
+ dt(0,0,7,css('--ac'),'Tierra');dt(sx,sy,8,'#ffd23f','Sol');if(!V)dt(m.dx,m.dy,4,css('--ok'));dt(m.x,m.y,7,css('--och'),NM[K]);
+ cd.fillStyle=css('--mu');cd.font='12px "Atkinson Hyperlegible",sans-serif';cd.textAlign='left';cd.fillText(ext?'Naranja: modelo. Gris: realidad. Grueso: el tramo que ajustas.':'Azul: Tierra→Sol. Verde: Sol→'+NM[K]+'.',8,H-8)}
+function drawRl(){
+ const[W,H]=setup(rl,cr),sc=Math.min(W,H)/2*0.9/(Math.max(1,PL_[K].a)*1.15),cx=W/2,cy=H/2,X=x=>cx+x*sc,Y=y=>cy-y*sc;
+ const ci=(r,col,w,dash)=>{cr.beginPath();cr.arc(cx,cy,r*sc,0,7);cr.strokeStyle=col;cr.lineWidth=w;cr.setLineDash(dash||[]);cr.stroke();cr.setLineDash([])};
+ const ln=(a,b,c,d,col,w)=>{cr.beginPath();cr.moveTo(X(a),Y(b));cr.lineTo(X(c),Y(d));cr.strokeStyle=col;cr.lineWidth=w;cr.stroke()};
+ const dt=(p0,r,col,lb)=>{cr.fillStyle=col;cr.beginPath();cr.arc(X(p0[0]),Y(p0[1]),r,0,7);cr.fill();cr.strokeStyle=css('--ink');cr.lineWidth=1.5;cr.stroke();if(lb){cr.fillStyle=css('--ink');cr.font='bold 13px "Atkinson Hyperlegible",sans-serif';cr.textAlign='left';cr.fillText(lb,X(p0[0])+9,Y(p0[1])-8)}};
+ const mars=t=>{const i=Math.min(N-2,Math.floor(t)),f=t-i,a=(MH[i]*(1-f)+MH[i+1]*f)*RAD,r=MR[i]*(1-f)+MR[i+1]*f;return[r*Math.cos(a),r*Math.sin(a)]};
+ const earth=t=>{const a=(sunAt(t)+180)*RAD;return[Math.cos(a),Math.sin(a)]};
+ const RM=PL_[K].a;ci(1,css('--mu'),1.2,[5,5]);ci(RM,css('--mu'),1.2,[5,5]);
+ cr.fillStyle=css('--mu');cr.font='12px "Atkinson Hyperlegible",sans-serif';cr.textAlign='center';cr.fillText('órbita de la Tierra (1)',cx,Y(-1)+14);cr.fillText('órbita de '+NM[K]+' ('+PL_[K].a.toFixed(2).replace('.',',')+')',cx,Y(-RM)+14);
+ for(const [fn,col] of [[earth,'--ac'],[mars,'--ok']]){cr.beginPath();for(let i=0;i<N-1;i++){const q=fn(i);i?cr.lineTo(X(q[0]),Y(q[1])):cr.moveTo(X(q[0]),Y(q[1]))}cr.strokeStyle=css(col);cr.globalAlpha=0.5;cr.lineWidth=2.5;cr.stroke();cr.globalAlpha=1}
+ const E=earth(cur),Mq=mars(cur);
+ ln(E[0],E[1],0,0,css('--ac'),3.5);ln(0,0,Mq[0],Mq[1],css('--ok'),3.5);ln(E[0],E[1],Mq[0],Mq[1],css('--ink'),2);
+ dt([0,0],9,'#ffd23f','Sol');dt(E,6,css('--ac'),'Tierra');dt(Mq,6,css('--och'),NM[K])}
+function frame(){if(run){cur+=0.06;if(cur>=N-1)cur=0;$('pd').value=Math.round(cur);$('dl').textContent=ds(Math.round(cur))}drawSky();drawDg();drawRl();requestAnimationFrame(frame)}
+function setP(q){p.r=Math.min(RH,Math.max(RL,q.r));p.th=((q.th%360)+360)%360;p.P=Math.min(PH,Math.max(PL,q.P));$('pr').value=p.r;$('pth').value=p.th;$('pP').value=p.P;upd()}
+$('pr').oninput=e=>{p.r=+e.target.value;upd()};$('pth').oninput=e=>{p.th=+e.target.value;upd()};$('pP').oninput=e=>{p.P=+e.target.value;upd()};
+$('pd').oninput=e=>{cur=+e.target.value;run=false;$('rpl').textContent='Seguir';$('rpl').setAttribute('aria-pressed','true');upd()};
+$('rpl').onclick=()=>{run=!run;$('rpl').textContent=run?'Pausa':'Seguir';$('rpl').setAttribute('aria-pressed',String(!run))};
+$('rau').onclick=()=>setP(fit());
+$('rpt').onclick=()=>{let b={v:1e9,th:0};for(let th=0;th<360;th+=0.5){const v=rms({th,r:REF[K].r,P:REF[K].P});if(v<b.v)b={v,th}}setP({r:REF[K].r,th:b.th,P:REF[K].P})};
+$('rre').onclick=()=>setP({r:(RL+RH)/2,th:0,P:REF[K].P});
+function pick(k){load(k);IDS.forEach(i=>$(i).innerHTML=TX[k][i]);$('rn').textContent='Sé Ptolomeo: atrapa a '+NM[k];$('lg1').textContent=NM[k]+' real';$('pP').min=PL;$('pP').max=PH;$('pr').min=RL;$('pr').max=RH;$('pr').step=(RH-RL)/70;$('pd').max=N-1;for(const q in PL_)$('p'+q).setAttribute('aria-pressed',String(q===k));cur=0;setP({r:(RL+RH)/2,th:0,P:REF[k].P})}
+$('psel').innerHTML=Object.keys(PL_).map(k=>'<button id="p'+k+'" aria-pressed="false">'+PL_[k].n+'</button>').join('');Object.keys(PL_).forEach(k=>$('p'+k).onclick=()=>pick(k));
+$('lg').onchange=()=>{$('lgt').style.display=$('lg').checked?'block':'none'};
+pick('Ma');frame();
+})();
+</script>
+<script>(function(){
+const $=id=>document.getElementById(id),R=Math.PI/180,LA=40.42,LO0=0.43;
+const ST=[['Polar',2.53,89.264,2],['Dubhe',11.062,61.751,1.8],['Merak',11.031,56.382,2.4],['Phecda',11.897,53.695,2.4],['Megrez',12.257,57.033,3.3],['Alioth',12.9,55.96,1.8],['Mizar',13.399,54.925,2.2],['Alkaid',13.792,49.313,1.9],['Yildun',17.537,86.586,4.4],['eps',16.766,82.037,4.2],['zeta',15.734,77.795,4.3],['eta',16.292,75.755,5],['Pherkad',15.345,71.834,3],['Kochab',14.845,74.156,2.1],['Alnitak',5.679,-1.943,1.8],['Alnilam',5.603,-1.202,1.7],['Mintaka',5.533,-0.299,2.2],['Betelgeuse',5.919,7.407,.5],['Rigel',5.242,-8.202,.1]];
+const LN=[[1,2],[2,3],[3,4],[4,1],[4,5],[5,6],[6,7],[0,8],[8,9],[9,10],[10,11],[11,12],[12,13],[13,10],[14,15],[15,16]];
+const LB=[[0,'Polar'],[4,'Osa Mayor'],[13,'Osa Menor'],[15,'Cinturón de Orión']];
+const PC={Me:['Mercurio','#8d6e63'],Ve:['Venus','#e0a100'],Ma:['Marte','#e5484d'],Ju:['Júpiter','#2f9e6d'],Sa:['Saturno','#8a63d2']};
+const cz=$('cz'),c=cz.getContext('2d');let mode='A',play=false,ph=18,mc=0,TR=null,trKey='',dayOff=0,playD=false;
+const val=id=>$(id).value,clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+$('zpl').innerHTML=Object.keys(PC).map(k=>'<label class="chk"><input type="checkbox" id="z'+k+'" checked> '+PC[k][0]+'</label>').join('');
+const td=new Date();$('zdate').value=td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');
+const d0=()=>{const a=val('zdate').split('-').map(Number);return Date.UTC(a[0],a[1]-1,a[2])+dayOff*864e5};
+const jdAt=h=>EPH.jdOf(d0()+(h-LO0/15)*36e5);
+const lst=jd=>(280.46061837+360.98564736629*(jd-2451545)+LO0)%360;
+function hz(ra,dec,L){const H=(L-ra*15)*R,f=LA*R,d=dec*R,sa=Math.sin(f)*Math.sin(d)+Math.cos(f)*Math.cos(d)*Math.cos(H);return[Math.asin(clamp(sa,-1,1))/R,Math.atan2(-Math.cos(d)*Math.sin(H),Math.sin(d)*Math.cos(f)-Math.cos(d)*Math.sin(f)*Math.cos(H))]}
+const fmt=h=>{let hh=Math.floor(h),mm=Math.round((h-hh)*60);if(mm===60){hh++;mm=0}return String(hh%24).padStart(2,'0')+':'+String(mm).padStart(2,'0')};
+const font=(s,b)=>c.font=(b?'bold ':'')+s+'px "Atkinson Hyperlegible",sans-serif';
+function drawA(W,H){
+ const cx=W/2,cy=H/2,Rd=Math.min(W,H)/2-22,t=+val('zt'),jd=jdAt(t),L=lst(jd),sq=EPH.sunEq(jd),sa=hz(sq.ra,sq.dec,L)[0],dark=clamp(-sa/12,0,1);
+ const P=(alt,az)=>{const r=(90-alt)/90*Rd;return[cx-r*Math.sin(az),cy-r*Math.cos(az)]};
+ c.fillStyle='hsl(222,55%,'+(5+(1-dark)*52)+'%)';c.beginPath();c.arc(cx,cy,Rd,0,7);c.fill();c.strokeStyle=css('--mu');c.lineWidth=2;c.stroke();
+ c.fillStyle=css('--ink');font(14,1);c.textAlign='center';c.fillText('N',cx,cy-Rd-6);c.fillText('S',cx,cy+Rd+17);c.fillText('E',cx-Rd-12,cy+5);c.fillText('O',cx+Rd+12,cy+5);
+ const q=new Date(d0());c.textAlign='left';font(13,1);c.fillText(fmt(t)+' (hora solar) · '+q.getUTCDate()+'/'+(q.getUTCMonth()+1)+'/'+q.getUTCFullYear(),6,16);
+ const A=ST.map(s=>hz(s[1],s[2],L));
+ if($('ztr').checked&&!playD){c.lineWidth=1.5;c.strokeStyle='rgba(255,255,255,'+(0.15+0.3*dark)+')';ST.forEach(s=>{c.beginPath();let on=false;for(let u=18;u<=t+1e-6;u+=0.2){const a=hz(s[1],s[2],lst(jdAt(u)));if(a[0]<0){on=false;continue}const p=P(a[0],a[1]);on?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]);on=true}c.stroke()})}
+ c.strokeStyle='rgba(150,190,255,'+(0.2+0.5*dark)+')';c.lineWidth=1.5;LN.forEach(l=>{if(A[l[0]][0]>0&&A[l[1]][0]>0){const p=P(A[l[0]][0],A[l[0]][1]),q=P(A[l[1]][0],A[l[1]][1]);c.beginPath();c.moveTo(p[0],p[1]);c.lineTo(q[0],q[1]);c.stroke()}});
+ ST.forEach((s,i)=>{if(A[i][0]>0){const p=P(A[i][0],A[i][1]);c.fillStyle='rgba(255,255,255,'+(0.15+0.85*dark)+')';c.beginPath();c.arc(p[0],p[1],Math.max(1.6,4.4-0.7*s[3]),0,7);c.fill()}});
+ c.fillStyle='rgba(255,255,255,'+(0.3+0.7*dark)+')';font(12,0);LB.forEach(b=>{if(A[b[0]][0]>0){const p=P(A[b[0]][0],A[b[0]][1]);c.fillText(b[1],p[0]+8,p[1]-7)}});
+ Object.keys(PC).forEach(k=>{const e=EPH.eq(EPH.gv(k,jd)),a=hz(e.ra,e.dec,L);if(a[0]>0){const p=P(a[0],a[1]);c.fillStyle=PC[k][1];c.strokeStyle='#fff';c.lineWidth=1.5;c.beginPath();c.arc(p[0],p[1],5.5,0,7);c.fill();c.stroke();c.fillStyle='#fff';font(12,1);c.fillText(PC[k][0],p[0]+9,p[1]+4)}});
+ if(sa>0){const a=hz(sq.ra,sq.dec,L),p=P(a[0],a[1]);c.fillStyle='#ffd23f';c.beginPath();c.arc(p[0],p[1],9,0,7);c.fill();c.fillStyle='#000';font(12,1);c.fillText('Sol',p[0]+12,p[1]+4)}}
+function calc(){const a=val('zdate').split('-').map(Number),yrs=+val('zs'),st=yrs<=2?1:(yrs<=5?2:4),n=Math.round(yrs*365.25/st),key=val('zdate')+yrs;if(key===trKey)return;trKey=key;TR={st,n};Object.keys(PC).forEach(k=>{const ra=[],de=[];for(let i=0;i<=n;i++){const e=EPH.eq(EPH.gv(k,EPH.jdOf(d0()+i*st*864e5)));ra.push(e.ra);de.push(e.dec)}TR[k]={ra,de}})}
+function drawB(W,H){
+ calc();const mL=34,mR=8,mT=8,mB=24,D1=70,D0_=-35,X=ra=>mL+(24-ra)/24*(W-mL-mR),Y=d=>mT+(D1-d)/(D1-D0_)*(H-mT-mB);
+ c.fillStyle=css('--bg');c.fillRect(mL,mT,W-mL-mR,H-mT-mB);c.strokeStyle=css('--line');c.lineWidth=1;c.fillStyle=css('--mu');font(11,0);c.textAlign='center';
+ for(let h=0;h<=24;h+=2){c.beginPath();c.moveTo(X(h),mT);c.lineTo(X(h),H-mB);c.stroke();if(h<24)c.fillText(h+'h',X(h),H-mB+14)}
+ c.textAlign='right';for(let d=-30;d<=60;d+=30){c.beginPath();c.moveTo(mL,Y(d));c.lineTo(W-mR,Y(d));c.stroke();c.fillText(d+'°',mL-4,Y(d)+4)}
+ c.setLineDash([5,4]);c.strokeStyle=css('--mu');c.beginPath();for(let l=0;l<=360;l+=3){const s=Math.sin(l*R),co=Math.cos(l*R),ra=((Math.atan2(s*Math.cos(23.44*R),co)/R+360)%360)/15,de=Math.asin(Math.sin(23.44*R)*s)/R;l?(ra<c._r?c.moveTo(X(ra),Y(de)):c.lineTo(X(ra),Y(de))):c.moveTo(X(ra),Y(de));c._r=ra}c.stroke();c.setLineDash([]);
+ c.strokeStyle='rgba(90,130,200,.7)';c.lineWidth=1.5;LN.forEach(l=>{if(ST[l[0]][2]>65||ST[l[1]][2]>65)return;c.beginPath();c.moveTo(X(ST[l[0]][1]),Y(ST[l[0]][2]));c.lineTo(X(ST[l[1]][1]),Y(ST[l[1]][2]));c.stroke()});
+ c.fillStyle=css('--ink');ST.forEach(s=>{if(s[2]>65)return;c.beginPath();c.arc(X(s[1]),Y(s[2]),Math.max(1.6,4-0.6*s[3]),0,7);c.fill()});font(11,0);c.textAlign='left';LB.forEach(b=>{if(ST[b[0]][2]<=65)c.fillText(b[1],X(ST[b[0]][1])+6,Y(ST[b[0]][2])-5)});
+ const i0=Math.floor(mc*TR.n);
+ Object.keys(PC).forEach(k=>{if(!$('z'+k).checked)return;const T=TR[k];for(const pass of [0,1]){c.beginPath();const m=pass?i0:TR.n;for(let i=0;i<=m;i++){const x=X(T.ra[i]),y=Y(T.de[i]);i&&Math.abs(T.ra[i]-T.ra[i-1])<12?c.lineTo(x,y):c.moveTo(x,y)}c.strokeStyle=PC[k][1];c.globalAlpha=pass?1:0.28;c.lineWidth=pass?2.5:1.5;c.stroke();c.globalAlpha=1}
+  c.fillStyle=PC[k][1];c.strokeStyle=css('--ink');c.lineWidth=1.5;c.beginPath();c.arc(X(T.ra[i0]),Y(T.de[i0]),5,0,7);c.fill();c.stroke();c.fillStyle=css('--ink');font(12,1);c.fillText(PC[k][0],X(T.ra[i0])+8,Y(T.de[i0])-6)});
+ const dd=new Date(d0()+i0*TR.st*864e5);c.fillStyle=css('--ink');font(13,1);c.textAlign='left';c.fillText(dd.getUTCDate()+'/'+(dd.getUTCMonth()+1)+'/'+dd.getUTCFullYear(),mL+6,mT+16)}
+function frame(){
+ const W=cz.clientWidth,hh=mode==='A'?Math.min(W,540):Math.round(W*0.31+22);if(cz.style.height!==hh+'px')cz.style.height=hh+'px';
+ const dpr=window.devicePixelRatio||1,H=cz.clientHeight;if(cz.width!==Math.round(W*dpr)||cz.height!==Math.round(H*dpr)){cz.width=Math.round(W*dpr);cz.height=Math.round(H*dpr)}
+ c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,W,H);
+ if(playD&&mode==='A'){dayOff+=0.5;if(dayOff>365)dayOff=0}
+ if(play){if(mode==='A'){ph+=0.05;if(ph>30)ph=18;$('zt').value=ph}else{mc+=1/720;if(mc>1)mc=0;$('zc').value=mc}}
+ $('ztv').textContent=fmt(+val('zt'));mode==='A'?drawA(W,H):drawB(W,H);requestAnimationFrame(frame)}
+const TXT={A:'Vista mirando hacia arriba desde Benicarló: el centro es lo que tienes sobre tu cabeza y el borde es el horizonte (N arriba, E a la izquierda). La hora es solar aproximada, sin horario de verano. De día no se ven las estrellas. Con «Pasar los días» el reloj se queda a las 23 h y los días corren: el cielo se desplaza cada día un poco (casi 1°) y los planetas avanzan despacio entre las estrellas.',B:'Mapa fijo del cielo: las estrellas no se mueven y los planetas avanzan entre ellas hacia la izquierda (hacia el este). De vez en cuando se paran, retroceden y vuelven a avanzar: esos son los bucles. La línea discontinua es la eclíptica, el camino del Sol. La Polar y la Osa Menor no caben en este mapa: están junto al polo norte del cielo, donde un mapa rectangular se deforma mucho. Las tienes en la vista de una noche.'};
+function setMode(m){mode=m;play=false;playD=false;dayOff=0;$('zday').textContent='Pasar los días';$('zplay').textContent=m==='A'?'Pasar la noche':'Ver pasar el tiempo';$('ga').style.display=m==='A'?'':'none';$('gb').style.display=m==='B'?'':'none';$('zx').textContent=TXT[m];$('zmA').setAttribute('aria-pressed',String(m==='A'));$('zmB').setAttribute('aria-pressed',String(m==='B'))}
+$('zmA').onclick=()=>setMode('A');$('zmB').onclick=()=>setMode('B');
+$('zplay').onclick=()=>{playD=false;dayOff=0;$('zday').textContent='Pasar los días';play=!play;if(play&&mode==='A')ph=18;if(play&&mode==='B')mc=0;$('zplay').textContent=play?'Parar':(mode==='A'?'Pasar la noche':'Ver pasar el tiempo')};
+$('zt').oninput=e=>{ph=+e.target.value;play=false;$('zplay').textContent='Pasar la noche'};
+$('zc').oninput=e=>{mc=+e.target.value;play=false;$('zplay').textContent='Ver pasar el tiempo'};
+$('zday').onclick=()=>{playD=!playD;if(playD){play=false;dayOff=0;ph=23;$('zt').value=23;$('zplay').textContent='Pasar la noche'}$('zday').textContent=playD?'Parar los días':'Pasar los días'};
+$('zdate').onchange=()=>{dayOff=0};
+window.addEventListener('skygo',e=>{$('zdate').value=e.detail;setMode('A');ph=22;$('zt').value=22;trKey='';cz.scrollIntoView({behavior:'smooth',block:'center'})});
+setMode('A');frame();
+})();
+</script>
+<script>(function(){
+const $=id=>document.getElementById(id),R=Math.PI/180,MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const PN={Me:'Mercurio',Ve:'Venus',Ma:'Marte',Ju:'Júpiter',Sa:'Saturno'},AR={Me:0.387,Ve:0.723,Ma:1.524,Ju:5.203,Sa:9.537};
+const PRE=[['Ju','Sa',2019,3,'Júpiter–Saturno'],['Ve','Ma',2021,1,'Venus–Marte'],['Ma','Sa',2022,1,'Marte–Saturno'],['Ve','Ju',2022,1,'Venus–Júpiter'],['Ma','Ju',2022,1,'Marte–Júpiter']];
+const opt=k=>Object.keys(PN).map(q=>'<option value="'+q+'"'+(q===k?' selected':'')+'>'+PN[q]+'</option>').join('');
+$('aA').innerHTML=opt('Ju');$('aB').innerHTML=opt('Sa');
+$('apre').innerHTML=PRE.map((p,i)=>'<button id="ap'+i+'">'+p[4]+'</button>').join('');
+const wr=x=>((x+180)%360+360)%360-180,clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+const th=(b,jd,eq)=>{const o=EPH.elem(b,jd);return o.L+(eq?2*o.e/R*Math.sin((o.L-o.w)*R):0)};
+function model(b,jd,eq){const tp=th(b,jd,eq)*R,te=th('Ea',jd,eq)*R;return Math.atan2(AR[b]*Math.sin(tp)-Math.sin(te),AR[b]*Math.cos(tp)-Math.cos(te))/R}
+const real=(b,jd)=>EPH.info(b,jd).lon;
+function conj(fa,fb,j0,n){const d=[];for(let i=0;i<=n;i++)d.push(wr(fb(j0+i)-fa(j0+i)));const cs=[];for(let i=1;i<=n;i++){const a=d[i-1],b=d[i];if(a*b<0&&Math.abs(a)<90&&Math.abs(b)<90)cs.push(j0+i-1+Math.abs(a)/(Math.abs(a)+Math.abs(b)))}return{d,cs}}
+const dt=j=>new Date((j-2440587.5)*864e5),fd=j=>{const d=dt(j);return d.getUTCDate()+' '+MES[d.getUTCMonth()]+' '+d.getUTCFullYear()},iso=j=>dt(j+0.5).toISOString().slice(0,10);
+function chart(re,mo,j0,n,yrs){
+ const cv=$('ac'),x=cv.getContext('2d'),dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}
+ x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);const mL=42,mR=10,mT=10,mB=26;let mx=0;re.d.concat(mo.d).forEach(v=>{mx=Math.max(mx,Math.abs(v))});const Y0=clamp(Math.ceil(mx/10)*10,20,180);
+ const X=i=>mL+i/n*(W-mL-mR),Y=v=>mT+(Y0-v)/(2*Y0)*(H-mT-mB);
+ x.font='11px "Atkinson Hyperlegible",sans-serif';x.lineWidth=1;x.strokeStyle=css('--line');x.fillStyle=css('--mu');x.textAlign='right';
+ [-Y0,-Y0/2,0,Y0/2,Y0].forEach(v=>{x.beginPath();x.moveTo(mL,Y(v));x.lineTo(W-mR,Y(v));x.strokeStyle=v?css('--line'):css('--mu');x.stroke();x.fillText(v+'°',mL-4,Y(v)+4)});
+ x.textAlign='center';const y0=dt(j0).getUTCFullYear();for(let k=0;k<=yrs;k++){const jj=EPH.jdOf(Date.UTC(y0+k,0,1));if(jj>=j0&&jj<=j0+n){x.fillText(y0+k,X(jj-j0),H-mB+14);x.beginPath();x.moveTo(X(jj-j0),mT);x.lineTo(X(jj-j0),H-mB);x.strokeStyle=css('--line');x.stroke()}}
+ const pa=(d,col)=>{x.beginPath();for(let i=0;i<=n;i++){i&&Math.abs(d[i]-d[i-1])<180?x.lineTo(X(i),Y(d[i])):x.moveTo(X(i),Y(d[i]))}x.strokeStyle=col;x.lineWidth=2.5;x.stroke()};
+ pa(re.d,css('--ac'));pa(mo.d,css('--och'));
+ [[re.cs,'--ac',5],[mo.cs,'--och',4]].forEach(a=>a[0].forEach(j=>{x.fillStyle=css(a[1]);x.strokeStyle=css('--ink');x.lineWidth=1.5;x.beginPath();x.arc(X(j-j0),Y(0),a[2],0,7);x.fill();x.stroke()}));
+ x.fillStyle=css('--mu');x.textAlign='left';x.fillText('diferencia de longitud (segundo − primero)',mL+4,mT+10)}
+function run(){
+ const A=$('aA').value,B=$('aB').value;if(A===B||!PN[A]||!PN[B]){$('ar').innerHTML='<p>Elige dos planetas distintos.</p>';return}
+ const eq=$('ae').checked,y=clamp(+$('ay').value||2019,1990,2045),yrs=+$('an').value,j0=EPH.jdOf(Date.UTC(y,0,1)),n=Math.round(yrs*365.25);
+ const re=conj(j=>real(A,j),j=>real(B,j),j0,n),mo=conj(j=>model(A,j,eq),j=>model(B,j,eq),j0,n);chart(re,mo,j0,n,yrs);
+ if(!re.cs.length){$('ar').innerHTML='<p>En estos años la realidad no tiene ninguna conjunción de '+PN[A]+' y '+PN[B]+'. Prueba con más años.</p>';return}
+ let sum=0,cnt=0;const rows=re.cs.map(r=>{let best=null;mo.cs.forEach(m=>{if(Math.abs(m-r)<250&&(best===null||Math.abs(m-r)<Math.abs(best-r)))best=m});
+  let dd='—',bt='';if(best!==null){const k=Math.round(best-r);dd=(k>0?'+':'')+k;sum+=Math.abs(best-r);cnt++;bt=' <button data-d="'+iso(best)+'">modelo</button>'}
+  return '<tr><td>'+fd(r)+'</td><td>'+(best!==null?fd(best):'—')+'</td><td>'+dd+'</td><td><button data-d="'+iso(r)+'">real</button>'+bt+'</td></tr>'}).join('');
+ $('ar').innerHTML='<div class="tw"><table><tr><th>Conjunción real (efeméride)</th><th>Predicción del modelo</th><th>Diferencia (días)</th><th>Ver en el cielo</th></tr>'+rows+'</table></div>'+(cnt?'<p>Diferencia media: <b>'+(sum/cnt).toFixed(0)+' días</b>'+(eq?' (con ecuante)':' (sin ecuante)')+'.</p>':'');
+ $('ar').querySelectorAll('button').forEach(b=>b.onclick=()=>window.dispatchEvent(new CustomEvent('skygo',{detail:b.dataset.d})))}
+['aA','aB','an','ae'].forEach(i=>$(i).onchange=run);$('ay').oninput=run;
+PRE.forEach((p,i)=>$('ap'+i).onclick=()=>{$('aA').value=p[0];$('aB').value=p[1];$('ay').value=p[2];$('an').value=p[3];run()});
+run();
+})();
+</script></body></html>
