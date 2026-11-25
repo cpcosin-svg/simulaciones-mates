@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ca"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El rellotge del Sistema Solar</title>
+<style>
+:root{--bg:#fff8ec;--fg:#1d2340;--card:#fff;--mu:#5b6082;--bd:#e3dcc9;--ac:#5b3df5;--or:#ff7a3d;--cd:#f1ecff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1030;--fg:#eef0ff;--card:#181c4a;--mu:#a9aed6;--bd:#2c3175;--ac:#9a86ff;--or:#ff9a63;--cd:#10133a}}
+:root[data-theme="dark"]{--bg:#0d1030;--fg:#eef0ff;--card:#181c4a;--mu:#a9aed6;--bd:#2c3175;--ac:#9a86ff;--or:#ff9a63;--cd:#10133a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Trebuchet MS",system-ui,sans-serif}
+header{background:linear-gradient(135deg,#1b1464,#5b3df5 60%,#ff7a3d);color:#fff;padding:40px 20px 34px;text-align:center}
+header h1{margin:0 0 8px;font-size:clamp(28px,6vw,46px)}header p{margin:0 auto;max-width:640px;opacity:.92}
+main{max-width:900px;margin:0 auto;padding:16px}
+section{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:20px;margin:18px 0}
+h2{margin:0 0 10px;font-size:24px}h2 span{display:inline-block;background:var(--or);color:#fff;border-radius:50%;width:34px;height:34px;line-height:34px;text-align:center;margin-right:8px;font-size:18px}
+code,pre{font-family:Consolas,monospace;background:var(--cd);border-radius:8px}code{padding:1px 6px}pre{padding:10px 14px;overflow-x:auto;margin:6px 0}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:6px 10px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}th{background:var(--cd)}th:first-child,td:first-child{text-align:left}
+.step{border-left:5px solid var(--ac);padding:2px 0 2px 14px;margin:14px 0}.step b{color:var(--ac)}
+.note{background:var(--cd);border-radius:12px;padding:10px 14px;margin:10px 0}
+button,select{font:inherit;font-size:14px;padding:5px 12px;border-radius:20px;border:1px solid var(--ac);background:var(--card);color:var(--fg);cursor:pointer}
+button.on{background:var(--ac);color:#fff}.ct{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0;font-size:14px}.ct input[type=range]{flex:1;min-width:120px}
+svg{display:block}.lg{font-size:12px;color:var(--mu)}
+</style></head><body>
+<header><div style="font-size:48px">🪐 ☀️ 🌍</div><h1>El rellotge del Sistema Solar</h1>
+<p>Projecte d’ampliació de 2n d’ESO: construïm amb GeoGebra un simulador on els planetes giren al voltant del Sol com les busques d’un rellotge.</p></header>
+<main>
+<p style="margin:6px 0 0"><a href="../index.html" style="color:var(--ac)">← Totes les simulacions</a></p>
+<section><h2><span>1</span>Quin és l’objectiu?</h2>
+<p>Construirem un <b>simulador del Sistema Solar</b> amb GeoGebra. Suposarem que les òrbites són <b>circumferències</b> amb el Sol al centre i que cada planeta va a <b>velocitat constant</b>. És una aproximació molt senzilla… però enganya prou bé! Al final comprovarem quant s’equivoca.</p>
+<p>Prenem la <b>Terra com a patró</b>: la distància Terra–Sol val 1 (una UA) i l’any de la Terra val 1.</p></section>
+
+<section><h2><span>2</span>La configuració: la taula</h2>
+<p>Aquestes són les dades que necessitem. La <b>fase</b> φ₀ és l’angle on es troba cada planeta el <b>24 de novembre de 2026</b>, mesurat en sentit antihorari des de l’eix X.</p>
+<div class="tw"><table id="tb"></table></div>
+<p class="lg">Distàncies en UA, anys terrestres, angles en graus. Velocitat = voltes per any = 1/durada de l’any.</p></section>
+
+<section><h2><span>3</span>Construïm-ho en GeoGebra</h2>
+<p>Repeteix aquests passos per a cada planeta (pots escriure les ordres a la <b>Vista d’entrada</b>; també funcionen en anglés). Exemple amb Mercuri:</p>
+<div class="step"><b>Pas 1 · El Sol.</b> El centre de tot: <pre>S = (0, 0)</pre></div>
+<div class="step"><b>Pas 2 · La circumferència.</b> Amb el radi de la taula dibuixem l’òrbita: <pre>a_M = 0.3871
+c_M = Circle(S, a_M)</pre></div>
+<div class="step"><b>Pas 3 · El planeta, avui.</b> Amb la fase, col·loquem el punt inicial: <pre>P0_M = Rotate((a_M, 0), 135.4°, S)</pre> El símbol ° s’escriu amb Alt+O.</div>
+<div class="step"><b>Pas 4 · El lliscador.</b> Crea un lliscador d’<b>angle</b> <code>α_M</code> de 0° a 360°, repetició «creixent». A les propietats, posa-li com a <b>velocitat</b> la de la taula (4.1528 per a Mercuri). Velocitat 1 vol dir una volta cada 10 s, així que <b>1 any = 10 segons</b>.</div>
+<div class="step"><b>Pas 5 · El moviment.</b> Fem girar el punt inicial, en sentit antihorari, al voltant del Sol: <pre>Mercuri = Rotate(P0_M, α_M, S)</pre> Dibuixa’l amb un cercle petit: <code>Circle(Mercuri, 0.0638)</code> (radi del planeta ÷ 6).</div>
+<div class="step"><b>Pas 6 · Animació.</b> Posa en marxa tots els lliscadors alhora. Si els planetes comencen d’on diu la fase, veuràs el cel d’avui!</div>
+<div class="note">💡 <b>Comprovació:</b> Mercuri ha de fer unes 41 voltes en 10 anys, mentre Neptú no arriba ni a un 7 % d’una volta.</div></section>
+
+<section><h2><span>4</span>Model 1: el Sistema Solar en moviment</h2>
+<p>Així hauria de quedar el teu simulador. Hi ha dues maneres de mirar el mateix moviment: des del <b>Sol</b> (Copèrnic) o des de la <b>Terra</b> (Ptolemeu). Canvia de pestanya i de zoom!</p>
+<div class="ct"><button id="m1" class="on">☀️ Sistema heliocèntric</button><button id="m2">🌍 Sistema ptolemaic</button><span id="pw" style="display:none"><label for="ps">Planeta: </label><select id="ps"><option value="0">Mercuri</option><option value="1">Venus</option><option value="3" selected>Mart</option><option value="4">Júpiter</option><option value="5">Saturn</option><option value="6">Urà</option><option value="7">Neptú</option></select></span></div><p id="cap" class="lg"></p>
+<div class="ct" id="zb"></div><div id="c1"></div>
+<svg id="sA" viewBox="0 0 600 600" width="100%" role="img" aria-label="Sistema solar circular animat"></svg>
+<h3>Com fer el sistema ptolemaic en GeoGebra (amb un truc)</h3>
+<p>Ja tens fet el sistema heliocèntric del Model 1. Per veure’l <b>des de la Terra</b> només has de canviar de punt de vista: la Terra passarà a l’origen i tot es mourà respecte d’ella. Un planeta P vist des de la Terra E està en <b>P − E</b>, és a dir, en el <b>vector que va de la Terra al planeta</b>. Ho farem així: construïm eixe vector, el portem a l’origen i només mostrem el seu extrem.</p>
+<div class="step"><b>Pas 1 · El vector Terra → planeta.</b> Amb els punts del Model 1 (la Terra i Mart, que ja es mouen): <pre>v_Mart = Vector(Terra, Mart)</pre></div>
+<div class="step"><b>Pas 2 · Portar el vector a l’origen.</b> Fixa l’origen i trasllada’l: <pre>T = (0, 0)
+Mart_p = Translate(T, v_Mart)</pre> Ara el vector comença en T i acaba en <code>Mart_p</code>, que és Mart vist des de la Terra. (També val <code>Mart_p = T + v_Mart</code>.)</div>
+<div class="step"><b>Pas 3 · Mostrar només l’extrem.</b> Amaga el vector i el Mart heliocèntric, i deixa visibles T (la Terra, ara quieta al centre) i <code>Mart_p</code>. Repeteix-ho amb tots els planetes. Amb el Sol fes el mateix: <pre>Sol_p = Translate(T, Vector(Terra, S))</pre> i veuràs com el Sol gira al voltant de la Terra!</div>
+<div class="step"><b>Pas 4 · La traça.</b> Activa el <b>rastre</b> d’un planeta (botó dret › Mostra el rastre) i engega l’animació: dibuixarà bucles. Són el <b>moviment retrògrad</b>: el planeta sembla anar enrere quan la Terra l’avança.</div>
+<div class="note">🔍 <b>Per què funciona?</b> P − E = P + (−E): sumem la volta del planeta (deferent) i la volta, al revés, de la Terra (epicicle). Per això no cal distingir planetes interiors i exteriors: el vector fa tota la feina. Si vols veure el deferent i l’epicicle, dibuixa el cercle de radi a centrat en T (és el del Model 1, perquè el Sol era a l’origen) i el cercle de radi 1 centrat en el punt <code>Mart</code> del Model 1: Mart_p gira sobre ell.</div>
+<div class="note">💡 Ptolemeu va usar aquest mecanisme cap a l’any 150 per predir el cel. No era «fals»: descrivia bé els moviments vistos des de la Terra. La diferència és que el model heliocèntric ho explica amb menys peces.</div>
+<p>Vols veure més rodes que dibuixen? Mira <a href="ruedas-y-planetas.html" style="color:var(--ac)">Rodes que dibuixen: de Ptolemeu als planetes</a>.</p></section>
+
+<section><h2><span>5</span>Model 2: el mecanisme de rellotgeria</h2>
+<p>Ara posem cada planeta al seu propi rellotge. L’<b>agulla grisa</b> és el teu model circular i l’<b>agulla roja</b> és el planeta real, que segueix una el·lipse amb el Sol en un focus. Les dues comencen amb la mateixa fase (la mitjana). Sota cada rellotge veus el desfasament en graus.</p>
+<div class="ct" id="c2"></div>
+<div class="ct"><label for="k">Exagera la desviació de l’òrbita:</label><input type="range" id="k" min="1" max="4" step="0.5" value="1" style="flex:0 1 150px"><b id="ko">×1</b></div>
+<div id="gr" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 8px"></div>
+<p class="lg">Línia discontínua: el teu cercle. Línia contínua blava: l’òrbita real. Punt roig: planeta real.</p></section>
+
+<section><h2><span>6</span>Quins errors cometem?</h2>
+<p>Dues coses fan que el model no sigui perfecte:</p>
+<ol><li><b>L’òrbita no és un cercle, és una el·lipse.</b> El Sol no està al centre sinó en un focus, així que la distància real oscil·la entre a(1−e) i a(1+e). El nombre <b>e</b> (excentricitat) diu com d’aixafada és l’el·lipse.</li>
+<li><b>La velocitat no és constant.</b> Segons la segona llei de Kepler, un planeta va més ràpid prop del Sol i més lent lluny. El nostre model només coneix la velocitat mitjana.</li></ol>
+<p>Per això hem triat la fase <b>mitjana</b>: així l’error es reparteix, unes vegades el planeta real va per davant i altres per darrere.</p>
+<div class="tw"><table id="te"></table></div>
+<p>L’error no s’acumula: <b>va i ve</b> i es repeteix a cada volta. Mercuri és el que més falla perquè té l’òrbita més aixafada; la Terra i Venus gairebé ni es nota.</p>
+<div class="note">🤔 <b>Per pensar:</b><br>① Per què Venus i Neptú semblen cercles perfectes?<br>② Quin error angular màxim té Marte? I Mercuri?<br>③ Si el nostre model fos perfecte, què s’hauria de veure al rellotge del Model 2?</div></section>
+<footer style="margin:26px 0 8px;padding-top:12px;border-top:1px solid var(--bd);color:var(--mu);font-size:14px"><p>Material d’aula de Matemàtiques. Llicència <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ca" rel="license noopener" style="color:var(--ac)">Creative Commons Reconeixement-NoComercial-CompartirIgual 4.0 (CC BY-NC-SA 4.0)</a>.</p></footer>
+</main>
+<script>
+var D=[["Mercuri",.3871,.2056,77.456,.2408,135.4,.3825,"#9b9b9b"],["Venus",.7233,.0068,131.564,.6152,81.3,.9488,"#e8b86d"],["Terra",1,.0167,102.937,1,63.1,1,"#2a78d6"],["Marte",1.5237,.0934,336.06,1.8808,103.5,.5325,"#e34948"],["Júpiter",5.2034,.0484,14.331,11.862,130.6,11.209,"#d9944a"],["Saturn",9.5371,.0542,93.057,29.457,18.8,9.449,"#c9a43f"],["Urà",19.191,.0472,173.005,84.011,68.5,4.007,"#3fb0b3"],["Neptú",30.069,.0086,48.124,164.79,3.6,3.883,"#4a5be0"]];
+var B=Date.UTC(2026,10,24,12),rd=Math.PI/180;
+function f(x,d){return x.toFixed(d).replace(".",",")}
+document.getElementById("tb").innerHTML="<tr><th>Planeta</th><th>Any</th><th>Distància a</th><th>Circumferència</th><th>Velocitat</th><th>Fase φ₀</th><th>Radi dibuix</th></tr>"+D.map(function(p){return"<tr><td><b style='color:"+p[7]+"'>●</b> "+p[0]+"</td><td>"+f(p[4],4)+"</td><td>"+f(p[1],4)+"</td><td>x²+y²="+f(p[1]*p[1],4)+"</td><td>"+f(1/p[4],4)+"</td><td>"+f(p[5],1)+"°</td><td>"+f(p[6]/6,4)+"</td></tr>"}).join("");
+document.getElementById("te").innerHTML="<tr><th>Planeta</th><th>e</th><th>Desviació de distància</th><th>Error angular màxim</th></tr>"+D.map(function(p){return"<tr><td>"+p[0]+"</td><td>"+f(p[2],3)+"</td><td>± "+f(p[2]*100,1)+" %</td><td>≈ "+f(2*p[2]/rd,1)+"°</td></tr>"}).join("");
+function ctl(id,fn){var s={t:0,pl:0,last:null},el=document.getElementById(id);
+el.innerHTML='<button>▶ Reproduir</button><button>⏮</button><select><option value=".1">0,1 any/s</option><option value=".25" selected>0,25 any/s</option><option value=".5">0,5 any/s</option><option value="1">1 any/s</option></select><input type="range" min="0" max="10" step=".01" value="0"><b style="min-width:110px"></b>';
+var b=el.children,pb=b[0],sl=b[3],lb=b[4];
+s.up=function(){sl.value=s.t;lb.textContent=f(s.t,2)+" anys · "+new Date(B+s.t*365.25*864e5).toLocaleDateString("ca-ES");fn(s.t)};
+function fr(ts){if(!s.pl)return;if(s.last===null)s.last=ts;s.t+=(ts-s.last)/1000*parseFloat(b[2].value);s.last=ts;if(s.t>=10){s.t=10;s.pl=0;pb.textContent="↻ Repetir"}s.up();if(s.pl)requestAnimationFrame(fr)}
+pb.onclick=function(){if(s.pl){s.pl=0;pb.textContent="▶ Reproduir";return}if(s.t>=10)s.t=0;s.pl=1;s.last=null;pb.textContent="⏸ Pausa";requestAnimationFrame(fr)};
+b[1].onclick=function(){s.t=0;s.pl=0;pb.textContent="▶ Reproduir";s.up()};
+sl.oninput=function(){s.t=parseFloat(sl.value);s.up()};return s}
+var Z=5.8,zb=document.getElementById("zb");
+[["Fins a Mart",1.8],["Fins a Júpiter",5.8],["Fins a Saturn",10.5],["Tot",32]].forEach(function(z){var x=document.createElement("button");x.textContent=z[0];x.onclick=function(){Z=z[1];A.up();[].forEach.call(zb.children,function(c){c.className=c===x?"on":""})};if(z[1]==Z)x.className="on";zb.appendChild(x)});
+function dH(t){var s=300/Z,h='<circle cx="300" cy="300" r="6" fill="#eda100"/>';
+D.forEach(function(p){var r=p[1]*s;h+='<circle cx="300" cy="300" r="'+r.toFixed(1)+'" fill="none" stroke="#898781" stroke-width="1.2" stroke-dasharray="4 3"/>';
+if(p[1]<Z*1.02){var a=(p[5]+360*t/p[4])*rd,x=300+r*Math.cos(a),y=300-r*Math.sin(a);h+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5" fill="'+p[7]+'"/><text x="'+(x+8).toFixed(1)+'" y="'+(y-7).toFixed(1)+'" font-size="13" style="fill:var(--fg)">'+p[0]+'</text>'}});
+document.getElementById("sA").innerHTML=h}
+var M="h",PS=3,cp=["Model heliocèntric: el Sol és al centre i la Terra és un planeta més.","Model ptolemaic: la Terra està quieta al centre; el Sol i els planetes giren al seu voltant. La línia contínua és la traça del planeta triat: els bucles són el seu moviment retrògrad."];
+function dA(t){M=="h"?dH(t):dP(t)}
+function rl(i,tt){var p=D[i],th=(p[5]+360*tt/p[4])*rd,e=(63.1+360*tt)*rd;return[p[1]*Math.cos(th)-Math.cos(e),p[1]*Math.sin(th)-Math.sin(e)]}
+function dP(t){var s=300/Z,e=(63.1+360*t)*rd,sx=-Math.cos(e),sy=-Math.sin(e),h='';
+function X(u){return(300+u*s).toFixed(1)}function Y(v){return(300-v*s).toFixed(1)}
+function C(x,y,r,st){return'<circle cx="'+X(x)+'" cy="'+Y(y)+'" r="'+(r*s).toFixed(1)+'" fill="none" '+st+'/>'}
+function L(x,y,u,v){return'<line x1="'+X(x)+'" y1="'+Y(y)+'" x2="'+X(u)+'" y2="'+Y(v)+'" stroke="#e34948" stroke-width="1.2"/>'}
+function P(x,y,r,f,n){return'<circle cx="'+X(x)+'" cy="'+Y(y)+'" r="'+r+'" fill="'+f+'"/>'+(n?'<text x="'+(+X(x)+8)+'" y="'+(+Y(y)-7)+'" font-size="13" style="fill:var(--fg)">'+n+'</text>':'')}
+var q=D[PS],a=q[1],th=(q[5]+360*t/q[4])*rd,bx=a*Math.cos(th),by=a*Math.sin(th),cx,cy,dr,er,px,py;
+if(PS<2){cx=sx;cy=sy;dr=1;er=a;px=cx+bx;py=cy+by}else{cx=bx;cy=by;dr=a;er=1;px=cx+sx;py=cy+sy}
+h+=C(0,0,1,'stroke="#eda100" stroke-width="1" stroke-dasharray="2 3"')+C(0,0,dr,'stroke="#898781" stroke-width="1.2" stroke-dasharray="4 3"')+C(cx,cy,er,'stroke="#e34948" stroke-width="1"');
+var pt=[];for(var u=0;u<=t;u+=.02){var z=rl(PS,u);pt.push(X(z[0])+","+Y(z[1]))}pt.push(X(px)+","+Y(py));
+h+='<polyline points="'+pt.join(" ")+'" fill="none" stroke="'+q[7]+'" stroke-width="1.6"/>'+L(0,0,cx,cy)+L(cx,cy,px,py);
+D.forEach(function(p,i){if(i==2||i==PS)return;var z=rl(i,t);if(Math.abs(z[0])<Z*1.02&&Math.abs(z[1])<Z*1.02)h+=P(z[0],z[1],4,p[7],p[0])});
+h+=P(sx,sy,6,"#eda100","Sol")+P(0,0,6,"#2a78d6","Terra")+P(px,py,6,q[7],q[0]);
+document.getElementById("sA").innerHTML=h}
+function fz(){Z=Math.min(33,(D[PS][1]+1)*1.08);[].forEach.call(zb.children,function(c){c.className=""})}
+function sm(m){M=m;if(m!="h")fz();document.getElementById("m1").className=m=="h"?"on":"";document.getElementById("m2").className=m=="h"?"":"on";document.getElementById("pw").style.display=m=="h"?"none":"";document.getElementById("cap").textContent=cp[m=="h"?0:1];A.up()}
+document.getElementById("m1").onclick=function(){sm("h")};document.getElementById("m2").onclick=function(){sm("p")};
+document.getElementById("ps").onchange=function(){PS=+this.value;fz();A.up()};
+var A=ctl("c1",dA);sm("h");
+var K=1,g=document.getElementById("gr");
+D.forEach(function(p,i){var d=document.createElement("div");d.style.textAlign="center";d.innerHTML='<svg id="r'+i+'" viewBox="0 0 160 150" width="100%" role="img" aria-label="Rellotge de '+p[0]+'"><g id="q'+i+'"></g><g id="y'+i+'"></g></svg><div style="font-size:12px"><b>'+p[0]+'</b><br><span id="e'+i+'" class="lg"></span></div>';g.appendChild(d)});
+function kp(M,e){var E=M;for(var j=0;j<40;j++)E=M+e*Math.sin(E);return E}
+function RR(){return 68/(1+K*.2056)}
+function bs(){var R=RR();D.forEach(function(p,i){var e=p[2],w=p[3]*rd,q=[];for(var j=0;j<=180;j++){var th=j/180*2*Math.PI,r=(1-e*e)/(1+e*Math.cos(th-w)),u=Math.max(.03,1+K*(r-1))*R;q.push((80+u*Math.cos(th)).toFixed(1)+","+(75-u*Math.sin(th)).toFixed(1))}
+document.getElementById("q"+i).innerHTML='<circle cx="80" cy="75" r="'+R.toFixed(1)+'" fill="none" stroke="#898781" stroke-width="1.2" stroke-dasharray="3 3"/><polyline points="'+q.join(" ")+'" fill="none" stroke="#2a78d6" stroke-width="1.8"/><circle cx="80" cy="75" r="3.5" fill="#eda100"/>'})}
+function dB(t){var R=RR();D.forEach(function(p,i){var e=p[2],w=p[3]*rd,ph=2*Math.PI*t/p[4],am=p[5]*rd+ph,xm=80+R*Math.cos(am),ym=75-R*Math.sin(am);
+var E=kp((p[5]-p[3])*rd+ph,e),nu=2*Math.atan2(Math.sqrt(1+e)*Math.sin(E/2),Math.sqrt(1-e)*Math.cos(E/2)),ar=w+nu,u=Math.max(.03,1+K*(-e*Math.cos(E)))*R,x=80+u*Math.cos(ar),y=75-u*Math.sin(ar);
+document.getElementById("y"+i).innerHTML='<line x1="80" y1="75" x2="'+xm.toFixed(1)+'" y2="'+ym.toFixed(1)+'" stroke="#898781" stroke-width="1.5"/><circle cx="'+xm.toFixed(1)+'" cy="'+ym.toFixed(1)+'" r="4" fill="none" style="stroke:var(--fg)" stroke-width="1.5"/><line x1="80" y1="75" x2="'+x.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="#e34948" stroke-width="1.2"/><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.5" fill="#e34948"/>';
+var dd=((ar-am)/rd)%360;if(dd>180)dd-=360;if(dd<-180)dd+=360;
+document.getElementById("e"+i).textContent="desfasament: "+(dd>=0?"+":"")+f(dd,1)+"°"})}
+var C=ctl("c2",dB);
+document.getElementById("k").oninput=function(e){K=parseFloat(e.target.value);document.getElementById("ko").textContent="×"+K;bs();C.up()};
+bs();C.up();
+</script></body></html>
